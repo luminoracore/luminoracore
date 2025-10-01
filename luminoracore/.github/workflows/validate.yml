@@ -1,0 +1,49 @@
+name: Validate Personalities
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'personalities/**'
+      - 'schema/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'personalities/**'
+      - 'schema/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .
+    
+    - name: Validate all personalities
+      run: |
+        python -m luminoracore.tools.validator --all personalities/
+    
+    - name: Validate schema
+      run: |
+        python -c "
+        import json
+        from jsonschema import validate, Draft7Validator
+        
+        # Load schema
+        with open('schema/personality.schema.json', 'r') as f:
+            schema = json.load(f)
+        
+        # Validate schema itself
+        Draft7Validator.check_schema(schema)
+        print('Schema validation passed')
+        "

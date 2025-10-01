@@ -1,0 +1,57 @@
+{
+  "name": "Telegram Bot Integration",
+  "description": "A Telegram bot template with LuminoraCore personality integration",
+  "version": "1.0.0",
+  "author": "LuminoraCore Team",
+  "template_type": "integration",
+  "files": [
+    {
+      "path": "bot.py",
+      "content": "import logging\nfrom telegram import Update\nfrom telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes\nimport os\nfrom luminoracore import LuminoraCore\n\n# Configure logging\nlogging.basicConfig(\n    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',\n    level=logging.INFO\n)\nlogger = logging.getLogger(__name__)\n\n# Initialize LuminoraCore\ncore = LuminoraCore()\n\n# Load personality\npersonality_name = os.getenv('PERSONALITY_NAME', 'assistant')\npersonality = core.load_personality(personality_name)\n\nasync def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:\n    \"\"\"Send a message when the command /start is issued.\"\"\"\n    persona = personality.persona\n    \n    welcome_message = f\"\"\"\n🤖 Hello! I'm {persona.get('name', 'an AI assistant')}.\n\n{persona.get('description', 'I'm here to help and chat with you!')}\n\nYou can:\n• Send me any message to chat\n• Use /personality to see my details\n• Use /help to see available commands\n\nLet's start chatting! 🚀\n    \"\"\"\n    \n    await update.message.reply_text(welcome_message)\n\nasync def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:\n    \"\"\"Send a message when the command /help is issued.\"\"\"\n    help_text = \"\"\"\n🤖 Available Commands:\n\n/start - Start the bot and see welcome message\n/help - Show this help message\n/personality - Show personality information\n/ping - Check bot status\n\n💬 Chat:\nJust send me any message to start a conversation!\n    \"\"\"\n    \n    await update.message.reply_text(help_text)\n\nasync def personality_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:\n    \"\"\"Show information about the current personality.\"\"\"\n    persona = personality.persona\n    \n    info_text = f\"\"\"\n🤖 Personality Information:\n\nName: {persona.get('name', 'Unknown')}\nDescription: {persona.get('description', 'No description')}\nArchetype: {persona.get('archetype', 'Unknown')}\nVersion: {persona.get('version', 'Unknown')}\nAuthor: {persona.get('author', 'Unknown')}\n    \"\"\"\n    \n    if persona.get('tags'):\n        info_text += f\"\\nTags: {', '.join(persona['tags'])}\"\n    \n    await update.message.reply_text(info_text)\n\nasync def ping(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:\n    \"\"\"Check bot status.\"\"\"\n    await update.message.reply_text(\"🏓 Pong! Bot is running and ready to chat!\")\n\nasync def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:\n    \"\"\"Handle incoming messages.\"\"\"\n    message = update.message.text\n    \n    if not message:\n        return\n    \n    # Show typing indicator\n    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action='typing')\n    \n    try:\n        # Generate response\n        response = personality.generate(\n            message=message,\n            provider=os.getenv('LLM_PROVIDER', 'openai'),\n            model=os.getenv('LLM_MODEL', 'gpt-3.5-turbo')\n        )\n        \n        # Send response\n        await update.message.reply_text(response)\n        \n    except Exception as e:\n        logger.error(f\"Error generating response: {e}\")\n        await update.message.reply_text(\"Sorry, I encountered an error while processing your message. Please try again.\")\n\ndef main() -> None:\n    \"\"\"Start the bot.\"\"\"\n    # Get Telegram token from environment\n    token = os.getenv('TELEGRAM_TOKEN')\n    if not token:\n        logger.error(\"TELEGRAM_TOKEN environment variable not set\")\n        return\n    \n    # Create application\n    application = Application.builder().token(token).build()\n    \n    # Add handlers\n    application.add_handler(CommandHandler(\"start\", start))\n    application.add_handler(CommandHandler(\"help\", help_command))\n    application.add_handler(CommandHandler(\"personality\", personality_info))\n    application.add_handler(CommandHandler(\"ping\", ping))\n    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))\n    \n    # Start the bot\n    logger.info(f\"Starting bot with personality: {personality_name}\")\n    application.run_polling()\n\nif __name__ == '__main__':\n    main()",
+      "template_vars": []
+    },
+    {
+      "path": "requirements.txt",
+      "content": "python-telegram-bot>=20.0\nluminoracore>=1.0.0\npython-dotenv>=1.0.0",
+      "template_vars": []
+    },
+    {
+      "path": ".env.example",
+      "content": "# Telegram Bot Configuration\nTELEGRAM_TOKEN=your-telegram-bot-token-here\nPERSONALITY_NAME=assistant\nLLM_PROVIDER=openai\nLLM_MODEL=gpt-3.5-turbo",
+      "template_vars": []
+    },
+    {
+      "path": "config/luminoracore.yaml",
+      "content": "# LuminoraCore Configuration\ncache_dir: ./cache\nrepository_url: https://api.luminoracore.com/v1\napi_key: null\ntimeout: 30\nmax_retries: 3\nstrict_validation: false\ndefault_provider: openai\ndefault_model: gpt-3.5-turbo\ninclude_metadata: true",
+      "template_vars": []
+    },
+    {
+      "path": "README.md",
+      "content": "# Telegram Bot with LuminoraCore\n\nA Telegram bot that uses LuminoraCore personalities for intelligent conversations.\n\n## Features\n\n- Telegram bot integration\n- LuminoraCore personality support\n- Multiple LLM provider support\n- Command handlers\n- Typing indicators\n- Error handling\n- Logging\n\n## Setup\n\n1. Create a Telegram bot:\n   - Message @BotFather on Telegram\n   - Use `/newbot` command\n   - Follow the instructions to create your bot\n   - Copy the bot token\n\n2. Install dependencies:\n   ```bash\n   pip install -r requirements.txt\n   ```\n\n3. Configure environment variables:\n   ```bash\n   cp .env.example .env\n   # Edit .env with your Telegram bot token\n   ```\n\n4. Run the bot:\n   ```bash\n   python bot.py\n   ```\n\n## Usage\n\n- Send `/start` to begin\n- Send any message to chat with the bot\n- Use `/personality` to see personality information\n- Use `/ping` to check bot status\n- Use `/help` to see available commands\n\n## Configuration\n\nEnvironment variables:\n- `TELEGRAM_TOKEN`: Your Telegram bot token\n- `PERSONALITY_NAME`: Name of the personality to use\n- `LLM_PROVIDER`: LLM provider (openai, anthropic, etc.)\n- `LLM_MODEL`: Specific model to use\n\n## Development\n\n```bash\n# Install development dependencies\npip install -r requirements-dev.txt\n\n# Run tests\npytest\n\n# Format code\nblack .\nisort .\n```",
+      "template_vars": []
+    }
+  ],
+  "template_vars": {
+    "bot_name": {
+      "type": "string",
+      "description": "Name of the Telegram bot",
+      "default": "LuminoraCore Bot"
+    },
+    "personality_name": {
+      "type": "string",
+      "description": "Default personality to use",
+      "default": "assistant"
+    }
+  },
+  "dependencies": [
+    "python-telegram-bot>=20.0",
+    "luminoracore>=1.0.0",
+    "python-dotenv>=1.0.0"
+  ],
+  "dev_dependencies": [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "isort>=5.0.0"
+  ]
+}
