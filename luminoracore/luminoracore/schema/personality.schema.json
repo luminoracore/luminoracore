@@ -74,7 +74,7 @@
         },
         "temperament": {
           "type": "string",
-          "enum": ["calm", "energetic", "serious", "playful", "mysterious", "direct"],
+          "enum": ["calm", "energetic", "serious", "playful", "mysterious", "direct", "cool"],
           "description": "Overall temperament"
         },
         "communication_style": {
@@ -95,7 +95,8 @@
             "type": "string",
             "enum": [
               "friendly", "professional", "casual", "formal", "warm", "cool",
-              "enthusiastic", "calm", "confident", "humble", "playful", "serious"
+              "enthusiastic", "calm", "confident", "humble", "playful", "serious", "curious",
+              "connected", "adventurous", "wise", "mysterious", "direct"
             ]
           },
           "uniqueItems": true,
@@ -114,7 +115,6 @@
             "minLength": 1,
             "maxLength": 100
           },
-          "uniqueItems": true,
           "description": "Characteristic words and phrases"
         },
         "fillers": {
@@ -153,7 +153,7 @@
           "items": {
             "type": "string",
             "minLength": 5,
-            "maxLength": 150
+            "maxLength": 200
           },
           "description": "Responses to greetings"
         },
@@ -171,7 +171,7 @@
           "items": {
             "type": "string",
             "minLength": 5,
-            "maxLength": 150
+            "maxLength": 200
           },
           "description": "Responses to successful completion"
         },
@@ -189,7 +189,7 @@
           "items": {
             "type": "string",
             "minLength": 5,
-            "maxLength": 150
+            "maxLength": 200
           },
           "description": "Responses to farewells"
         }

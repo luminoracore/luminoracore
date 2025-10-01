@@ -12,6 +12,7 @@ class SessionType(str, Enum):
     """Session type enumeration."""
     STATEFUL = "stateful"
     STATELESS = "stateless"
+    CHAT = "chat"
 
 
 class MessageRole(str, Enum):
@@ -92,6 +93,13 @@ class Conversation:
 @dataclass
 class SessionConfig:
     """Configuration for personality sessions."""
+    
+    session_id: str
+    personality: Dict[str, Any]
+    provider_config: Dict[str, Any]
+    session_type: SessionType = SessionType.CHAT
+    max_history: int = 100
+    timeout: int = 300
     
     # Generation parameters
     generation_params: Dict[str, Any] = field(default_factory=dict)

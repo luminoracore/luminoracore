@@ -13,7 +13,7 @@ __license__ = "MIT"
 from .core.personality import Personality, PersonalityError
 from .core.schema import PersonalitySchema
 from .tools.validator import PersonalityValidator
-from .tools.compiler import PersonalityCompiler
+from .tools.compiler import PersonalityCompiler, LLMProvider
 from .tools.blender import PersonaBlend
 
 __all__ = [
@@ -22,5 +22,6 @@ __all__ = [
     "PersonalitySchema",
     "PersonalityValidator",
     "PersonalityCompiler",
+    "LLMProvider",
     "PersonaBlend",
 ]

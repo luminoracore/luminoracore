@@ -1,5 +1,6 @@
 """Storage backend for LuminoraCore SDK."""
 
+import asyncio
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional
 import logging
@@ -133,7 +134,7 @@ class RedisStorage(SessionStorage):
     def __init__(self, config: StorageConfig):
         """Initialize Redis storage."""
         super().__init__(config)
-        self.redis_url = config.redis_url
+        self.redis_url = config.connection_string or "redis://localhost:6379"
         self._redis = None
     
     async def _get_redis(self):
@@ -154,7 +155,7 @@ class RedisStorage(SessionStorage):
             serialized_data = json.dumps(session_data, default=str)
             
             # Save with TTL if configured
-            if self.config.ttl:
+            if hasattr(self.config, 'ttl') and self.config.ttl:
                 await redis_client.setex(key, self.config.ttl, serialized_data)
             else:
                 await redis_client.set(key, serialized_data)
@@ -224,7 +225,7 @@ class PostgreSQLStorage(SessionStorage):
     def __init__(self, config: StorageConfig):
         """Initialize PostgreSQL storage."""
         super().__init__(config)
-        self.postgres_url = config.postgres_url
+        self.postgres_url = config.connection_string or "postgresql://localhost/luminoracore"
         self._pool = None
     
     async def _get_pool(self):
@@ -341,7 +342,7 @@ class MongoDBStorage(SessionStorage):
     def __init__(self, config: StorageConfig):
         """Initialize MongoDB storage."""
         super().__init__(config)
-        self.mongodb_url = config.mongodb_url
+        self.mongodb_url = config.connection_string or "mongodb://localhost:27017/luminoracore"
         self._client = None
         self._db = None
     
@@ -447,7 +448,7 @@ def create_storage(config: StorageConfig) -> SessionStorage:
         return InMemoryStorage(config)
     elif config.storage_type == StorageType.REDIS:
         return RedisStorage(config)
-    elif config.storage_type == StorageType.POSTGRESQL:
+    elif config.storage_type == StorageType.POSTGRES:
         return PostgreSQLStorage(config)
     elif config.storage_type == StorageType.MONGODB:
         return MongoDBStorage(config)

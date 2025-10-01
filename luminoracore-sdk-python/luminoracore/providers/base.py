@@ -26,8 +26,8 @@ class BaseProvider(ABC):
         self.name = config.name
         self.api_key = config.api_key
         self.base_url = config.base_url
-        self.timeout = config.timeout or 30.0
-        self.max_retries = config.max_retries or 3
+        self.timeout = config.extra.get("timeout", 30.0) if config.extra else 30.0
+        self.max_retries = config.extra.get("max_retries", 3) if config.extra else 3
         self.model = config.model or self.get_default_model()
         
         # Validate configuration

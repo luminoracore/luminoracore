@@ -27,7 +27,7 @@ class PersonalitySchema:
         """
         if schema_path is None:
             # Get the schema from the package
-            package_dir = Path(__file__).parent.parent.parent
+            package_dir = Path(__file__).parent.parent
             schema_path = package_dir / "schema" / "personality.schema.json"
         
         self.schema_path = Path(schema_path)

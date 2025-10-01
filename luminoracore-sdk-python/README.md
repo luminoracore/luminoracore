@@ -118,22 +118,24 @@ from luminoracore.types.session import StorageConfig
 # Redis storage
 storage_config = StorageConfig(
     storage_type="redis",
-    redis_url="redis://localhost:6379",
-    ttl=3600
+    connection_string="redis://localhost:6379"
 )
 
 # PostgreSQL storage
 storage_config = StorageConfig(
-    storage_type="postgresql",
-    postgres_url="postgresql://user:password@localhost/db",
-    ttl=3600
+    storage_type="postgres",
+    connection_string="postgresql://user:password@localhost/db"
 )
 
 # MongoDB storage
 storage_config = StorageConfig(
     storage_type="mongodb",
-    mongodb_url="mongodb://localhost:27017/db",
-    ttl=3600
+    connection_string="mongodb://localhost:27017/db"
+)
+
+# In-memory storage (default)
+storage_config = StorageConfig(
+    storage_type="memory"
 )
 ```
 
@@ -143,9 +145,14 @@ storage_config = StorageConfig(
 from luminoracore.types.session import MemoryConfig
 
 memory_config = MemoryConfig(
-    max_tokens=10000,
-    max_messages=100,
-    ttl=1800
+    enabled=True,
+    max_entries=1000,
+    decay_factor=0.1,
+    importance_threshold=0.5,
+    track_topics=True,
+    track_preferences=True,
+    track_context=True,
+    track_emotions=False
 )
 ```
 
@@ -163,6 +170,7 @@ memory_config = MemoryConfig(
 Check out the `examples/` directory for comprehensive examples:
 
 - `basic_usage.py` - Basic usage examples
+- `simple_usage.py` - Simple usage examples
 - `personality_blending.py` - Personality blending examples
 - `integrations/fastapi_integration.py` - FastAPI integration
 - `integrations/streamlit_app.py` - Streamlit web app
@@ -206,6 +214,11 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## API Documentation
+
+- 📚 [API Reference](docs/api_reference.md) - Complete API documentation
+- 📖 [Examples](examples/) - Code examples and tutorials
 
 ## Support
 

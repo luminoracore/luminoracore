@@ -24,22 +24,22 @@ __version__ = "0.1.0"
 
 def print_success(message: str) -> None:
     """Print success message in green."""
-    click.echo(f"{Fore.GREEN}✓ {message}{Style.RESET_ALL}")
+    click.echo(f"{Fore.GREEN}[OK] {message}{Style.RESET_ALL}")
 
 
 def print_error(message: str) -> None:
     """Print error message in red."""
-    click.echo(f"{Fore.RED}✗ {message}{Style.RESET_ALL}")
+    click.echo(f"{Fore.RED}[ERROR] {message}{Style.RESET_ALL}")
 
 
 def print_warning(message: str) -> None:
     """Print warning message in yellow."""
-    click.echo(f"{Fore.YELLOW}⚠ {message}{Style.RESET_ALL}")
+    click.echo(f"{Fore.YELLOW}[WARNING] {message}{Style.RESET_ALL}")
 
 
 def print_info(message: str) -> None:
     """Print info message in blue."""
-    click.echo(f"{Fore.BLUE}ℹ {message}{Style.RESET_ALL}")
+    click.echo(f"{Fore.BLUE}[INFO] {message}{Style.RESET_ALL}")
 
 
 @click.group()

@@ -34,7 +34,7 @@ install_rich_traceback(show_locals=True)
 # Create main app
 app = typer.Typer(
     name="luminoracore",
-    help="🌟 LuminoraCore CLI - Professional tool for AI personality management",
+    help="LuminoraCore CLI - Professional tool for AI personality management",
     epilog="Visit https://luminoracore.com for more information",
     no_args_is_help=True,
     rich_markup_mode="rich",
@@ -129,16 +129,16 @@ def main(
         raise typer.Exit(1)
 
 # Register commands
-app.command("validate", help="🔍 Validate personality files")(validate_command)
-app.command("compile", help="⚙️ Compile personalities to prompts")(compile_command)
-app.command("create", help="✨ Create new personalities")(create_command)
-app.command("list", help="📋 List available personalities")(list_command)
-app.command("test", help="🧪 Test personalities interactively")(test_command)
-app.command("serve", help="🚀 Start development server")(serve_command)
-app.command("blend", help="🎭 Blend multiple personalities")(blend_command)
-app.command("update", help="⬇️ Update personality cache")(update_command)
-app.command("init", help="🏗️ Initialize new project")(init_command)
-app.command("info", help="ℹ️ Show personality information")(info_command)
+app.command("validate", help="Validate personality files")(validate_command)
+app.command("compile", help="Compile personalities to prompts")(compile_command)
+app.command("create", help="Create new personalities")(create_command)
+app.command("list", help="List available personalities")(list_command)
+app.command("test", help="Test personalities interactively")(test_command)
+app.command("serve", help="Start development server")(serve_command)
+app.command("blend", help="Blend multiple personalities")(blend_command)
+app.command("update", help="Update personality cache")(update_command)
+app.command("init", help="Initialize new project")(init_command)
+app.command("info", help="Show personality information")(info_command)
 
 # Exception handling
 @app.callback(invoke_without_command=True)

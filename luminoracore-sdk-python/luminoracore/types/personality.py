@@ -18,17 +18,10 @@ class PersonalityData(BaseModel):
     """Personality data structure."""
     
     name: str = Field(..., description="Personality name")
-    version: str = Field(..., description="Personality version")
     description: str = Field(..., description="Personality description")
-    author: Optional[str] = Field(None, description="Personality author")
-    tags: List[str] = Field(default_factory=list, description="Personality tags")
-    
-    # Core personality structure
-    persona: Dict[str, Any] = Field(..., description="Persona definition")
-    core_traits: List[str] = Field(..., description="Core personality traits")
-    linguistic_profile: Dict[str, Any] = Field(..., description="Linguistic profile")
-    behavioral_rules: List[str] = Field(..., description="Behavioral rules")
-    advanced_parameters: Dict[str, Any] = Field(default_factory=dict, description="Advanced parameters")
+    system_prompt: str = Field(..., description="System prompt for the personality")
+    name_override: Optional[str] = Field(None, description="Override for display name")
+    description_override: Optional[str] = Field(None, description="Override for display description")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
     
     model_config = ConfigDict(

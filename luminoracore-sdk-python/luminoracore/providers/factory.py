@@ -179,8 +179,10 @@ class ProviderFactory:
             api_key=api_key,
             model=kwargs.get("model"),
             base_url=kwargs.get("base_url"),
-            timeout=kwargs.get("timeout"),
-            max_retries=kwargs.get("max_retries"),
+            extra={
+                "timeout": kwargs.get("timeout", 30),
+                "max_retries": kwargs.get("max_retries", 3)
+            }
         )
         
         return cls.create_provider(config)

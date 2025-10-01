@@ -2,6 +2,12 @@
 
 import asyncio
 import os
+import sys
+from pathlib import Path
+
+# Add the parent directory to the path to import luminoracore
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from luminoracore import LuminoraCoreClient
 from luminoracore.types.provider import ProviderConfig
 from luminoracore.types.session import StorageConfig, MemoryConfig
@@ -12,13 +18,11 @@ async def main():
     # Initialize the client
     client = LuminoraCoreClient(
         storage_config=StorageConfig(
-            storage_type="memory",
-            ttl=3600
+            storage_type="memory"
         ),
         memory_config=MemoryConfig(
-            max_tokens=10000,
-            max_messages=100,
-            ttl=1800
+            max_entries=1000,
+            decay_factor=0.1
         )
     )
     
@@ -31,8 +35,10 @@ async def main():
         api_key=os.getenv("OPENAI_API_KEY", "your-api-key-here"),
         model="gpt-3.5-turbo",
         base_url="https://api.openai.com/v1",
-        timeout=30,
-        max_retries=3
+        extra={
+            "timeout": 30,
+            "max_retries": 3
+        }
     )
     
     # Create a session
@@ -67,8 +73,7 @@ async def main():
     await client.store_memory(
         session_id=session_id,
         key="user_preference",
-        value="interested in AI personality blending",
-        ttl=3600
+        value="interested in AI personality blending"
     )
     
     # Retrieve memory
