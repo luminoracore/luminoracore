@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import os
 import sys
 from pathlib import Path
@@ -133,7 +134,7 @@ app.command("validate", help="Validate personality files")(validate_command)
 app.command("compile", help="Compile personalities to prompts")(compile_command)
 app.command("create", help="Create new personalities")(create_command)
 app.command("list", help="List available personalities")(list_command)
-app.command("test", help="Test personalities interactively")(test_command)
+app.command("test", help="Test personalities interactively")(lambda *args, **kwargs: asyncio.run(test_command(*args, **kwargs)))
 app.command("serve", help="Start development server")(serve_command)
 app.command("blend", help="Blend multiple personalities")(blend_command)
 app.command("update", help="Update personality cache")(update_command)

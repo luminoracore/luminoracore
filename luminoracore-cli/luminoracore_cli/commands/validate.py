@@ -165,15 +165,15 @@ async def _validate_files_parallel(
     async def validate_single_file(file_path: Path) -> Tuple[Path, str, bool, Optional[str]]:
         try:
             personality_data = read_file(file_path)
-            result = await validator.validate_async(personality_data)
+            result = validator.validate(personality_data, strict=False)
             
-            if result.is_valid:
+            if result.get("valid", False):
                 name = personality_data.get("persona", {}).get("name", "Unknown")
                 return file_path, name, True, None
             else:
                 error_msg = "\n".join([
-                    f"• {error.message}" + (f" (at {error.field})" if error.field else "")
-                    for error in result.errors
+                    f"• {error}"
+                    for error in result.get("errors", [])
                 ])
                 return file_path, "Invalid", False, error_msg
                 
@@ -227,15 +227,15 @@ async def _validate_files_sequential(
     for file_path in files:
         try:
             personality_data = read_file(file_path)
-            result = await validator.validate_async(personality_data)
+            result = validator.validate(personality_data, strict=False)
             
-            if result.is_valid:
+            if result.get("valid", False):
                 name = personality_data.get("persona", {}).get("name", "Unknown")
                 results.append((file_path, name, True, None))
             else:
                 error_msg = "\n".join([
-                    f"• {error.message}" + (f" (at {error.field})" if error.field else "")
-                    for error in result.errors
+                    f"• {error}"
+                    for error in result.get("errors", [])
                 ])
                 results.append((file_path, "Invalid", False, error_msg))
                 
@@ -361,7 +361,7 @@ def _output_text(results: List[Tuple[Path, str, bool, Optional[str]]], quiet: bo
     """Output results as plain text."""
     
     for file_path, name, success, error_msg in results:
-        status = "✓ VALID" if success else "✗ INVALID"
+        status = "[OK] VALID" if success else "[ERROR] INVALID"
         console.print(f"{status}: {file_path}")
         
         if not success and error_msg:

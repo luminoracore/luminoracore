@@ -14,7 +14,7 @@ from luminoracore_cli.utils.files import find_personality_files, read_json_file
 from luminoracore_cli.core.client import get_client
 
 
-def test_command(
+async def test_command(
     personality: str = typer.Argument(..., help="Personality name or file path"),
     provider: str = typer.Option("openai", "--provider", "-p", help="LLM provider to use"),
     model: Optional[str] = typer.Option(None, "--model", "-m", help="Specific model to use"),
@@ -31,9 +31,9 @@ def test_command(
     """
     try:
         # Find personality file
-        personality_path = find_personality_files(personality)
-        if not personality_path:
-            error_console.print(f"[red]Error: Personality '{personality}' not found[/red]")
+        personality_path = Path(personality)
+        if not personality_path.exists():
+            error_console.print(f"[red]Error: Personality file '{personality}' not found[/red]")
             return 1
         
         if verbose:
@@ -63,17 +63,17 @@ def test_command(
                 return 1
             
             if verbose:
-                console.print("[green]✓ Personality validation passed[/green]")
+                console.print("[green][OK] Personality validation passed[/green]")
         
         # Get client
         client = get_client()
         
         # Interactive mode
         if interactive:
-            return test_interactive(personality_data, provider, model, verbose=verbose)
+            return await test_interactive(personality_data, provider, model, verbose=verbose)
         
         # Single test
-        return test_single(personality_data, provider, model, message, verbose=verbose)
+        return await test_single(personality_data, provider, model, message, verbose=verbose)
         
     except CLIError as e:
         error_console.print(f"[red]CLI error: {e}[/red]")
@@ -86,7 +86,7 @@ def test_command(
         return 1
 
 
-def test_single(personality_data: Dict[str, Any], provider: str, model: Optional[str], message: Optional[str], verbose: bool = False) -> int:
+async def test_single(personality_data: Dict[str, Any], provider: str, model: Optional[str], message: Optional[str], verbose: bool = False) -> int:
     """Test personality with a single message."""
     try:
         # Use default message if none provided
@@ -100,8 +100,10 @@ def test_single(personality_data: Dict[str, Any], provider: str, model: Optional
             console.print(f"[blue]Test message: {message}[/blue]")
         
         # Test personality
-        client = get_client()
-        test_result = client.test_personality(
+        from luminoracore_cli.core.tester import PersonalityTester
+        
+        tester = PersonalityTester()
+        test_result = await tester.test(
             personality_data=personality_data,
             provider=provider,
             model=model,
@@ -134,7 +136,7 @@ def test_single(personality_data: Dict[str, Any], provider: str, model: Optional
         return 1
 
 
-def test_interactive(personality_data: Dict[str, Any], provider: str, model: Optional[str], verbose: bool = False) -> int:
+async def test_interactive(personality_data: Dict[str, Any], provider: str, model: Optional[str], verbose: bool = False) -> int:
     """Test personality interactively."""
     try:
         console.print("")
@@ -142,7 +144,7 @@ def test_interactive(personality_data: Dict[str, Any], provider: str, model: Opt
             f"[bold blue]Interactive Testing Mode[/bold blue]\n\n"
             f"Personality: {personality_data.get('persona', {}).get('name', 'Unknown')}\n"
             f"Provider: {provider}\n"
-            f"Model: {model or 'Default'}\n\n"
+            f"Model: {model if model and not hasattr(model, '__class__') else 'Default'}\n\n"
             f"Type 'quit' or 'exit' to end the session\n"
             f"Type 'clear' to clear the conversation history",
             title="Interactive Testing",
@@ -176,7 +178,10 @@ def test_interactive(personality_data: Dict[str, Any], provider: str, model: Opt
                 if verbose:
                     console.print(f"[blue]Sending message: {user_message}[/blue]")
                 
-                test_result = client.test_personality(
+                from luminoracore_cli.core.tester import PersonalityTester
+                
+                tester = PersonalityTester()
+                test_result = await tester.test(
                     personality_data=personality_data,
                     provider=provider,
                     model=model,
@@ -184,7 +189,7 @@ def test_interactive(personality_data: Dict[str, Any], provider: str, model: Opt
                 )
                 
                 # Get response
-                response = test_result.get("test_result", {}).get("response", "No response")
+                response = test_result.get("response", "No response")
                 
                 # Display response
                 console.print(f"\n[bold green]{personality_data.get('persona', {}).get('name', 'AI')}[/bold green]: {response}")

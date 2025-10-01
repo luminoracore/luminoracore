@@ -23,13 +23,13 @@ class LuminoraCoreClient:
         """
         self.settings = settings or load_settings()
         self.http_client = create_http_client(
-            base_url=self.settings.get("repository_url"),
-            api_key=self.settings.get("api_key"),
-            timeout=self.settings.get("timeout"),
-            max_retries=self.settings.get("max_retries")
+            base_url=getattr(self.settings, "repository_url", None),
+            api_key=getattr(self.settings, "api_key", None),
+            timeout=getattr(self.settings, "timeout", 30),
+            max_retries=getattr(self.settings, "max_retries", 3)
         )
         self.cache_manager = get_cache_manager(
-            cache_dir=self.settings.get("cache_dir")
+            cache_dir=getattr(self.settings, "cache_dir", None)
         )
     
     async def validate_personality(self, personality_data: Dict[str, Any], strict: bool = False) -> Dict[str, Any]:

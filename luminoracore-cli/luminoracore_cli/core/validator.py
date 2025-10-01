@@ -39,21 +39,22 @@ class ValidationResult:
 class PersonalitySchema(BaseModel):
     """Pydantic model for personality validation."""
     
-    # Basic metadata
-    name: str
-    version: str
-    description: str
-    author: Optional[str] = None
-    tags: List[str] = []
-    
-    # Core personality data
+    # Core personality data (required)
     persona: Dict[str, Any]
-    core_traits: List[str]
-    linguistic_profile: Dict[str, Any]
-    behavioral_rules: List[str]
     
-    # Advanced parameters
+    # All other fields are optional
+    name: Optional[str] = None
+    version: Optional[str] = None
+    description: Optional[str] = None
+    author: Optional[str] = None
+    tags: Optional[List[str]] = None
+    core_traits: Optional[Union[List[str], Dict[str, Any]]] = None
+    linguistic_profile: Optional[Dict[str, Any]] = None
+    behavioral_rules: Optional[List[str]] = None
     advanced_parameters: Optional[Dict[str, Any]] = None
+    
+    # Allow extra fields
+    model_config = ConfigDict(extra="allow")
     
     # Validation methods
     @field_validator('name')
@@ -90,10 +91,7 @@ class PersonalitySchema(BaseModel):
     @field_validator('core_traits')
     @classmethod
     def validate_core_traits(cls, v):
-        if not v:
-            raise ValueError('At least one core trait is required')
-        if len(v) > 20:
-            raise ValueError('Too many core traits (max 20)')
+        # Accept any type for core_traits
         return v
     
     @field_validator('behavioral_rules')
@@ -209,6 +207,21 @@ class PersonalityValidator:
     def _validate_schema(self, data: Dict[str, Any]) -> None:
         """Validate against Pydantic schema."""
         try:
+            # Extract fields from persona if they exist there
+            if 'persona' in data and isinstance(data['persona'], dict):
+                persona = data['persona']
+                # Copy fields from persona to root level for validation
+                if 'name' in persona:
+                    data['name'] = persona['name']
+                if 'version' in persona:
+                    data['version'] = persona['version']
+                if 'description' in persona:
+                    data['description'] = persona['description']
+                if 'author' in persona:
+                    data['author'] = persona['author']
+                if 'tags' in persona:
+                    data['tags'] = persona['tags']
+            
             PersonalitySchema(**data)
         except ValidationError as e:
             for error in e.errors():
@@ -292,35 +305,38 @@ class PersonalityValidator:
                     suggestion="Consider adding this field for better language specification"
                 ))
     
-    def _validate_core_traits(self, traits: List[str]) -> None:
+    def _validate_core_traits(self, traits) -> None:
         """Validate core traits."""
-        if not isinstance(traits, list):
+        if traits is None:
+            return
+        if not isinstance(traits, (list, dict)):
             self.results.append(ValidationResult(
-                level=ValidationLevel.ERROR,
-                message="Core traits must be a list",
+                level=ValidationLevel.WARNING,
+                message="Core traits should be a list or dict",
                 field="core_traits"
             ))
             return
         
-        for i, trait in enumerate(traits):
-            if not isinstance(trait, str):
-                self.results.append(ValidationResult(
-                    level=ValidationLevel.ERROR,
-                    message=f"Core trait {i} must be a string",
-                    field=f"core_traits[{i}]"
-                ))
-            elif len(trait.strip()) == 0:
-                self.results.append(ValidationResult(
-                    level=ValidationLevel.ERROR,
-                    message=f"Empty core trait at index {i}",
-                    field=f"core_traits[{i}]"
-                ))
-            elif len(trait) > 100:
-                self.results.append(ValidationResult(
-                    level=ValidationLevel.WARNING,
-                    message=f"Core trait {i} is very long",
-                    field=f"core_traits[{i}]",
-                    suggestion="Consider shortening this trait"
+        if isinstance(traits, list):
+            for i, trait in enumerate(traits):
+                if not isinstance(trait, str):
+                    self.results.append(ValidationResult(
+                        level=ValidationLevel.ERROR,
+                        message=f"Core trait {i} must be a string",
+                        field=f"core_traits[{i}]"
+                    ))
+                elif len(trait.strip()) == 0:
+                    self.results.append(ValidationResult(
+                        level=ValidationLevel.ERROR,
+                        message=f"Empty core trait at index {i}",
+                        field=f"core_traits[{i}]"
+                    ))
+                elif len(trait) > 100:
+                    self.results.append(ValidationResult(
+                        level=ValidationLevel.WARNING,
+                        message=f"Core trait {i} is very long",
+                        field=f"core_traits[{i}]",
+                        suggestion="Consider shortening this trait"
                 ))
     
     def _validate_behavioral_rules(self, rules: List[str]) -> None:
@@ -428,6 +444,37 @@ class PersonalityValidator:
             result.level not in [ValidationLevel.CRITICAL, ValidationLevel.ERROR]
             for result in self.results
         )
+    
+    def validate(self, data: Dict[str, Any], strict: bool = False) -> Dict[str, Any]:
+        """Validate personality data.
+        
+        Args:
+            data: Personality data to validate
+            strict: Use strict validation rules
+            
+        Returns:
+            Validation result dictionary
+        """
+        self.results = []
+        
+        # Validate schema
+        self._validate_schema(data)
+        
+        # Validate content
+        self._validate_content(data)
+        
+        # Check if validation passed
+        errors = [r for r in self.results if r.level in [ValidationLevel.ERROR, ValidationLevel.CRITICAL]]
+        warnings = [r for r in self.results if r.level == ValidationLevel.WARNING]
+        info = [r for r in self.results if r.level == ValidationLevel.INFO]
+        
+        return {
+            "valid": len(errors) == 0,
+            "errors": [f"{r.field}: {r.message}" for r in errors],
+            "warnings": [f"{r.field}: {r.message}" for r in warnings],
+            "info": [f"{r.field}: {r.message}" for r in info],
+            "total_issues": len(self.results)
+        }
     
     async def validate_async(self, data: Dict[str, Any]) -> 'ValidationResult':
         """Async validation method for compatibility with CLI commands."""
