@@ -29,14 +29,16 @@ class ValidationResult:
 class PersonalityValidator:
     """Validates personalities against schema and best practices."""
     
-    def __init__(self, schema_path: Optional[str] = None):
+    def __init__(self, schema_path: Optional[str] = None, enable_performance_checks: bool = True):
         """
         Initialize the validator.
         
         Args:
             schema_path: Path to the schema file. If None, uses default schema.
+            enable_performance_checks: Enable performance-related validations
         """
         self.schema = PersonalitySchema(schema_path)
+        self.enable_performance_checks = enable_performance_checks
         self.validation_rules = self._load_validation_rules()
     
     def _load_validation_rules(self) -> Dict[str, Any]:
@@ -103,6 +105,14 @@ class PersonalityValidator:
             
             # Security validations
             self._validate_security(data, errors, warnings, suggestions)
+            
+            # Performance validations
+            if self.enable_performance_checks:
+                performance_warnings = self._validate_performance(data)
+                warnings.extend(performance_warnings)
+                
+                efficiency_suggestions = self._validate_token_efficiency(data)
+                suggestions.extend(efficiency_suggestions)
             
             is_valid = len(errors) == 0
             
@@ -279,3 +289,71 @@ class PersonalityValidator:
             "total_suggestions": total_suggestions,
             "validation_rate": valid_files / total_files if total_files > 0 else 0
         }
+    
+    def _validate_performance(self, personality_data: Dict[str, Any]) -> List[str]:
+        """Validate performance-related aspects of the personality."""
+        warnings = []
+        
+        if not self.enable_performance_checks:
+            return warnings
+        
+        # Check for large vocabulary lists that might slow down compilation
+        linguistic = personality_data.get("linguistic_profile", {})
+        vocabulary = linguistic.get("vocabulary", [])
+        if len(vocabulary) > 50:
+            warnings.append(f"Large vocabulary list ({len(vocabulary)} items) may impact compilation performance")
+        
+        # Check for excessive behavioral rules
+        behavioral_rules = personality_data.get("behavioral_rules", [])
+        if len(behavioral_rules) > 20:
+            warnings.append(f"Many behavioral rules ({len(behavioral_rules)}) may impact prompt generation speed")
+        
+        # Check for large examples
+        examples = personality_data.get("examples", {})
+        sample_responses = examples.get("sample_responses", [])
+        if len(sample_responses) > 10:
+            warnings.append(f"Many example responses ({len(sample_responses)}) may impact compilation performance")
+        
+        # Check for very long descriptions
+        description = personality_data.get("persona", {}).get("description", "")
+        if len(description) > 500:
+            warnings.append("Very long description may impact token efficiency")
+        
+        # Check for excessive trigger responses
+        trigger_responses = personality_data.get("trigger_responses", {})
+        total_triggers = sum(len(responses) for responses in trigger_responses.values() if isinstance(responses, list))
+        if total_triggers > 20:
+            warnings.append(f"Many trigger responses ({total_triggers}) may impact compilation performance")
+        
+        return warnings
+    
+    def _validate_token_efficiency(self, personality_data: Dict[str, Any]) -> List[str]:
+        """Validate token efficiency of the personality."""
+        suggestions = []
+        
+        if not self.enable_performance_checks:
+            return suggestions
+        
+        # Check for redundant information
+        persona = personality_data.get("persona", {})
+        core_traits = personality_data.get("core_traits", {})
+        
+        # Check if archetype is mentioned in both persona and core_traits
+        persona_archetype = persona.get("archetype", "").lower()
+        core_archetype = core_traits.get("archetype", "").lower()
+        if persona_archetype and core_archetype and persona_archetype == core_archetype:
+            suggestions.append("Archetype mentioned in both persona and core_traits - consider consolidating")
+        
+        # Check for very long behavioral rules
+        behavioral_rules = personality_data.get("behavioral_rules", [])
+        long_rules = [rule for rule in behavioral_rules if len(rule) > 200]
+        if long_rules:
+            suggestions.append(f"Consider shortening {len(long_rules)} long behavioral rules for better token efficiency")
+        
+        # Check for excessive vocabulary
+        linguistic = personality_data.get("linguistic_profile", {})
+        vocabulary = linguistic.get("vocabulary", [])
+        if len(vocabulary) > 30:
+            suggestions.append("Consider reducing vocabulary list to most essential terms for better token efficiency")
+        
+        return suggestions

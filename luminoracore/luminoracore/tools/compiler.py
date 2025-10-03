@@ -3,11 +3,13 @@ Personality compiler for LuminoraCore.
 """
 
 import json
+import hashlib
 from typing import Dict, Any, List, Optional, Union
 from pathlib import Path
 import logging
 from dataclasses import dataclass
 from enum import Enum
+from functools import lru_cache
 
 from ..core.personality import Personality, PersonalityError
 
@@ -39,8 +41,13 @@ class CompilationResult:
 class PersonalityCompiler:
     """Compiles personalities into provider-specific prompts."""
     
-    def __init__(self):
-        """Initialize the compiler."""
+    def __init__(self, cache_size: int = 128):
+        """
+        Initialize the compiler.
+        
+        Args:
+            cache_size: Maximum number of compiled results to cache
+        """
         self.providers = {
             LLMProvider.OPENAI: self._compile_openai,
             LLMProvider.ANTHROPIC: self._compile_anthropic,
@@ -50,6 +57,10 @@ class PersonalityCompiler:
             LLMProvider.GOOGLE: self._compile_google,
             LLMProvider.UNIVERSAL: self._compile_universal,
         }
+        self._cache = {}
+        self._cache_size = cache_size
+        self._cache_hits = 0
+        self._cache_misses = 0
     
     def compile(self, personality: Union[Personality, Dict[str, Any]], 
                 provider: LLMProvider, 
@@ -71,6 +82,17 @@ class PersonalityCompiler:
             else:
                 personality_obj = personality
             
+            # Generate cache key
+            cache_key = self._generate_cache_key(personality_obj, provider, max_tokens)
+            
+            # Check cache first
+            if cache_key in self._cache:
+                self._cache_hits += 1
+                logger.debug(f"Cache hit for {personality_obj.persona.name} -> {provider.value}")
+                return self._cache[cache_key]
+            
+            self._cache_misses += 1
+            
             # Check compatibility
             if not personality_obj.is_compatible_with(provider.value):
                 logger.warning(f"Personality {personality_obj.persona.name} may not be optimized for {provider.value}")
@@ -88,12 +110,17 @@ class PersonalityCompiler:
             if max_tokens and token_estimate > max_tokens:
                 logger.warning(f"Prompt may exceed token limit: {token_estimate} > {max_tokens}")
             
-            return CompilationResult(
+            result = CompilationResult(
                 provider=provider,
                 prompt=prompt,
                 token_estimate=token_estimate,
                 metadata=metadata
             )
+            
+            # Cache the result
+            self._cache_result(cache_key, result)
+            
+            return result
             
         except Exception as e:
             logger.error(f"Compilation failed: {e}")
@@ -264,6 +291,7 @@ Assistant:"""
         
         return prompt, metadata
     
+    @lru_cache(maxsize=64)
     def _build_system_prompt(self, personality: Personality) -> str:
         """Build the core system prompt from personality data."""
         prompt_parts = []
@@ -414,3 +442,45 @@ Assistant:"""
                 f.write(result.prompt)
         
         logger.info(f"Saved compiled prompt to {output_path}")
+    
+    def _generate_cache_key(self, personality: Personality, provider: LLMProvider, max_tokens: Optional[int]) -> str:
+        """Generate a cache key for the compilation."""
+        # Create a hash of the personality data and compilation parameters
+        data = {
+            'personality_hash': hashlib.md5(json.dumps(personality.to_dict(), sort_keys=True).encode()).hexdigest(),
+            'provider': provider.value,
+            'max_tokens': max_tokens
+        }
+        return hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest()[:16]
+    
+    def _cache_result(self, cache_key: str, result: CompilationResult) -> None:
+        """Cache a compilation result."""
+        # Remove oldest entries if cache is full
+        if len(self._cache) >= self._cache_size:
+            # Remove the first (oldest) entry
+            oldest_key = next(iter(self._cache))
+            del self._cache[oldest_key]
+        
+        self._cache[cache_key] = result
+        logger.debug(f"Cached compilation result for key: {cache_key}")
+    
+    def clear_cache(self) -> None:
+        """Clear the compilation cache."""
+        self._cache.clear()
+        self._cache_hits = 0
+        self._cache_misses = 0
+        logger.info("Compilation cache cleared")
+    
+    def get_cache_stats(self) -> Dict[str, Any]:
+        """Get cache statistics."""
+        total_requests = self._cache_hits + self._cache_misses
+        hit_rate = (self._cache_hits / total_requests * 100) if total_requests > 0 else 0
+        
+        return {
+            'cache_size': len(self._cache),
+            'max_cache_size': self._cache_size,
+            'cache_hits': self._cache_hits,
+            'cache_misses': self._cache_misses,
+            'hit_rate': round(hit_rate, 2),
+            'total_requests': total_requests
+        }

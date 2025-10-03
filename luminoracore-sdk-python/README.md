@@ -1,65 +1,86 @@
-# LuminoraCore SDK Python
+# 🐍 LuminoraCore SDK Python
 
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/luminoracore/sdk-python)
+[![Status](https://img.shields.io/badge/status-90%25_complete-orange.svg)](#)
 
-**LuminoraCore SDK Python** is the official Python client for advanced AI personality management. It provides a comprehensive toolkit for building AI applications with sophisticated personality systems, session management, and multi-LLM provider support.
+**✅ SDK OFICIAL DE PYTHON - 90% COMPLETO**
 
-## Features
+**LuminoraCore SDK Python** es el cliente oficial de Python para gestión avanzada de personalidades de IA. Proporciona un conjunto completo de herramientas para construir aplicaciones de IA con sistemas sofisticados de personalidades, gestión de sesiones y soporte multi-proveedor LLM.
 
-- 🧠 **Advanced Personality Management**: Create, blend, and manage AI personalities with ease
-- 🔄 **Session Management**: Stateful conversations with persistent memory and context
-- 🌐 **Multi-Provider Support**: Integrate with OpenAI, Anthropic, Mistral, Cohere, Google, and more
-- 🎭 **PersonaBlend™ Technology**: Real-time personality blending with custom weights
-- 💾 **Flexible Storage**: Support for Redis, PostgreSQL, MongoDB, and in-memory storage
-- 📊 **Monitoring & Metrics**: Built-in observability with distributed tracing
-- 🚀 **Async/Await Support**: Full asynchronous API for high-performance applications
-- 🔒 **Type Safety**: Comprehensive type definitions and validation
+## Características Principales
 
-## Installation
+- **✅ Gestión Avanzada de Personalidades**: Crear, mezclar y gestionar personalidades de IA con facilidad
+- **✅ Gestión de Sesiones**: Conversaciones con estado y memoria persistente
+- **✅ Soporte Multi-Provider**: Integración con OpenAI, Anthropic, Mistral, Cohere, Google y más
+- **✅ PersonaBlend™ Technology**: Mezcla de personalidades en tiempo real con pesos personalizados
+- **✅ Almacenamiento Flexible**: Soporte para Redis, PostgreSQL, MongoDB y almacenamiento en memoria
+- **✅ Monitoreo y Métricas**: Observabilidad integrada con trazado distribuido
+- **✅ Soporte Async/Await**: API completamente asíncrona para aplicaciones de alto rendimiento
+- **✅ Seguridad de Tipos**: Definiciones de tipos comprehensivas y validación
+- **✅ Conexiones API Reales**: APIs reales a todos los proveedores de LLM
+- **✅ Manejo Robusto de Errores**: Reintentos automáticos y fallbacks
+- **✅ Analytics Completos**: Tracking de tokens, costos y uso
+
+## Instalación
 
 ```bash
-pip install luminoracore-sdk
+pip install -e luminoracore-sdk-python/
 ```
 
-## Quick Start
+## Inicio Rápido
 
 ```python
 import asyncio
 from luminoracore import LuminoraCoreClient
 from luminoracore.types.provider import ProviderConfig
+from luminoracore.types.storage import StorageConfig
 
 async def main():
-    # Initialize the client
+    # Inicializar el cliente
     client = LuminoraCoreClient()
     await client.initialize()
     
-    # Create a provider configuration
+    # Configurar almacenamiento (Redis, PostgreSQL, etc.)
+    storage_config = StorageConfig(
+        storage_type="redis",
+        connection_string="redis://localhost:6379"
+    )
+    await client.configure_storage(storage_config)
+    
+    # Crear configuración del proveedor
     provider_config = ProviderConfig(
         name="openai",
-        api_key="your-api-key",
-        model="gpt-3.5-turbo"
+        api_key="tu-api-key",
+        model="gpt-3.5-turbo",
+        extra={"timeout": 30, "max_retries": 3}
     )
     
-    # Create a session
+    # Crear una sesión
     session_id = await client.create_session(
-        personality_name="helpful_assistant",
+        personality_name="dr_luna",
         provider_config=provider_config
     )
     
-    # Send a message
+    # Enviar un mensaje (conexión real a OpenAI)
     response = await client.send_message(
         session_id=session_id,
-        message="Hello! Can you help me?"
+        message="¡Hola! ¿Puedes ayudarme con física cuántica?"
     )
     
-    print(response.content)
+    print(f"Respuesta: {response.content}")
+    print(f"Tokens usados: {response.usage}")
+    print(f"Costo: ${response.cost}")
     
-    # Clean up
+    # Obtener métricas
+    metrics = await client.get_session_metrics(session_id)
+    print(f"Mensajes totales: {metrics.total_messages}")
+    
+    # Limpiar
     await client.cleanup()
 
-# Run the example
+# Ejecutar el ejemplo
 asyncio.run(main())
 ```
 

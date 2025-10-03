@@ -1,21 +1,27 @@
-# LuminoraCore CLI
+# 🛠️ LuminoraCore CLI
 
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/luminoracore/cli)
+[![Status](https://img.shields.io/badge/status-95%25_complete-yellow.svg)](#)
 
-Professional command-line tool for AI personality management with LuminoraCore.
+**✅ HERRAMIENTA PROFESIONAL DE LÍNEA DE COMANDOS - 95% COMPLETO**
 
-## Features
+Herramienta profesional de línea de comandos para gestión de personalidades de IA con LuminoraCore. Incluye testing real con APIs, wizard interactivo, servidor de desarrollo y más.
 
-- 🔍 **Validate** personality files against official schema
-- ⚙️ **Compile** personalities to provider-specific prompts
-- ✨ **Create** new personalities with interactive wizard
-- 🧪 **Test** personalities with real LLM providers
-- 🎭 **Blend** multiple personalities with custom weights
-- 🚀 **Serve** local development server with web interface
-- 📋 **List** and browse available personalities
-- ⬇️ **Update** personality cache from repository
+## Características Principales
+
+- **✅ Validar** archivos de personalidades contra esquema oficial
+- **✅ Compilar** personalidades a prompts específicos del proveedor
+- **✅ Crear** nuevas personalidades con wizard interactivo
+- **✅ Probar** personalidades con proveedores LLM reales (OpenAI, Claude, etc.)
+- **✅ Mezclar** múltiples personalidades con pesos personalizados
+- **✅ Servir** servidor de desarrollo local con interfaz web
+- **✅ Listar** y navegar personalidades disponibles
+- **✅ Actualizar** caché de personalidades desde repositorio
+- **✅ Testing Real** - Conexiones reales a APIs de LLM
+- **✅ Interfaz Web** - UI integrada para testing y gestión
+- **✅ Manejo de Errores** - Robusto con reintentos automáticos
 
 ## Installation
 

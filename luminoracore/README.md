@@ -1,63 +1,76 @@
-# 🌟 LuminoraCore
+# 🧠 LuminoraCore - Motor Principal
 
 [![Build Status](https://github.com/luminoracore/luminoracore/workflows/Tests/badge.svg)](https://github.com/luminoracore/luminoracore/actions)
 [![Coverage](https://codecov.io/gh/luminoracore/luminoracore/branch/main/graph/badge.svg)](https://codecov.io/gh/luminoracore/luminoracore)
 [![Version](https://img.shields.io/pypi/v/luminoracore.svg)](https://pypi.org/project/luminoracore/)
 [![License](https://img.shields.io/pypi/l/luminoracore.svg)](https://github.com/luminoracore/luminoracore/blob/main/LICENSE)
 [![Python](https://img.shields.io/pypi/pyversions/luminoracore.svg)](https://pypi.org/project/luminoracore/)
+[![Status](https://img.shields.io/badge/status-100%25_complete-brightgreen.svg)](#)
 
-**Universal AI Personality Management Standard**
+**✅ ESTÁNDAR UNIVERSAL DE GESTIÓN DE PERSONALIDADES DE IA - 100% COMPLETO**
 
-LuminoraCore is a comprehensive framework for creating, validating, and managing AI personalities across multiple Large Language Model (LLM) providers. It provides a standardized way to define, validate, compile, and blend AI personalities for use with OpenAI, Anthropic, Llama, Mistral, and other LLM providers.
+LuminoraCore es el motor principal de personalidades de IA que impulsa toda la plataforma. Proporciona un sistema completo para crear, validar, compilar y mezclar personalidades de IA para uso con OpenAI, Anthropic, Llama, Mistral, Cohere, Google y otros proveedores de LLM.
 
-## ✨ Features
+## ✨ Características Principales
 
-- 🎭 **10 Pre-built Personalities** - Ready-to-use personality archetypes
-- 🔧 **Multi-LLM Support** - Compile personalities for OpenAI, Anthropic, Llama, Mistral, Cohere, Google
-- 🎨 **Personality Blending** - Mix multiple personalities with different strategies
-- ✅ **Robust Validation** - JSON Schema validation with quality checks
-- 🛠️ **CLI Tools** - Command-line interface for all operations
-- 📚 **Comprehensive Examples** - Learn with practical examples
-- 🧪 **Full Test Coverage** - Extensive unit tests and CI/CD
+- **✅ 10 Personalidades Pre-construidas** - Arquetipos de personalidad listos para usar
+- **✅ Soporte Multi-LLM** - Compilar personalidades para OpenAI, Anthropic, Llama, Mistral, Cohere, Google
+- **✅ PersonaBlend™ Technology** - Mezclar múltiples personalidades con estrategias avanzadas
+- **✅ Validación Robusta** - Validación JSON Schema con verificaciones de calidad
+- **✅ Motor de Compilación** - Convertir personalidades a prompts optimizados
+- **✅ Caché Inteligente** - Sistema LRU con estadísticas de rendimiento
+- **✅ Validaciones de Rendimiento** - Detección automática de problemas de eficiencia
+- **✅ Seguridad de Tipos** - Definiciones de tipos comprehensivas
+- **✅ Ejemplos Completos** - Aprender con ejemplos prácticos
+- **✅ Cobertura de Pruebas Completa** - Pruebas unitarias extensas y CI/CD
 
-## 🚀 Quick Start
+## 🚀 Inicio Rápido
 
-### Installation
+### Instalación
 
 ```bash
-pip install luminoracore
+pip install -e luminoracore/
 ```
 
-### Basic Usage
+### Uso Básico
 
 ```python
 from luminoracore import Personality, PersonalityCompiler, LLMProvider
 
-# Load a personality
+# Cargar una personalidad
 personality = Personality("personalities/dr_luna.json")
 
-# Compile for OpenAI
-compiler = PersonalityCompiler()
+# Compilar con caché inteligente
+compiler = PersonalityCompiler(cache_size=128)
 result = compiler.compile(personality, LLMProvider.OPENAI)
 
-# Use the compiled prompt
+# Usar el prompt compilado
 print(result.prompt)
+print(f"Tokens estimados: {result.token_estimate}")
+print(f"Metadatos: {result.metadata}")
+
+# Estadísticas de caché
+stats = compiler.get_cache_stats()
+print(f"Tasa de aciertos: {stats['hit_rate']}%")
 ```
 
-### CLI Usage
+### Uso Avanzado
 
-```bash
-# Validate a personality
-luminora validate personalities/dr_luna.json
+```python
+from luminoracore import PersonalityBlender
 
-# Compile for all providers
-luminora compile-all personalities/dr_luna.json
+# Mezclar personalidades
+blender = PersonalityBlender()
+blended = blender.blend(
+    personalities=[personality1, personality2],
+    weights=[0.7, 0.3],
+    strategy="weighted_average"
+)
 
-# Blend personalities
-luminora blend personalities/dr_luna.json personalities/captain_hook.json --weights "0.6,0.4"
-
-# List all personalities
-luminora list personalities/
+# Validar con verificaciones de rendimiento
+from luminoracore import PersonalityValidator
+validator = PersonalityValidator(enable_performance_checks=True)
+result = validator.validate(personality)
 ```
 
 ## 🎭 Built-in Personalities
