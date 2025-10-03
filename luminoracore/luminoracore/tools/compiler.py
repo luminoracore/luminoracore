@@ -62,6 +62,124 @@ class PersonalityCompiler:
         self._cache_hits = 0
         self._cache_misses = 0
     
+    def compile_system_prompt(self, personality: Personality, include_examples: bool = True) -> str:
+        """
+        Convert personality into a system prompt for LLMs.
+        
+        This is the CRITICAL method that makes personalities actually work.
+        It transforms the JSON personality definition into a coherent system prompt
+        that guides the LLM's behavior.
+        
+        Args:
+            personality: Personality object to compile
+            include_examples: Whether to include example interactions
+            
+        Returns:
+            Complete system prompt as string
+        """
+        prompt_parts = []
+        
+        # 1. Identity and role
+        prompt_parts.append(f"You are {personality.persona.name}.")
+        prompt_parts.append(f"{personality.persona.description}")
+        
+        # 2. Core traits
+        if personality.core_traits and len(personality.core_traits) > 0:
+            prompt_parts.append("\n## Your Core Personality Traits:")
+            for trait in personality.core_traits:
+                prompt_parts.append(f"- {trait}")
+        
+        # 3. Linguistic profile
+        if personality.linguistic_profile:
+            prompt_parts.append("\n## Your Communication Style:")
+            
+            # Tone
+            if personality.linguistic_profile.tone:
+                tones = ", ".join(personality.linguistic_profile.tone)
+                prompt_parts.append(f"- Tone: {tones}")
+            
+            # Formality level
+            if personality.linguistic_profile.formality_level:
+                prompt_parts.append(f"- Formality: {personality.linguistic_profile.formality_level}")
+            
+            # Response length preference
+            if personality.linguistic_profile.response_length:
+                prompt_parts.append(f"- Response length: {personality.linguistic_profile.response_length}")
+            
+            # Vocabulary preferences
+            if personality.linguistic_profile.vocabulary and len(personality.linguistic_profile.vocabulary) > 0:
+                vocab_sample = ", ".join(personality.linguistic_profile.vocabulary[:10])
+                prompt_parts.append(f"- Preferred vocabulary: {vocab_sample}")
+            
+            # Speech patterns
+            if personality.linguistic_profile.speech_patterns and len(personality.linguistic_profile.speech_patterns) > 0:
+                prompt_parts.append(f"- Speech patterns:")
+                for pattern in personality.linguistic_profile.speech_patterns[:5]:
+                    prompt_parts.append(f"  • \"{pattern}\"")
+        
+        # 4. Behavioral rules
+        if personality.behavioral_rules and len(personality.behavioral_rules) > 0:
+            prompt_parts.append("\n## Behavioral Guidelines:")
+            for i, rule in enumerate(personality.behavioral_rules, 1):
+                prompt_parts.append(f"{i}. {rule}")
+        
+        # 5. Trigger responses (if available)
+        if hasattr(personality, 'trigger_responses') and personality.trigger_responses:
+            triggers = personality.trigger_responses
+            
+            if hasattr(triggers, 'on_greeting') and triggers.on_greeting:
+                prompt_parts.append("\n## How to respond to greetings:")
+                for greeting in triggers.on_greeting[:3]:
+                    prompt_parts.append(f"- \"{greeting}\"")
+            
+            if hasattr(triggers, 'on_confusion') and triggers.on_confusion:
+                prompt_parts.append("\n## How to handle confusion:")
+                for response in triggers.on_confusion[:2]:
+                    prompt_parts.append(f"- \"{response}\"")
+        
+        # 6. Safety guards (if available)
+        if hasattr(personality, 'safety_guards') and personality.safety_guards:
+            guards = personality.safety_guards
+            
+            if hasattr(guards, 'forbidden_topics') and guards.forbidden_topics:
+                prompt_parts.append("\n## Topics to avoid:")
+                for topic in guards.forbidden_topics:
+                    prompt_parts.append(f"- {topic}")
+        
+        # 7. Examples (if requested and available)
+        if include_examples and hasattr(personality, 'examples') and personality.examples:
+            examples = personality.examples
+            if hasattr(examples, 'sample_responses') and examples.sample_responses:
+                prompt_parts.append("\n## Example Interactions:")
+                for i, example in enumerate(examples.sample_responses[:3], 1):
+                    if hasattr(example, 'input') and hasattr(example, 'output'):
+                        prompt_parts.append(f"\nExample {i}:")
+                        prompt_parts.append(f"User: {example.input}")
+                        prompt_parts.append(f"You: {example.output}")
+        
+        # 8. Advanced parameters guidance
+        if personality.advanced_parameters:
+            params = personality.advanced_parameters
+            prompt_parts.append("\n## Response Style Guidance:")
+            
+            if hasattr(params, 'temperature'):
+                if params.temperature < 0.3:
+                    prompt_parts.append("- Be precise, consistent, and focused")
+                elif params.temperature > 0.7:
+                    prompt_parts.append("- Be creative, varied, and exploratory")
+            
+            if hasattr(params, 'response_length'):
+                if params.response_length == "concise":
+                    prompt_parts.append("- Keep responses brief and to the point")
+                elif params.response_length == "detailed":
+                    prompt_parts.append("- Provide thorough, comprehensive responses")
+        
+        # 9. Final instruction
+        prompt_parts.append("\n## Important:")
+        prompt_parts.append("Stay in character at all times. Your responses should consistently reflect your personality traits, communication style, and behavioral guidelines.")
+        
+        return "\n".join(prompt_parts)
+    
     def compile(self, personality: Union[Personality, Dict[str, Any]], 
                 provider: LLMProvider, 
                 max_tokens: Optional[int] = None) -> CompilationResult:

@@ -4,6 +4,13 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Union, AsyncGenerator
 import asyncio
 import logging
+import sys
+from pathlib import Path
+
+# Add Core to path for imports
+core_path = Path(__file__).parent.parent.parent.parent / "luminoracore"
+if str(core_path) not in sys.path:
+    sys.path.insert(0, str(core_path))
 
 from ..types.provider import ProviderConfig, ChatMessage, ChatResponse
 from ..utils.exceptions import ProviderError
@@ -152,6 +159,160 @@ class BaseProvider(ABC):
         except Exception as e:
             logger.error(f"Streaming failed: {e}")
             raise ProviderError(f"Streaming failed: {e}")
+    
+    async def chat_with_personality(
+        self,
+        personality_data: Dict[str, Any],
+        user_message: str,
+        conversation_history: Optional[List[ChatMessage]] = None,
+        temperature: Optional[float] = None,
+        max_tokens: Optional[int] = None,
+        **kwargs
+    ) -> ChatResponse:
+        """
+        Chat with LLM applying a personality.
+        
+        THIS IS THE KEY METHOD that makes personalities actually work!
+        It uses compile_system_prompt() to convert personality JSON into
+        a system prompt that guides the LLM's behavior.
+        
+        Args:
+            personality_data: Personality data dictionary
+            user_message: User's message
+            conversation_history: Previous conversation messages
+            temperature: Sampling temperature (overrides personality default)
+            max_tokens: Maximum tokens (overrides personality default)
+            **kwargs: Additional provider-specific parameters
+            
+        Returns:
+            Chat response with personality applied
+        """
+        try:
+            # Import Core components
+            from luminoracore import Personality, PersonalityCompiler
+            
+            # Load personality
+            personality = Personality(personality_data)
+            
+            # Compile system prompt
+            compiler = PersonalityCompiler()
+            system_prompt = compiler.compile_system_prompt(personality, include_examples=True)
+            
+            logger.info(f"Applying personality: {personality.persona.name}")
+            logger.debug(f"System prompt length: {len(system_prompt)} chars")
+            
+            # Build message list
+            messages = []
+            
+            # Add system prompt
+            messages.append(ChatMessage(role="system", content=system_prompt))
+            
+            # Add conversation history if provided
+            if conversation_history:
+                messages.extend(conversation_history)
+            
+            # Add current user message
+            messages.append(ChatMessage(role="user", content=user_message))
+            
+            # Use personality's advanced parameters if not overridden
+            if temperature is None and personality.advanced_parameters:
+                temperature = getattr(personality.advanced_parameters, 'temperature', 0.7)
+            
+            if max_tokens is None and personality.advanced_parameters:
+                max_tokens = getattr(personality.advanced_parameters, 'max_tokens', None)
+            
+            # Call the provider's chat method
+            response = await self.chat(
+                messages=messages,
+                temperature=temperature or 0.7,
+                max_tokens=max_tokens,
+                **kwargs
+            )
+            
+            logger.info(f"Response generated with personality: {personality.persona.name}")
+            
+            return response
+            
+        except ImportError as e:
+            logger.error(f"Failed to import LuminoraCore: {e}")
+            raise ProviderError(f"LuminoraCore not available: {e}")
+        except Exception as e:
+            logger.error(f"Failed to apply personality: {e}")
+            raise ProviderError(f"Personality application failed: {e}")
+    
+    async def stream_chat_with_personality(
+        self,
+        personality_data: Dict[str, Any],
+        user_message: str,
+        conversation_history: Optional[List[ChatMessage]] = None,
+        temperature: Optional[float] = None,
+        max_tokens: Optional[int] = None,
+        **kwargs
+    ) -> AsyncGenerator[ChatResponse, None]:
+        """
+        Stream chat with LLM applying a personality.
+        
+        Args:
+            personality_data: Personality data dictionary
+            user_message: User's message
+            conversation_history: Previous conversation messages
+            temperature: Sampling temperature (overrides personality default)
+            max_tokens: Maximum tokens (overrides personality default)
+            **kwargs: Additional provider-specific parameters
+            
+        Yields:
+            Chat response chunks with personality applied
+        """
+        try:
+            # Import Core components
+            from luminoracore import Personality, PersonalityCompiler
+            
+            # Load personality
+            personality = Personality(personality_data)
+            
+            # Compile system prompt
+            compiler = PersonalityCompiler()
+            system_prompt = compiler.compile_system_prompt(personality, include_examples=False)
+            
+            logger.info(f"Streaming with personality: {personality.persona.name}")
+            
+            # Build message list
+            messages = []
+            
+            # Add system prompt
+            messages.append(ChatMessage(role="system", content=system_prompt))
+            
+            # Add conversation history if provided
+            if conversation_history:
+                messages.extend(conversation_history)
+            
+            # Add current user message
+            messages.append(ChatMessage(role="user", content=user_message))
+            
+            # Use personality's advanced parameters if not overridden
+            if temperature is None and personality.advanced_parameters:
+                temperature = getattr(personality.advanced_parameters, 'temperature', 0.7)
+            
+            if max_tokens is None and personality.advanced_parameters:
+                max_tokens = getattr(personality.advanced_parameters, 'max_tokens', None)
+            
+            # Stream from the provider
+            async for chunk in self.stream_chat(
+                messages=messages,
+                temperature=temperature or 0.7,
+                max_tokens=max_tokens,
+                **kwargs
+            ):
+                yield chunk
+            
+            logger.info(f"Streaming completed with personality: {personality.persona.name}")
+            
+        except ImportError as e:
+            logger.error(f"Failed to import LuminoraCore: {e}")
+            raise ProviderError(f"LuminoraCore not available: {e}")
+        except Exception as e:
+            logger.error(f"Failed to stream with personality: {e}")
+            raise ProviderError(f"Personality streaming failed: {e}")
     
     def format_messages(self, messages: List[ChatMessage]) -> List[Dict[str, Any]]:
         """
