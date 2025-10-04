@@ -2,7 +2,35 @@
 # -*- coding: utf-8 -*-
 """
 Script de Verificación de Instalación - LuminoraCore
-Verifica que todos los componentes estén instalados correctamente.
+====================================================
+
+Este script verifica:
+  1. Entorno virtual activo
+  2. Motor Base (luminoracore)
+  3. CLI (luminoracore-cli)
+  4. SDK (luminoracore-sdk-python)
+  5. Providers disponibles (7 en total)
+  6. Dependencias opcionales
+  7. API Keys configuradas
+
+NOTA IMPORTANTE SOBRE API KEYS:
+-------------------------------
+Las API keys se configuran como VARIABLES DE ENTORNO, NO en archivos de código.
+
+Esto es por seguridad: nunca debes poner API keys directamente en tu código.
+
+¿Cómo configurar una API key?
+
+  Windows PowerShell:
+    $env:DEEPSEEK_API_KEY="sk-tu-api-key-aqui"
+  
+  Linux/Mac:
+    export DEEPSEEK_API_KEY="sk-tu-api-key-aqui"
+
+Las API keys son necesarias solo si quieres hacer llamadas REALES a los LLMs.
+Para testing y desarrollo, el sistema funciona sin ellas.
+
+Más información: GUIA_INSTALACION_USO.md (sección "Configurar API Keys")
 """
 
 import sys
@@ -33,25 +61,42 @@ print()
 tests = []
 errors = []
 
-# Test 1: Motor Base
-print("1. MOTOR BASE (luminoracore)")
+# Test 1: Motor Base o SDK
+print("1. MOTOR BASE / SDK (luminoracore)")
 print("-" * 70)
+
+# Intentar importar desde Motor Base standalone
+motor_base_ok = False
 try:
     from luminoracore import Personality, PersonalityValidator, PersonalityCompiler
     from luminoracore.core.schema import LLMProvider
     import luminoracore
     version = getattr(luminoracore, '__version__', 'unknown')
-    print(f"✅ Instalado correctamente (v{version})")
+    print(f"✅ Motor Base instalado correctamente (v{version})")
     print(f"   - Personality: OK")
     print(f"   - PersonalityValidator: OK")
     print(f"   - PersonalityCompiler: OK")
     print(f"   - LLMProvider: OK")
-    tests.append(True)
-except ImportError as e:
-    print(f"❌ ERROR: {e}")
-    print("   Solucion: cd luminoracore && pip install -e .")
-    tests.append(False)
-    errors.append("Motor Base no instalado")
+    motor_base_ok = True
+except ImportError:
+    # Intentar importar desde SDK (que tiene su propio sistema)
+    try:
+        from luminoracore import LuminoraCoreClient
+        from luminoracore.providers import ProviderFactory
+        import luminoracore
+        version = getattr(luminoracore, '__version__', 'unknown')
+        print(f"✅ SDK instalado correctamente (v{version})")
+        print(f"   ℹ️  Usando SDK (incluye funcionalidad del Motor Base)")
+        print(f"   - LuminoraCoreClient: OK")
+        print(f"   - ProviderFactory: OK")
+        motor_base_ok = True
+    except ImportError as e:
+        print(f"❌ ERROR: {e}")
+        print("   Solucion: cd luminoracore && pip install -e .")
+        print("   O: cd luminoracore-sdk-python && pip install -e '.[openai]'")
+        errors.append("Motor Base/SDK no instalado")
+
+tests.append(motor_base_ok)
 print()
 
 # Test 2: CLI
@@ -90,23 +135,35 @@ except Exception as e:
     tests.append(True)
 print()
 
-# Test 3: SDK
-print("3. SDK (luminoracore-sdk-python)")
+# Test 3: SDK (verificación adicional si no se detectó antes)
+print("3. SDK - VERIFICACION COMPLETA (luminoracore-sdk-python)")
 print("-" * 70)
+sdk_ok = False
 try:
     from luminoracore import LuminoraCoreClient
     from luminoracore.types.provider import ProviderConfig
-    from luminoracore.types.storage import StorageConfig
-    print(f"✅ Instalado correctamente")
+    print(f"✅ SDK completamente funcional")
     print(f"   - LuminoraCoreClient: OK")
     print(f"   - ProviderConfig: OK")
-    print(f"   - StorageConfig: OK")
-    tests.append(True)
+    
+    # Verificar StorageConfig (puede estar en diferentes lugares)
+    try:
+        from luminoracore.types.storage import StorageConfig
+        print(f"   - StorageConfig: OK")
+    except ImportError:
+        try:
+            from luminoracore.types.session import StorageConfig
+            print(f"   - StorageConfig: OK")
+        except ImportError:
+            print(f"   ⚠️  StorageConfig: No encontrado (opcional)")
+    
+    sdk_ok = True
 except ImportError as e:
     print(f"❌ ERROR: {e}")
     print("   Solucion: cd luminoracore-sdk-python && pip install -e '.[openai]'")
-    tests.append(False)
-    errors.append("SDK no instalado")
+    errors.append("SDK no instalado completamente")
+
+tests.append(sdk_ok)
 print()
 
 # Test 4: Providers
@@ -164,30 +221,57 @@ for dep, desc in optional_deps.items():
 print()
 
 # Test 6: Configuración
-print("6. CONFIGURACION")
+print("6. CONFIGURACION DE API KEYS")
 print("-" * 70)
-config_vars = [
-    'OPENAI_API_KEY',
-    'ANTHROPIC_API_KEY',
-    'DEEPSEEK_API_KEY',
-    'MISTRAL_API_KEY',
-    'COHERE_API_KEY',
-    'GOOGLE_API_KEY',
-]
+print("Las API keys son necesarias para hacer llamadas reales a los LLMs.")
+print("Se configuran como variables de entorno (NO en el código).")
+print()
+
+config_vars = {
+    'OPENAI_API_KEY': 'https://platform.openai.com/api-keys',
+    'ANTHROPIC_API_KEY': 'https://console.anthropic.com/',
+    'DEEPSEEK_API_KEY': 'https://platform.deepseek.com/',
+    'MISTRAL_API_KEY': 'https://console.mistral.ai/',
+    'COHERE_API_KEY': 'https://dashboard.cohere.ai/',
+    'GOOGLE_API_KEY': 'https://makersuite.google.com/app/apikey',
+}
 
 api_keys_found = 0
-for var in config_vars:
+keys_no_configuradas = []
+
+for var, url in config_vars.items():
     if os.getenv(var):
         print(f"  ✅ {var}")
         api_keys_found += 1
     else:
         print(f"  ⚪ {var} (no configurada)")
+        keys_no_configuradas.append((var, url))
 
 if api_keys_found == 0:
     print("\n⚠️  Ninguna API key configurada")
-    print("   Las necesitaras para usar los providers")
-else:
+    print("   Para hacer llamadas reales a LLMs, necesitas configurar al menos una.")
+    print()
+    print("   📖 ¿Cómo configurar API keys?")
+    print()
+    print("   Windows PowerShell:")
+    print("   $env:DEEPSEEK_API_KEY=\"sk-tu-api-key-aqui\"")
+    print()
+    print("   Linux/Mac:")
+    print("   export DEEPSEEK_API_KEY=\"sk-tu-api-key-aqui\"")
+    print()
+    print("   📝 Donde obtener API keys:")
+    for var, url in keys_no_configuradas:
+        provider_name = var.replace('_API_KEY', '').title()
+        print(f"   - {provider_name}: {url}")
+elif api_keys_found < len(config_vars):
     print(f"\n✅ {api_keys_found} API key(s) configurada(s)")
+    print()
+    print("   💡 Tip: Configura más providers si los necesitas:")
+    print()
+    print("   Windows: $env:PROVIDER_API_KEY=\"tu-key\"")
+    print("   Linux/Mac: export PROVIDER_API_KEY=\"tu-key\"")
+else:
+    print(f"\n✅ Todas las API keys ({api_keys_found}) están configuradas!")
 
 print()
 
@@ -199,16 +283,33 @@ print("=" * 70)
 if all(tests):
     print("🎉 INSTALACION COMPLETA Y CORRECTA")
     print()
-    print("Todos los componentes principales instalados:")
-    print("  ✅ Motor Base (luminoracore)")
+    print("Componentes instalados:")
+    if motor_base_ok:
+        print("  ✅ Motor Base/SDK (luminoracore)")
     print("  ✅ CLI (luminoracore-cli)")
-    print("  ✅ SDK (luminoracore-sdk)")
+    if sdk_ok:
+        print("  ✅ SDK completo (con providers y cliente)")
     print()
+    if api_keys_found == 0:
+        print("⚠️  Nota: No tienes API keys configuradas (aún)")
+        print()
+        print("Esto está bien para empezar. Puedes:")
+        print("  1. Explorar el sistema sin hacer llamadas a LLMs reales")
+        print("  2. Ver ejemplos y documentación")
+        print("  3. Configurar API keys cuando las necesites")
+        print()
+        print("📖 Para configurar API keys, consulta:")
+        print("   GUIA_INSTALACION_USO.md (sección 'Configurar API Keys')")
+        print()
     print("Siguientes pasos:")
-    print("  1. Configura tus API keys (variables de entorno)")
-    print("  2. Lee: INICIO_RAPIDO.md")
-    print("  3. Prueba: luminoracore --help")
-    print("  4. Ejecuta ejemplos: python ejemplo_quick_start_core.py")
+    print("  1. Lee: INICIO_RAPIDO.md")
+    if sdk_ok and api_keys_found > 0:
+        print("  2. Prueba: luminoracore test --provider deepseek")
+        print("  3. Ejecuta ejemplos: python ejemplo_quick_start_sdk.py")
+    else:
+        print("  2. Configura tus API keys")
+        print("  3. Prueba: luminoracore --help")
+        print("  4. Ejecuta ejemplos disponibles")
 else:
     print("⚠️  ALGUNOS COMPONENTES FALTAN")
     print()

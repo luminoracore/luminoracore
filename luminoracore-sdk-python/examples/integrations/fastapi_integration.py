@@ -6,9 +6,9 @@ from typing import Optional, List
 import asyncio
 import os
 
-from luminoracore import LuminoraCoreClient
-from luminoracore.types.provider import ProviderConfig
-from luminoracore.types.session import StorageConfig, MemoryConfig
+from luminoracore_sdk import LuminoraCoreClient
+from luminoracore_sdk.types.provider import ProviderConfig
+from luminoracore_sdk.types.session import StorageConfig, MemoryConfig
 
 
 # Pydantic models

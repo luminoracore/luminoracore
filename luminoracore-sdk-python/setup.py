@@ -16,7 +16,7 @@ def read_readme():
 
 # Read version from __init__.py
 def get_version():
-    init_path = os.path.join(os.path.dirname(__file__), 'luminoracore', '__init__.py')
+    init_path = os.path.join(os.path.dirname(__file__), 'luminoracore_sdk', '__init__.py')
     if os.path.exists(init_path):
         with open(init_path, 'r', encoding='utf-8') as f:
             for line in f:

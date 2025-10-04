@@ -5,12 +5,12 @@ import os
 import sys
 from pathlib import Path
 
-# Add the parent directory to the path to import luminoracore
+# Add the parent directory to the path to import luminoracore_sdk
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from luminoracore import LuminoraCoreClient
-from luminoracore.types.provider import ProviderConfig
-from luminoracore.types.session import StorageConfig, MemoryConfig
+from luminoracore_sdk import LuminoraCoreClient
+from luminoracore_sdk.types.provider import ProviderConfig
+from luminoracore_sdk.types.session import StorageConfig, MemoryConfig
 
 
 async def main():

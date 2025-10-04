@@ -189,7 +189,7 @@ class BaseProvider(ABC):
         """
         try:
             # Import Core components
-            from luminoracore import Personality, PersonalityCompiler
+            from luminoracore_sdk import Personality, PersonalityCompiler
             
             # Load personality
             personality = Personality(personality_data)
@@ -234,7 +234,7 @@ class BaseProvider(ABC):
             return response
             
         except ImportError as e:
-            logger.error(f"Failed to import LuminoraCore: {e}")
+            logger.error(f"Failed to import luminoracore_sdk: {e}")
             raise ProviderError(f"LuminoraCore not available: {e}")
         except Exception as e:
             logger.error(f"Failed to apply personality: {e}")
@@ -265,7 +265,7 @@ class BaseProvider(ABC):
         """
         try:
             # Import Core components
-            from luminoracore import Personality, PersonalityCompiler
+            from luminoracore_sdk import Personality, PersonalityCompiler
             
             # Load personality
             personality = Personality(personality_data)
@@ -308,7 +308,7 @@ class BaseProvider(ABC):
             logger.info(f"Streaming completed with personality: {personality.persona.name}")
             
         except ImportError as e:
-            logger.error(f"Failed to import LuminoraCore: {e}")
+            logger.error(f"Failed to import luminoracore_sdk: {e}")
             raise ProviderError(f"LuminoraCore not available: {e}")
         except Exception as e:
             logger.error(f"Failed to stream with personality: {e}")

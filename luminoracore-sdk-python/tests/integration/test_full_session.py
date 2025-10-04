@@ -4,10 +4,10 @@ import pytest
 import asyncio
 from unittest.mock import Mock, AsyncMock, patch
 
-from luminoracore.client import LuminoraCoreClient
-from luminoracore.types.session import StorageConfig, MemoryConfig
-from luminoracore.types.provider import ProviderConfig
-from luminoracore.types.personality import PersonalityData
+from luminoracore_sdk.client import LuminoraCoreClient
+from luminoracore_sdk.types.session import StorageConfig, MemoryConfig
+from luminoracore_sdk.types.provider import ProviderConfig
+from luminoracore_sdk.types.personality import PersonalityData
 
 
 class TestFullSessionWorkflow:

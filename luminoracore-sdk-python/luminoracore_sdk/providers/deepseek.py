@@ -64,8 +64,7 @@ class DeepSeekProvider(BaseProvider):
                 role=message["role"],
                 finish_reason=choice.get("finish_reason"),
                 usage=response_data.get("usage"),
-                model=response_data.get("model"),
-                provider_metadata=response_data
+                model=response_data.get("model")
             )
             
         except Exception as e:
@@ -136,9 +135,7 @@ class DeepSeekProvider(BaseProvider):
                                             role=delta.get("role", "assistant"),
                                             finish_reason=choice.get("finish_reason"),
                                             usage=chunk_data.get("usage"),
-                                            model=chunk_data.get("model"),
-                                            provider_metadata=chunk_data,
-                                            is_streaming=True
+                                            model=chunk_data.get("model")
                                         )
                             except json.JSONDecodeError:
                                 logger.warning(f"Failed to parse streaming chunk: {data}")

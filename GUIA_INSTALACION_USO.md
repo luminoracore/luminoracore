@@ -250,7 +250,8 @@ pip install -e .
 
 # 3. DESPUÉS el SDK (opcional - solo si vas a construir apps)
 cd ../luminoracore-sdk-python
-pip install -e .
+pip install ".[all]"  # Instalación normal (recomendado)
+# O para desarrollo: pip install -e ".[all]" (puede fallar en Windows)
 ```
 
 **Si intentas instalar el CLI sin el motor:**
@@ -393,20 +394,21 @@ cd ..
 # Navegar a la carpeta del SDK
 cd luminoracore-sdk-python
 
-# Instalar en modo desarrollo
-pip install -e .
+# ⚠️ IMPORTANTE: En Windows, el modo editable (-e) puede causar problemas
+# Recomendado: Instalación normal
+pip install ".[all]"
 
-# Opcional: Instalar con todos los proveedores
-pip install -e ".[all]"
+# Alternativa (solo si necesitas modificar el código):
+# pip install -e ".[all]"  # NOTA: Puede fallar en Windows
 
-# O solo los proveedores que necesites:
-pip install -e ".[openai]"      # Solo OpenAI
-pip install -e ".[anthropic]"   # Solo Anthropic
-pip install -e ".[deepseek]"    # Solo DeepSeek (económico)
-pip install -e ".[mistral]"     # Solo Mistral AI
-pip install -e ".[llama]"       # Solo Llama (vía Replicate)
-pip install -e ".[cohere]"      # Solo Cohere
-pip install -e ".[google]"      # Solo Google Gemini
+# Opcional: Solo proveedores específicos
+pip install ".[openai]"      # Solo OpenAI
+pip install ".[anthropic]"   # Solo Anthropic
+pip install ".[deepseek]"    # Solo DeepSeek (económico)
+pip install ".[mistral]"     # Solo Mistral AI
+pip install ".[llama]"       # Solo Llama (vía Replicate)
+pip install ".[cohere]"      # Solo Cohere
+pip install ".[google]"      # Solo Google Gemini
 
 # Volver a la raíz
 cd ..
@@ -1567,10 +1569,12 @@ pip show luminoracore-cli
 ```bash
 # Instala las dependencias del proveedor que estés usando
 cd luminoracore-sdk-python
-pip install -e ".[openai]"  # Para OpenAI
-pip install -e ".[anthropic]"  # Para Anthropic
-pip install -e ".[all]"  # Para todos
+pip install ".[openai]"  # Para OpenAI
+pip install ".[anthropic]"  # Para Anthropic
+pip install ".[all]"  # Para todos (recomendado)
 cd ..
+
+# Nota: Si ves errores de importación, NO uses -e (modo editable) en Windows
 ```
 
 ### Problema 4: "Permission denied" al activar entorno virtual en Windows

@@ -11,6 +11,7 @@ class ProviderType(str, Enum):
     """LLM provider type enumeration."""
     OPENAI = "openai"
     ANTHROPIC = "anthropic"
+    DEEPSEEK = "deepseek"
     LLAMA = "llama"
     MISTRAL = "mistral"
     COHERE = "cohere"
@@ -30,6 +31,7 @@ class ChatResponse:
     finish_reason: Optional[str] = None
     usage: Optional[Dict[str, Any]] = None
     model: Optional[str] = None
+    provider_metadata: Optional[Dict[str, Any]] = None  # Metadatos adicionales del provider
 
 
 @dataclass
