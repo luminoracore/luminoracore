@@ -6,6 +6,7 @@ import logging
 from .base import BaseProvider
 from .openai import OpenAIProvider
 from .anthropic import AnthropicProvider
+from .deepseek import DeepSeekProvider
 from .llama import LlamaProvider
 from .mistral import MistralProvider
 from .cohere import CohereProvider
@@ -23,6 +24,7 @@ class ProviderFactory:
     _providers: Dict[str, Type[BaseProvider]] = {
         "openai": OpenAIProvider,
         "anthropic": AnthropicProvider,
+        "deepseek": DeepSeekProvider,
         "llama": LlamaProvider,
         "mistral": MistralProvider,
         "cohere": CohereProvider,

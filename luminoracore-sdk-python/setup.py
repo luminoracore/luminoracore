@@ -50,6 +50,9 @@ setup(
     extras_require={
         'openai': ['openai>=1.0.0,<2.0.0'],
         'anthropic': ['anthropic>=0.7.0,<1.0.0'],
+        'deepseek': ['httpx>=0.24.0'],  # DeepSeek uses httpx (already in base requirements)
+        'mistral': ['httpx>=0.24.0'],   # Mistral uses httpx
+        'llama': ['httpx>=0.24.0'],     # Llama via Replicate uses httpx
         'cohere': ['cohere>=4.21.0,<5.0.0'],
         'google': ['google-generativeai>=0.3.0,<1.0.0'],
         'redis': ['redis>=4.5.0,<5.0.0'],
