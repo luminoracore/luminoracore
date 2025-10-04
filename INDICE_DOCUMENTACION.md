@@ -21,6 +21,22 @@
 - Solución de problemas
 - Configuración de API keys
 
+### 3. [GUIA_CREAR_PERSONALIDADES.md](GUIA_CREAR_PERSONALIDADES.md) ⭐⭐
+**Guía completa para crear personalidades AI.**
+- Ubicación y estructura de archivos JSON
+- Explicación detallada de cada sección
+- Schema completo y validaciones
+- Ejemplos paso a paso
+- 11 personalidades de ejemplo incluidas
+
+### 4. [GUIA_VERIFICACION_INSTALACION.md](GUIA_VERIFICACION_INSTALACION.md) ⭐
+**Cómo usar el script de verificación.**
+- Qué verifica el script automáticamente
+- Cuándo y cómo usarlo
+- Interpretación de resultados
+- Solución de problemas comunes
+- Casos de uso prácticos
+
 ---
 
 ## 📦 Componentes del Proyecto
@@ -176,7 +192,7 @@
 ## 🗂️ Estructura de Carpetas
 
 ```
-LuminoraCoreBase/
+luminoracore/
 ├── 🚀 INICIO_RAPIDO.md                    ⭐ EMPIEZA AQUÍ
 ├── 📘 GUIA_INSTALACION_USO.md            ⭐ GUÍA COMPLETA
 ├── 📚 INDICE_DOCUMENTACION.md            ← Estás aquí

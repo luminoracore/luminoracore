@@ -299,14 +299,14 @@ Esta opción te permite editar el código fuente y ver los cambios inmediatament
 Si ya tienes el proyecto descargado, navega a su carpeta:
 
 ```bash
-cd "D:\Proyectos Ereace\LuminoraCoreBase"
+cd luminoracore
 ```
 
-Si no lo tienes, clónalo:
+Si no lo tienes, clónalo primero:
 
 ```bash
-git clone <url-del-repositorio>
-cd LuminoraCoreBase
+git clone https://github.com/tu-usuario/luminoracore.git
+cd luminoracore
 ```
 
 ### Paso 2: Crear un entorno virtual (Recomendado)
@@ -331,14 +331,33 @@ Cuando esté activado, verás `(venv)` al inicio de tu línea de comandos.
 
 ### Paso 3: Instalar el Motor Base (luminoracore)
 
+⚠️ **IMPORTANTE: Verifica que estás en el lugar correcto**
+
+```
+luminoracore/                     ← Repo clonado
+└── luminoracore/                 ← ⭐ AQUÍ debes estar
+    ├── setup.py                  ← ✅ Este archivo DEBE existir
+    ├── pyproject.toml
+    ├── venv/                     ← Tu entorno virtual
+    └── luminoracore/             ← ❌ NO entres aquí (código fuente)
+```
+
 Este es el componente fundamental que todos los demás necesitan:
 
 ```bash
 # Navegar a la carpeta del motor base
 cd luminoracore
 
+# ⚠️ VERIFICACIÓN VISUAL:
+ls      # Linux/Mac - DEBE mostrar setup.py
+dir     # Windows - DEBE mostrar setup.py
+
+# ❌ Si NO ves setup.py: cd .. y vuelve a intentar
+
 # Instalar en modo desarrollo
 pip install -e .
+
+# ✅ ÉXITO SI VES: "Successfully installed luminoracore-X.X.X"
 
 # Opcional: Instalar dependencias de desarrollo
 pip install -e ".[dev]"
@@ -395,6 +414,119 @@ cd ..
 
 ### Paso 6: Verificar la instalación
 
+#### ✅ Opción 1: Script Automático (Recomendado)
+
+**Descarga el script:**
+```bash
+# Si estás en el repositorio clonado, descarga el script:
+curl -O https://raw.githubusercontent.com/tu-usuario/luminoracore/main/verificar_instalacion.py
+
+# O cópialo manualmente desde el repositorio
+```
+
+**Ejecuta la verificación:**
+```bash
+python verificar_instalacion.py
+```
+
+**Salida esperada:**
+```
+==================================================================
+VERIFICACION DE INSTALACION - LUMINORACORE
+==================================================================
+
+✅ Entorno virtual activado
+   Python: 3.11.0
+   Path: /ruta/a/tu/venv/bin/python
+
+1. MOTOR BASE (luminoracore)
+----------------------------------------------------------------------
+✅ Instalado correctamente (v1.0.0)
+   - Personality: OK
+   - PersonalityValidator: OK
+   - PersonalityCompiler: OK
+   - LLMProvider: OK
+
+2. CLI (luminoracore-cli)
+----------------------------------------------------------------------
+✅ Instalado correctamente (v1.0.0)
+   - Comando 'luminoracore': OK
+
+3. SDK (luminoracore-sdk-python)
+----------------------------------------------------------------------
+✅ Instalado correctamente
+   - LuminoraCoreClient: OK
+   - ProviderConfig: OK
+   - StorageConfig: OK
+
+4. PROVIDERS DISPONIBLES
+----------------------------------------------------------------------
+  ✅ Openai       - OpenAIProvider
+  ✅ Anthropic    - AnthropicProvider
+  ✅ Deepseek     - DeepSeekProvider
+  ✅ Mistral      - MistralProvider
+  ✅ Cohere       - CohereProvider
+  ✅ Google       - GoogleProvider
+  ✅ Llama        - LlamaProvider
+
+✅ Todos los providers (7) disponibles
+
+5. DEPENDENCIAS OPCIONALES
+----------------------------------------------------------------------
+  ✅ openai       - OpenAI API
+  ⚪ anthropic    - Anthropic Claude API (no instalado)
+  ⚪ redis        - Redis storage (no instalado)
+  ⚪ asyncpg      - PostgreSQL storage (no instalado)
+  ⚪ motor        - MongoDB storage (no instalado)
+
+6. CONFIGURACION
+----------------------------------------------------------------------
+  ✅ OPENAI_API_KEY
+  ⚪ ANTHROPIC_API_KEY (no configurada)
+  ⚪ DEEPSEEK_API_KEY (no configurada)
+  ⚪ MISTRAL_API_KEY (no configurada)
+  ⚪ COHERE_API_KEY (no configurada)
+  ⚪ GOOGLE_API_KEY (no configurada)
+
+✅ 1 API key(s) configurada(s)
+
+==================================================================
+RESUMEN
+==================================================================
+🎉 INSTALACION COMPLETA Y CORRECTA
+
+Todos los componentes principales instalados:
+  ✅ Motor Base (luminoracore)
+  ✅ CLI (luminoracore-cli)
+  ✅ SDK (luminoracore-sdk)
+
+Siguientes pasos:
+  1. Configura tus API keys (variables de entorno)
+  2. Lee: INICIO_RAPIDO.md
+  3. Prueba: luminoracore --help
+  4. Ejecuta ejemplos: python ejemplo_quick_start_core.py
+==================================================================
+```
+
+**Este script verifica automáticamente:**
+- ✅ Qué componentes están instalados (Motor, CLI, SDK)
+- ✅ Qué providers están disponibles (7 en total)
+- ✅ Qué API keys están configuradas
+- ✅ Si el entorno virtual está activo
+- ❌ Qué falta por instalar o configurar
+
+**Salida esperada si todo está bien:**
+```
+🎉 INSTALACION COMPLETA Y CORRECTA
+
+Todos los componentes principales instalados:
+  ✅ Motor Base (luminoracore)
+  ✅ CLI (luminoracore-cli)
+  ✅ SDK (luminoracore-sdk)
+```
+
+#### Opción 2: Verificación Manual
+
 ```bash
 # Verificar que luminoracore está instalado
 python -c "import luminoracore; print(luminoracore.__version__)"
@@ -439,7 +571,7 @@ from luminoracore import Personality, PersonalityValidator, PersonalityCompiler,
 
 # 1. Cargar una personalidad
 print("1. Cargando personalidad...")
-personality = Personality("personalidades/Dr. Luna Científica Entusiasta.json")
+personality = Personality("luminoracore/luminoracore/personalities/dr_luna.json")
 print(f"✅ Personalidad cargada: {personality.persona.name}")
 
 # 2. Validar la personalidad
@@ -484,8 +616,8 @@ from luminoracore import Personality, PersonalityBlender
 
 # Cargar dos personalidades
 print("Cargando personalidades...")
-dr_luna = Personality("personalidades/Dr. Luna Científica Entusiasta.json")
-rocky = Personality("personalidades/Rocky Inspiración.json")
+dr_luna = Personality("luminoracore/luminoracore/personalities/dr_luna.json")
+rocky = Personality("luminoracore/luminoracore/personalities/rocky_inspiration.json")
 
 # Mezclar personalidades
 print("\nMezclando personalidades...")
@@ -517,22 +649,22 @@ luminoracore list
 luminoracore list --detailed
 
 # 2. Validar una personalidad
-luminoracore validate "personalidades/Dr. Luna Científica Entusiasta.json"
+luminoracore validate "luminoracore/luminoracore/personalities/dr_luna.json"
 
 # Validar todas las personalidades en una carpeta
-luminoracore validate personalidades/ --strict
+luminoracore validate luminoracore/luminoracore/personalities/ --strict
 
 # 3. Compilar una personalidad
-luminoracore compile "personalidades/Dr. Luna Científica Entusiasta.json" --provider openai
+luminoracore compile "luminoracore/luminoracore/personalities/dr_luna.json" --provider openai
 
 # Guardar en archivo
-luminoracore compile "personalidades/Rocky Inspiración.json" --provider anthropic --output rocky_prompt.txt
+luminoracore compile "luminoracore/luminoracore/personalities/rocky_inspiration.json" --provider anthropic --output rocky_prompt.txt
 
 # 4. Crear una nueva personalidad (modo interactivo)
 luminoracore create --interactive
 
 # 5. Mezclar personalidades
-luminoracore blend "personalidades/Dr. Luna Científica Entusiasta.json:0.6" "personalidades/Rocky Inspiración.json:0.4" --output mezcla.json
+luminoracore blend "luminoracore/luminoracore/personalities/dr_luna.json:0.6" "luminoracore/luminoracore/personalities/rocky_inspiration.json:0.4" --output mezcla.json
 
 # 6. Iniciar servidor de desarrollo con interfaz web
 luminoracore serve
@@ -541,7 +673,7 @@ luminoracore serve
 luminoracore serve --port 3000
 
 # 7. Obtener información de una personalidad
-luminoracore info "personalidades/Victoria Sterling.json"
+luminoracore info "luminoracore/luminoracore/personalities/victoria_sterling.json"
 ```
 
 ### Ejemplo Práctico: Workflow Completo
@@ -1316,10 +1448,10 @@ provider_config = ProviderConfig(
 ```
 mi-proyecto/
 ├── venv/                          # Entorno virtual
-├── personalidades/                # Tus personalidades personalizadas
-│   ├── asistente_ventas.json
-│   ├── soporte_tecnico.json
-│   └── creativo_marketing.json
+├── my_personalities/              # Tus personalidades personalizadas
+│   ├── sales_assistant.json
+│   ├── tech_support.json
+│   └── creative_marketing.json
 ├── config/
 │   └── providers.yaml            # Configuración de proveedores
 ├── src/
@@ -1352,13 +1484,61 @@ luminoracore-sdk[all]>=1.0.0
 
 ## 🐛 Solución de Problemas Comunes
 
-### Problema 1: "ModuleNotFoundError: No module named 'luminoracore'"
+### Problema 1: "neither 'setup.py' nor 'pyproject.toml' found"
 
-**Solución:**
+**❌ Síntoma:**
+```
+ERROR: file:///D:/luminoracore/luminoracore/luminoracore does not appear to be a Python project
+```
+
+**🔍 Causa:** Estás en el directorio equivocado (demasiado profundo o demasiado arriba)
+
+**✅ Solución:**
+
+```bash
+# 1. Verifica dónde estás
+pwd      # Linux/Mac
+cd       # Windows (sin argumentos muestra la ruta actual)
+
+# 2. Busca setup.py
+ls | grep setup.py      # Linux/Mac
+dir | findstr setup.py  # Windows
+
+# 3. Si NO ves setup.py:
+# Opción A: Si estás muy adentro (ej: luminoracore/luminoracore/luminoracore/)
+cd ..
+cd ..
+ls  # Verifica que ahora ves setup.py
+
+# Opción B: Si estás muy arriba (ej: solo luminoracore/)
+cd luminoracore
+ls  # Verifica que ves setup.py
+
+# 4. Ahora sí, instala
+pip install -e .
+```
+
+**📍 Lugar correcto:**
+```
+D:\luminoracore\luminoracore\          ← AQUÍ (con setup.py)
+├── setup.py                            ← ✅ Debe existir
+├── pyproject.toml
+├── venv/
+└── luminoracore/                       ← Código fuente (NO entrar)
+```
+
+### Problema 2: "ModuleNotFoundError: No module named 'luminoracore'"
+
+**🔍 Causa:** Entorno virtual no activado o instalación incorrecta
+
+**✅ Solución:**
 
 ```bash
 # Asegúrate de estar en el entorno virtual correcto
-.\venv\Scripts\Activate.ps1
+.\venv\Scripts\Activate.ps1   # Windows
+source venv/bin/activate      # Linux/Mac
+
+# Debes ver (venv) al inicio de tu prompt
 
 # Reinstala el paquete
 cd luminoracore
@@ -1465,10 +1645,11 @@ python luminoracore-sdk-python/examples/personality_blending.py
 
 ## 🎓 Próximos Pasos
 
-1. **Explora las personalidades incluidas** en la carpeta `personalidades/`
-2. **Ejecuta los ejemplos** en `luminoracore/examples/`
-3. **Crea tu primera personalidad personalizada**
-4. **Integra LuminoraCore en tu aplicación**
+1. **Explora las personalidades incluidas** en `luminoracore/luminoracore/personalities/`
+2. **Lee la guía completa:** `GUIA_CREAR_PERSONALIDADES.md`
+3. **Ejecuta los ejemplos** en `luminoracore/examples/`
+4. **Crea tu primera personalidad personalizada**
+5. **Integra LuminoraCore en tu aplicación**
 5. **Comparte tus personalidades con la comunidad**
 
 ---

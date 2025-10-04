@@ -3,14 +3,14 @@
 ## 📁 ESTRUCTURA DE DIRECTORIOS RECOMENDADA
 
 ```
-D:\Proyectos Ereace\
-├── LuminoraCoreBase/              # ← Proyecto actual (Backend/Core)
+~/proyectos/                       # Tu directorio de proyectos
+├── luminoracore/                  # ← Proyecto LuminoraCore (Backend/Core)
 │   ├── luminoracore/              # Motor principal
 │   ├── luminoracore-cli/          # CLI
 │   ├── luminoracore-sdk-python/   # SDK Python
 │   └── README.md
 │
-└── LuminoraCoreWeb/               # ← NUEVO proyecto (Frontend/Demo)
+└── luminoracore-web/              # ← NUEVO proyecto (Frontend/Demo)
     ├── frontend/                  # Next.js app
     │   ├── src/
     │   │   ├── pages/
@@ -48,10 +48,16 @@ D:\Proyectos Ereace\
 ### **1.1 Crear directorio principal**
 
 ```bash
-# En PowerShell (Windows)
-cd "D:\Proyectos Ereace"
-mkdir LuminoraCoreWeb
-cd LuminoraCoreWeb
+# En tu directorio de proyectos
+# Windows PowerShell:
+cd ~\proyectos
+mkdir luminoracore-web
+cd luminoracore-web
+
+# Linux/Mac:
+cd ~/proyectos
+mkdir luminoracore-web
+cd luminoracore-web
 ```
 
 ### **1.2 Inicializar Git**
@@ -176,7 +182,7 @@ python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 
 # LuminoraCore SDK (local)
-# Se instalará con: pip install -e ../../LuminoraCoreBase/luminoracore-sdk-python/
+# Se instalará con: pip install -e ../../luminoracore/luminoracore-sdk-python/
 EOF
 ```
 
@@ -186,8 +192,8 @@ EOF
 # Instalar dependencias
 pip install -r requirements.txt
 
-# Instalar LuminoraCore SDK (desde el otro proyecto)
-pip install -e "../../LuminoraCoreBase/luminoracore-sdk-python/"
+# Instalar LuminoraCore SDK (desde el proyecto principal)
+pip install -e "../../luminoracore/luminoracore-sdk-python/"
 ```
 
 ### **3.4 Crear estructura de carpetas**
@@ -248,7 +254,7 @@ COHERE_API_KEY=your_cohere_key_here
 MISTRAL_API_KEY=your_mistral_key_here
 
 # Paths
-PERSONALITIES_PATH=../../LuminoraCoreBase/luminoracore/personalities
+PERSONALITIES_PATH=../../luminoracore/luminoracore/personalities
 
 # Rate Limiting
 RATE_LIMIT_REQUESTS=100
@@ -379,7 +385,7 @@ class Settings(BaseSettings):
     MISTRAL_API_KEY: Optional[str] = None
     
     # Paths
-    PERSONALITIES_PATH: str = "../../LuminoraCoreBase/luminoracore/personalities"
+    PERSONALITIES_PATH: str = "../../luminoracore/luminoracore/personalities"
     
     # Rate Limiting
     RATE_LIMIT_REQUESTS: int = 100
@@ -492,7 +498,7 @@ services:
       - ../backend/.env
     volumes:
       - ../backend:/app
-      - ../../LuminoraCoreBase:/luminoracore
+      - ../../luminoracore:/luminoracore
 
   nginx:
     image: nginx:alpine
@@ -619,7 +625,7 @@ LuminoraCoreWeb/
    .\venv\Scripts\Activate.ps1  # Windows
    # source venv/bin/activate    # Linux/Mac
    pip install -r requirements.txt
-   pip install -e ../../LuminoraCoreBase/luminoracore-sdk-python/
+   pip install -e ../../luminoracore/luminoracore-sdk-python/
    cp .env.example .env
    # Editar .env con tus API keys
    ```
@@ -726,7 +732,7 @@ cat .env.local
 
 ### **Iniciar Desarrollo (Windows)**
 ```powershell
-cd "D:\Proyectos Ereace\LuminoraCoreWeb"
+cd ~/proyectos/luminoracore-web
 .\start-dev.ps1
 ```
 
@@ -765,7 +771,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```bash
 cd backend
 .\venv\Scripts\Activate.ps1
-pip install -e ../../LuminoraCoreBase/luminoracore-sdk-python/
+pip install -e ../../luminoracore/luminoracore-sdk-python/
 ```
 
 ### **Error: "Port 3000 already in use"**

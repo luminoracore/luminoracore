@@ -23,18 +23,39 @@
 ./instalar_todo.sh
 ```
 
+### ✅ Verificar Instalación
+
+```bash
+# 1. Descarga el script de verificación (si no lo tienes)
+curl -O https://raw.githubusercontent.com/tu-usuario/luminoracore/main/verificar_instalacion.py
+
+# 2. Ejecuta la verificación
+python verificar_instalacion.py
+```
+
+**Este script verifica automáticamente:**
+- ✅ Todos los componentes instalados (Motor, CLI, SDK)
+- ✅ Providers disponibles (7 en total)
+- ✅ API keys configuradas
+- ✅ Entorno virtual activo
+
+**Resultado esperado:** `🎉 INSTALACION COMPLETA Y CORRECTA`
+
 ### 📚 Guías de Inicio
 
 | Documento | Tiempo | Descripción |
 |-----------|--------|-------------|
 | **[INICIO_RAPIDO.md](INICIO_RAPIDO.md)** ⭐⭐⭐ | 5 min | Instalación express y primeros pasos |
-| **[GUIA_INSTALACION_USO.md](GUIA_INSTALACION_USO.md)** ⭐⭐⭐ | 30 min | Guía completa paso a paso |
+| **[GUIA_INSTALACION_USO.md](GUIA_INSTALACION_USO.md)** ⭐⭐⭐ | 30 min | Guía completa paso a paso con verificaciones |
+| **[GUIA_CREAR_PERSONALIDADES.md](GUIA_CREAR_PERSONALIDADES.md)** ⭐⭐ | 15 min | Cómo crear tus propias personalidades AI |
 | **[COMO_USAR_LUMINORACORE.md](COMO_USAR_LUMINORACORE.md)** | 10 min | Referencia rápida de comandos |
 | **[CHEATSHEET.md](CHEATSHEET.md)** | 2 min | CheatSheet para imprimir |
 
 **¿No sabes por dónde empezar?** → Lee [INICIO_RAPIDO.md](INICIO_RAPIDO.md) primero.
 
 **¿Quieres todos los detalles?** → Lee [GUIA_INSTALACION_USO.md](GUIA_INSTALACION_USO.md).
+
+**¿Problemas al instalar?** → Ejecuta `python verificar_instalacion.py` (ver [GUIA_VERIFICACION_INSTALACION.md](GUIA_VERIFICACION_INSTALACION.md))
 
 **¿Buscas algo específico?** → Consulta [INDICE_DOCUMENTACION.md](INDICE_DOCUMENTACION.md).
 

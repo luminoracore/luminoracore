@@ -28,7 +28,19 @@ chmod +x instalar_todo.sh
 
 ## ✅ Verificar Instalación
 
-Ejecuta estos 3 scripts para verificar que todo funciona:
+### Opción 1: Script Automático (Recomendado)
+
+```bash
+# Descarga el script (si no lo tienes)
+curl -O https://raw.githubusercontent.com/tu-usuario/luminoracore/main/verificar_instalacion.py
+
+# Ejecuta la verificación completa
+python verificar_instalacion.py
+```
+
+**Salida esperada:** `🎉 INSTALACION COMPLETA Y CORRECTA`
+
+### Opción 2: Scripts de Ejemplo (Paso a Paso)
 
 ```bash
 # 1. Probar el motor base

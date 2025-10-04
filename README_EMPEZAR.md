@@ -22,7 +22,8 @@
 ### 1️⃣ Clona o ubica el proyecto
 
 ```bash
-cd "D:\Proyectos Ereace\LuminoraCoreBase"
+# Navega al directorio del proyecto
+cd luminoracore
 ```
 
 ### 2️⃣ Ejecuta UN comando
@@ -139,7 +140,7 @@ python ejemplo_quick_start_sdk.py
 ## 🗂️ Estructura del Proyecto (Simplificada)
 
 ```
-LuminoraCoreBase/
+luminoracore/
 │
 ├── 📘 INICIO_RAPIDO.md              ⭐ EMPIEZA AQUÍ (5 min)
 ├── 📗 GUIA_INSTALACION_USO.md      ⭐ GUÍA COMPLETA (30 min)
