@@ -343,19 +343,43 @@ luminoracore/                     ← Repo clonado
     └── luminoracore/             ← ❌ NO entres aquí (código fuente)
 ```
 
-Este es el componente fundamental que todos los demás necesitan:
+Este es el componente fundamental que todos los demás necesitan.
+
+#### 🪟 WINDOWS (Instalación Normal - Recomendado)
+
+```powershell
+# Navegar a la carpeta del motor base
+cd luminoracore
+
+# ⚠️ VERIFICACIÓN VISUAL:
+dir     # DEBE mostrar setup.py
+
+# ❌ Si NO ves setup.py: cd .. y vuelve a intentar
+
+# ✅ WINDOWS: Instalar en modo NORMAL (NO usar -e)
+pip install .
+
+# ✅ ÉXITO SI VES: "Successfully installed luminoracore-X.X.X"
+
+# Volver a la raíz
+cd ..
+```
+
+**🚨 IMPORTANTE PARA WINDOWS:**  
+En Windows, el Motor Base debe instalarse en **modo normal** (`pip install .`) en lugar de editable (`pip install -e .`) debido a problemas con el editable finder de pip. El CLI y SDK pueden instalarse en modo editable sin problemas.
+
+#### 🐧 LINUX / MAC (Instalación Editable)
 
 ```bash
 # Navegar a la carpeta del motor base
 cd luminoracore
 
 # ⚠️ VERIFICACIÓN VISUAL:
-ls      # Linux/Mac - DEBE mostrar setup.py
-dir     # Windows - DEBE mostrar setup.py
+ls      # DEBE mostrar setup.py
 
 # ❌ Si NO ves setup.py: cd .. y vuelve a intentar
 
-# Instalar en modo desarrollo
+# ✅ LINUX/MAC: Instalar en modo editable
 pip install -e .
 
 # ✅ ÉXITO SI VES: "Successfully installed luminoracore-X.X.X"
@@ -371,6 +395,8 @@ cd ..
 - Instala en modo "editable"
 - Los cambios en el código se reflejan inmediatamente
 - No necesitas reinstalar después de cada modificación
+
+**💡 Nota:** Si necesitas modificar el código del Motor Base en Windows, después de hacer cambios ejecuta `pip install --force-reinstall --no-deps .` para que se actualice.
 
 ### Paso 4: Instalar el CLI (luminoracore-cli)
 
@@ -1562,7 +1588,31 @@ cd ..
 pip show luminoracore-cli
 ```
 
-### Problema 3: Error al importar el SDK
+### Problema 3: "ImportError: cannot import name 'Personality' from 'luminoracore'" (Windows)
+
+**🔍 Causa:** El Motor Base fue instalado en modo editable (`-e`) en Windows, causando conflictos en el import system.
+
+**✅ Solución:**
+
+```powershell
+# 1. Desinstalar todo
+pip uninstall luminoracore luminoracore-sdk -y
+
+# 2. Reinstalar Motor Base en modo NORMAL (sin -e)
+cd luminoracore
+pip install .
+cd ..
+
+# 3. Reinstalar SDK normalmente
+cd luminoracore-sdk-python
+pip install ".[all]"
+cd ..
+
+# 4. Verificar
+python -c "from luminoracore import Personality; print('OK')"
+```
+
+### Problema 4: Error al importar el SDK o los providers
 
 **Solución:**
 
@@ -1571,13 +1621,14 @@ pip show luminoracore-cli
 cd luminoracore-sdk-python
 pip install ".[openai]"  # Para OpenAI
 pip install ".[anthropic]"  # Para Anthropic
+pip install ".[deepseek]"  # Para DeepSeek
 pip install ".[all]"  # Para todos (recomendado)
 cd ..
 
 # Nota: Si ves errores de importación, NO uses -e (modo editable) en Windows
 ```
 
-### Problema 4: "Permission denied" al activar entorno virtual en Windows
+### Problema 5: "Permission denied" al activar entorno virtual en Windows
 
 **Solución:**
 
@@ -1586,7 +1637,7 @@ cd ..
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
-### Problema 5: Las personalidades no se encuentran
+### Problema 6: Las personalidades no se encuentran
 
 **Solución:**
 
@@ -1596,7 +1647,7 @@ from pathlib import Path
 
 # Obtener la ruta del proyecto
 PROJECT_ROOT = Path(__file__).parent
-PERSONALITIES_DIR = PROJECT_ROOT / "personalidades"
+PERSONALITIES_DIR = PROJECT_ROOT / "luminoracore" / "luminoracore" / "personalities"
 
 # Cargar personalidad
 personality_path = PERSONALITIES_DIR / "Dr. Luna Científica Entusiasta.json"

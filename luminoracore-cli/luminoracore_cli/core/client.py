@@ -87,7 +87,7 @@ class LuminoraCoreClient:
         try:
             # Get default model if not specified
             if not model:
-                model = self.settings.get("default_model", "gpt-3.5-turbo")
+                model = getattr(self.settings, "default_model", "gpt-3.5-turbo")
             
             # Check cache first
             cache_key = f"compile_{hash(str(personality_data))}_{provider}_{model}"
@@ -238,7 +238,7 @@ class LuminoraCoreClient:
         try:
             # Get default model if not specified
             if not model:
-                model = self.settings.get("default_model", "gpt-3.5-turbo")
+                model = getattr(self.settings, "default_model", "gpt-3.5-turbo")
             
             # Compile personality
             compilation_result = await self.compile_personality(

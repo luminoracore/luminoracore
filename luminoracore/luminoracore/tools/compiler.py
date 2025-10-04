@@ -22,6 +22,7 @@ class LLMProvider(Enum):
     """Supported LLM providers."""
     OPENAI = "openai"
     ANTHROPIC = "anthropic"
+    DEEPSEEK = "deepseek"
     LLAMA = "llama"
     MISTRAL = "mistral"
     COHERE = "cohere"
@@ -51,6 +52,7 @@ class PersonalityCompiler:
         self.providers = {
             LLMProvider.OPENAI: self._compile_openai,
             LLMProvider.ANTHROPIC: self._compile_anthropic,
+            LLMProvider.DEEPSEEK: self._compile_deepseek,
             LLMProvider.LLAMA: self._compile_llama,
             LLMProvider.MISTRAL: self._compile_mistral,
             LLMProvider.COHERE: self._compile_cohere,
@@ -288,6 +290,31 @@ class PersonalityCompiler:
             "format": "xml",
             "model": "claude-3-sonnet",
             "max_tokens": max_tokens
+        }
+        
+        return prompt, metadata
+    
+    def _compile_deepseek(self, personality: Personality, max_tokens: Optional[int] = None) -> tuple:
+        """Compile for DeepSeek models."""
+        system_prompt = self._build_system_prompt(personality)
+        
+        # DeepSeek uses OpenAI-compatible messages format
+        prompt = {
+            "messages": [
+                {
+                    "role": "system",
+                    "content": system_prompt
+                }
+            ],
+            "model": "deepseek-chat",  # Default model
+            "temperature": self._get_temperature(personality),
+            "max_tokens": max_tokens
+        }
+        
+        metadata = {
+            "format": "messages",
+            "model": "deepseek-chat",
+            "temperature": prompt["temperature"]
         }
         
         return prompt, metadata

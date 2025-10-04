@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
 Runner principal para la Test Suite de LuminoraCore
 Ejecuta todos los tests o suites específicas con reportes detallados
@@ -8,6 +9,12 @@ import os
 import subprocess
 import argparse
 from pathlib import Path
+import codecs
+
+# Fix encoding en Windows
+if sys.platform == 'win32':
+    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
+    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
 
 # Colores para terminal
 class Colors:

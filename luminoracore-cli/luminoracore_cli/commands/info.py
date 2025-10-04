@@ -22,6 +22,7 @@ def info_command(
     provider: Optional[str] = typer.Option(None, "--provider", "-p", help="LLM provider for compilation info"),
     model: Optional[str] = typer.Option(None, "--model", "-m", help="Specific model for compilation info"),
     validate: bool = typer.Option(False, "--validate", help="Show validation information"),
+    detailed: bool = typer.Option(False, "--detailed", "-d", help="Show detailed information"),
     format: str = typer.Option("tree", "--format", "-f", help="Output format (tree, panel, json, yaml)"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output")
 ) -> int:
@@ -32,11 +33,15 @@ def info_command(
     including its structure, validation status, and compilation details.
     """
     try:
-        # Find personality file
-        personality_path = find_personality_files(personality)
-        if not personality_path:
-            error_console.print(f"[red]Error: Personality '{personality}' not found[/red]")
-            return 1
+        # Find personality file - check if it's a direct path first
+        personality_path = Path(personality)
+        if not personality_path.exists():
+            # Try to find by name
+            found_paths = find_personality_files(personality)
+            if not found_paths:
+                error_console.print(f"[red]Error: Personality '{personality}' not found[/red]")
+                return 1
+            personality_path = found_paths[0] if isinstance(found_paths, list) else found_paths
         
         if verbose:
             console.print(f"[blue]Found personality file: {personality_path}[/blue]")

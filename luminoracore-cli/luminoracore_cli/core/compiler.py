@@ -15,6 +15,7 @@ class PersonalityCompiler:
         self.providers = {
             "openai": self._compile_openai,
             "anthropic": self._compile_anthropic,
+            "deepseek": self._compile_deepseek,
             "google": self._compile_google,
             "cohere": self._compile_cohere,
             "huggingface": self._compile_huggingface
@@ -183,6 +184,11 @@ class PersonalityCompiler:
         system_prompt = "\n".join(prompt_parts)
         
         return system_prompt
+    
+    def _compile_deepseek(self, personality_data: Dict[str, Any], model: Optional[str] = None) -> str:
+        """Compile personality for DeepSeek models."""
+        # DeepSeek uses OpenAI-compatible format
+        return self._compile_openai(personality_data, model)
     
     def _compile_google(self, personality_data: Dict[str, Any], model: Optional[str] = None) -> str:
         """Compile personality for Google models."""

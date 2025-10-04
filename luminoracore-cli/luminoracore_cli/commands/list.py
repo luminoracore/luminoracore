@@ -10,12 +10,13 @@ from rich import box
 
 from luminoracore_cli.utils.errors import CLIError
 from luminoracore_cli.utils.console import console, error_console
-from luminoracore_cli.utils.files import find_personality_files
+from luminoracore_cli.utils.files import find_personality_files, read_json_file
 from luminoracore_cli.utils.formatting import format_personality_list, format_personality_table
 from luminoracore_cli.core.client import get_client
 
 
 def list_command(
+    path: Optional[Path] = typer.Option(None, "--path", "-p", help="Directory to list personalities from"),
     search: Optional[str] = typer.Option(None, "--search", "-s", help="Search personalities by name or tags"),
     archetype: Optional[str] = typer.Option(None, "--archetype", "-a", help="Filter by archetype"),
     author: Optional[str] = typer.Option(None, "--author", help="Filter by author"),
@@ -37,7 +38,7 @@ def list_command(
         
         # Get local personalities
         if not remote_only:
-            local_personalities = get_local_personalities(verbose=verbose)
+            local_personalities = get_local_personalities(path=path, verbose=verbose)
             personalities.extend(local_personalities)
         
         # Get remote personalities
@@ -75,7 +76,9 @@ def list_command(
         
         if format == "json":
             import json
-            console.print(json.dumps(personalities, indent=2))
+            import sys
+            # Print directly to stdout without rich formatting
+            print(json.dumps(personalities, indent=2))
         elif format == "yaml":
             import yaml
             console.print(yaml.dump(personalities, default_flow_style=False))
@@ -103,24 +106,29 @@ def list_command(
         return 1
 
 
-def get_local_personalities(verbose: bool = False) -> List[Dict[str, Any]]:
+def get_local_personalities(path: Optional[Path] = None, verbose: bool = False) -> List[Dict[str, Any]]:
     """Get local personalities from cache and current directory."""
     personalities = []
     
-    # Search in current directory
-    current_dir = Path.cwd()
-    personality_files = find_personality_files("*", search_dir=current_dir)
+    # Search in specified directory or current directory
+    search_dir = path if path else Path.cwd()
     
-    for file_path in personality_files:
-        try:
-            personality_data = read_json_file(file_path)
-            if personality_data.get("persona"):
-                personality_data["source"] = "local"
-                personality_data["file_path"] = str(file_path)
-                personalities.append(personality_data)
-        except Exception as e:
-            if verbose:
-                console.print(f"[yellow]Warning: Could not load {file_path}: {e}[/yellow]")
+    try:
+        personality_files = find_personality_files(search_dir)
+        
+        for file_path in personality_files:
+            try:
+                personality_data = read_json_file(file_path)
+                if personality_data.get("persona"):
+                    personality_data["source"] = "local"
+                    personality_data["file_path"] = str(file_path)
+                    personalities.append(personality_data)
+            except Exception as e:
+                if verbose:
+                    console.print(f"[yellow]Warning: Could not load {file_path}: {e}[/yellow]")
+    except Exception as e:
+        if verbose:
+            console.print(f"[yellow]Warning: Could not search directory {search_dir}: {e}[/yellow]")
     
     # Search in cache directory
     cache_dir = Path.home() / ".luminoracore" / "cache"
@@ -144,14 +152,10 @@ def get_local_personalities(verbose: bool = False) -> List[Dict[str, Any]]:
 def get_remote_personalities(verbose: bool = False) -> List[Dict[str, Any]]:
     """Get remote personalities from repository."""
     try:
-        client = get_client()
-        personalities = client.list_personalities()
-        
-        # Add source information
-        for personality in personalities:
-            personality["source"] = "remote"
-        
-        return personalities
+        # Remote personalities require async, skip for now in sync context
+        if verbose:
+            console.print(f"[yellow]Note: Remote personalities fetch not available in current context[/yellow]")
+        return []
     except Exception as e:
         if verbose:
             console.print(f"[yellow]Warning: Could not fetch remote personalities: {e}[/yellow]")

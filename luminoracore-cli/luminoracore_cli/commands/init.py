@@ -17,7 +17,7 @@ from luminoracore_cli.templates import get_template, list_templates
 def init_command(
     name: Optional[str] = typer.Option(None, "--name", "-n", help="Project name"),
     template: Optional[str] = typer.Option("basic", "--template", "-t", help="Project template to use"),
-    directory: Optional[str] = typer.Option(".", "--directory", "-d", help="Directory to initialize in"),
+    path: Optional[str] = typer.Option(".", "--path", "--directory", "-d", help="Directory to initialize in"),
     force: bool = typer.Option(False, "--force", "-f", help="Force initialization in non-empty directory"),
     interactive: bool = typer.Option(False, "--interactive", "-i", help="Interactive mode"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output")
@@ -30,7 +30,7 @@ def init_command(
     """
     try:
         # Get target directory
-        target_dir = Path(directory).resolve()
+        target_dir = Path(path).resolve()
         
         if verbose:
             console.print(f"[blue]Initializing project in: {target_dir}[/blue]")

@@ -23,7 +23,7 @@ def get_client() -> LuminoraCoreClient:
     return LuminoraCoreClient()
 
 
-async def validate_command(
+def validate_command(
     files: List[Path] = typer.Argument(
         ...,
         help="Personality files to validate",
@@ -74,6 +74,29 @@ async def validate_command(
         min=1,
         max=16,
     ),
+) -> None:
+    """Synchronous wrapper for async validate_command_impl."""
+    asyncio.run(_validate_command_impl(
+        files=files,
+        schema_url=schema_url,
+        strict=strict,
+        format=format,
+        output_file=output_file,
+        quiet=quiet,
+        parallel=parallel,
+        max_workers=max_workers
+    ))
+
+
+async def _validate_command_impl(
+    files: List[Path],
+    schema_url: Optional[str],
+    strict: bool,
+    format: str,
+    output_file: Optional[Path],
+    quiet: bool,
+    parallel: bool,
+    max_workers: int,
 ) -> None:
     """
     Validate personality files against the LuminoraCore schema.

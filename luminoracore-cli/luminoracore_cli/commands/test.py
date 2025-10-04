@@ -14,7 +14,7 @@ from luminoracore_cli.utils.files import find_personality_files, read_json_file
 from luminoracore_cli.core.client import get_client
 
 
-async def test_command(
+def test_command(
     personality: str = typer.Argument(..., help="Personality name or file path"),
     provider: str = typer.Option("openai", "--provider", "-p", help="LLM provider to use"),
     model: Optional[str] = typer.Option(None, "--model", "-m", help="Specific model to use"),
@@ -22,6 +22,27 @@ async def test_command(
     interactive: bool = typer.Option(False, "--interactive", "-i", help="Interactive testing mode"),
     validate: bool = typer.Option(True, "--validate", help="Validate personality before testing"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output")
+) -> int:
+    """Synchronous wrapper for async test_command_impl."""
+    return asyncio.run(_test_command_impl(
+        personality=personality,
+        provider=provider,
+        model=model,
+        message=message,
+        interactive=interactive,
+        validate=validate,
+        verbose=verbose
+    ))
+
+
+async def _test_command_impl(
+    personality: str,
+    provider: str,
+    model: Optional[str],
+    message: Optional[str],
+    interactive: bool,
+    validate: bool,
+    verbose: bool
 ) -> int:
     """
     Test a personality with a real LLM provider.

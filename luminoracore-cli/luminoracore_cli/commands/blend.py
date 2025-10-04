@@ -16,7 +16,8 @@ from luminoracore_cli.core.client import get_client
 
 
 def blend_command(
-    personalities: str = typer.Argument(..., help="Personalities to blend in format 'name1:weight1,name2:weight2'"),
+    personalities: List[str] = typer.Argument(..., help="Personality files to blend"),
+    weights: Optional[str] = typer.Option(None, "--weights", "-w", help="Weights for each personality (space-separated)"),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file path"),
     name: Optional[str] = typer.Option(None, "--name", "-n", help="Custom name for blended personality"),
     interactive: bool = typer.Option(False, "--interactive", "-i", help="Interactive weight adjustment"),
@@ -30,8 +31,18 @@ def blend_command(
     with weighted characteristics from each source personality.
     """
     try:
-        # Parse personality weights
-        personality_weights = parse_personality_weights(personalities)
+        # Build personality weights dict
+        if weights is None:
+            # Equal weights
+            weight_value = 1.0 / len(personalities)
+            personality_weights = {p: weight_value for p in personalities}
+        else:
+            # Parse weights string
+            weight_values = [float(w) for w in weights.split()]
+            if len(weight_values) != len(personalities):
+                error_console.print(f"[red]Error: Number of weights ({len(weight_values)}) must match number of personalities ({len(personalities)})[/red]")
+                raise typer.Exit(1)
+            personality_weights = dict(zip(personalities, weight_values))
         
         if verbose:
             console.print(f"[blue]Blending {len(personality_weights)} personalities[/blue]")
@@ -44,7 +55,7 @@ def blend_command(
         total_weight = sum(personality_weights.values())
         if abs(total_weight - 1.0) > 0.01:
             error_console.print(f"[red]Error: Weights must sum to 1.0, got {total_weight:.3f}[/red]")
-            return 1
+            raise typer.Exit(1)
         
         # Get personality data
         personality_data_list = []
@@ -56,8 +67,9 @@ def blend_command(
         if verbose:
             console.print("[blue]Blending personalities...[/blue]")
         
-        client = get_client()
-        blended_personality = client.blend_personalities(personality_weights, custom_name=name)
+        from luminoracore_cli.core.blender import PersonalityBlender
+        blender = PersonalityBlender()
+        blended_personality = blender.blend(personality_data_list, custom_name=name)
         
         if verbose:
             console.print("[green]✓ Personalities blended successfully[/green]")
@@ -76,7 +88,7 @@ def blend_command(
                 error_console.print("[red]Validation failed:[/red]")
                 for error in validation_result["errors"]:
                     error_console.print(f"  [red]• {error}[/red]")
-                return 1
+                raise typer.Exit(1)
             
             if verbose:
                 console.print("[green]✓ Blended personality validation passed[/green]")
@@ -111,13 +123,13 @@ def blend_command(
         
     except CLIError as e:
         error_console.print(f"[red]CLI error: {e}[/red]")
-        return 1
+        raise typer.Exit(1)
     except Exception as e:
         error_console.print(f"[red]Unexpected error: {e}[/red]")
         if verbose:
             import traceback
             error_console.print(traceback.format_exc())
-        return 1
+        raise typer.Exit(1)
 
 
 def parse_personality_weights(personalities: str) -> Dict[str, float]:
@@ -204,11 +216,16 @@ def adjust_weights_interactively(personality_weights: Dict[str, float]) -> Dict[
 def get_personality_data(personality_id: str) -> Dict[str, Any]:
     """Get personality data by ID or file path."""
     try:
-        # Try to find personality file
-        personality_path = find_personality_files(personality_id)
-        
-        if personality_path:
+        # Check if it's a direct path first
+        personality_path = Path(personality_id)
+        if personality_path.exists():
             return read_json_file(personality_path)
+        
+        # Try to find personality file
+        found_paths = find_personality_files(personality_id)
+        if found_paths:
+            path = found_paths[0] if isinstance(found_paths, list) else found_paths
+            return read_json_file(path)
         
         # Try to get from repository
         client = get_client()

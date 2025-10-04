@@ -24,52 +24,33 @@ from luminoracore import (
 
 @pytest.fixture
 def valid_personality_dict():
-    """Personalidad válida como diccionario."""
+    """Personalidad válida como diccionario (cumple JSON Schema)."""
     return {
-        "name": "test_personality",
-        "description": "A test personality",
         "persona": {
             "name": "TestBot",
-            "description": "A testing assistant",
-            "role": "assistant",
-            "archetype": "helper"
+            "version": "1.0.0",
+            "description": "A testing assistant for unit tests",
+            "author": "Test Suite",
+            "tags": ["testing", "qa", "unit-test"],
+            "language": "en",
+            "compatibility": ["openai", "anthropic"]
         },
         "core_traits": {
-            "archetype": "helper",
-            "tone": "friendly",
-            "formality": 0.5,
-            "enthusiasm": 0.7,
-            "empathy": 0.8
+            "archetype": "scientist",
+            "temperament": "calm",
+            "communication_style": "casual"
         },
-        "communication_style": {
-            "verbosity": 0.5,
-            "complexity": 0.5,
-            "humor": 0.3,
-            "directness": 0.7
+        "linguistic_profile": {
+            "tone": ["friendly", "professional", "warm"],
+            "syntax": "simple",
+            "vocabulary": ["test", "example", "verify", "check", "validate"]
         },
-        "knowledge_domains": ["testing", "qa"],
-        "behavioral_rules": {
-            "must_do": ["Be helpful", "Be clear"],
-            "must_not_do": ["Be rude"],
-            "preferences": ["Concise answers"]
-        },
-        "response_patterns": {
-            "greeting": "Hello! How can I help you test today?",
-            "farewell": "Happy testing!",
-            "acknowledgment": "Got it!",
-            "clarification": "Could you clarify that?"
-        },
-        "context_awareness": {
-            "maintains_conversation_context": True,
-            "adapts_to_user_mood": False,
-            "considers_previous_interactions": True
-        },
-        "metadata": {
-            "version": "1.0.0",
-            "author": "Test Suite",
-            "created_at": "2025-01-04",
-            "tags": ["testing", "qa"]
-        }
+        "behavioral_rules": [
+            "Always be helpful and clear",
+            "Provide accurate test information",
+            "Be respectful and friendly",
+            "Focus on testing best practices"
+        ]
     }
 
 @pytest.fixture
@@ -99,13 +80,13 @@ class TestPersonalityLoading:
         """✅ Cargar desde archivo JSON válido."""
         personality = Personality(valid_personality_file)
         assert personality is not None
-        assert personality.name == "test_personality"
+        assert personality.persona.name == "TestBot"
     
     def test_load_from_dict(self, valid_personality_dict):
         """✅ Cargar desde diccionario Python."""
         personality = Personality(valid_personality_dict)
         assert personality is not None
-        assert personality.name == "test_personality"
+        assert personality.persona.name == "TestBot"
     
     def test_load_nonexistent_file(self):
         """✅ Manejo de archivo inexistente."""
@@ -144,17 +125,30 @@ class TestPersonalityValidation:
     
     def test_validate_with_warnings(self, valid_personality_dict):
         """✅ Personalidad con warnings (no errores)."""
-        # Personalidad válida pero con campos opcionales vacíos
+        # Personalidad válida pero mínima (cumple schema pero tiene campos opcionales vacíos)
         minimal_dict = {
-            "name": "minimal",
             "persona": {
                 "name": "MinBot",
-                "description": "Minimal",
-                "role": "assistant"
+                "version": "1.0.0",
+                "description": "Minimal personality",
+                "author": "Test",
+                "tags": ["minimal"],
+                "language": "en",
+                "compatibility": ["openai"]
             },
             "core_traits": {
-                "archetype": "helper"
-            }
+                "archetype": "caregiver",
+                "temperament": "calm",
+                "communication_style": "formal"
+            },
+            "linguistic_profile": {
+                "tone": ["friendly"],
+                "syntax": "simple",
+                "vocabulary": ["test"]
+            },
+            "behavioral_rules": [
+                "Be helpful"
+            ]
         }
         
         personality = Personality(minimal_dict)
@@ -294,16 +288,18 @@ class TestPersonaBlend:
     
     @pytest.fixture
     def personality_a(self, valid_personality_dict):
-        dict_a = valid_personality_dict.copy()
-        dict_a["name"] = "personality_a"
-        dict_a["core_traits"]["enthusiasm"] = 0.9
+        import copy
+        dict_a = copy.deepcopy(valid_personality_dict)
+        dict_a["persona"]["name"] = "personality_a"
+        dict_a["advanced_parameters"] = {"verbosity": 0.9}
         return Personality(dict_a)
     
     @pytest.fixture
     def personality_b(self, valid_personality_dict):
-        dict_b = valid_personality_dict.copy()
-        dict_b["name"] = "personality_b"
-        dict_b["core_traits"]["enthusiasm"] = 0.1
+        import copy
+        dict_b = copy.deepcopy(valid_personality_dict)
+        dict_b["persona"]["name"] = "personality_b"
+        dict_b["advanced_parameters"] = {"verbosity": 0.1}
         return Personality(dict_b)
     
     def test_blend_two_personalities_50_50(self, personality_a, personality_b):
@@ -311,42 +307,47 @@ class TestPersonaBlend:
         blender = PersonaBlend()
         result = blender.blend(
             personalities=[personality_a, personality_b],
-            weights=[0.5, 0.5]
+            weights={"personality_a": 0.5, "personality_b": 0.5}
         )
         
         assert result is not None
-        assert hasattr(result, 'core_traits')
+        assert result.blended_personality is not None
         
-        # El resultado debe estar entre ambos
-        # enthusiasm: 0.9 * 0.5 + 0.1 * 0.5 = 0.5
-        assert result.core_traits.enthusiasm == pytest.approx(0.5, abs=0.1)
+        # El resultado debe ser una mezcla válida
+        # verbosity: 0.9 * 0.5 + 0.1 * 0.5 = 0.5
+        blended = result.blended_personality
+        assert hasattr(blended, 'advanced_parameters')
+        assert blended.advanced_parameters.verbosity == pytest.approx(0.5, abs=0.1)
     
     def test_blend_two_personalities_70_30(self, personality_a, personality_b):
         """✅ Mezclar 2 personalidades (70/30)."""
         blender = PersonaBlend()
         result = blender.blend(
             personalities=[personality_a, personality_b],
-            weights=[0.7, 0.3]
+            weights={"personality_a": 0.7, "personality_b": 0.3}
         )
         
         assert result is not None
-        # enthusiasm: 0.9 * 0.7 + 0.1 * 0.3 = 0.66
-        assert result.core_traits.enthusiasm == pytest.approx(0.66, abs=0.1)
+        blended = result.blended_personality
+        # verbosity: 0.9 * 0.7 + 0.1 * 0.3 = 0.66
+        assert blended.advanced_parameters.verbosity == pytest.approx(0.66, abs=0.1)
     
     def test_blend_three_personalities(self, personality_a, personality_b, valid_personality_dict):
         """✅ Mezclar 3+ personalidades."""
-        dict_c = valid_personality_dict.copy()
-        dict_c["name"] = "personality_c"
-        dict_c["core_traits"]["enthusiasm"] = 0.5
+        import copy
+        dict_c = copy.deepcopy(valid_personality_dict)
+        dict_c["persona"]["name"] = "personality_c"
+        dict_c["advanced_parameters"] = {"verbosity": 0.5}
         personality_c = Personality(dict_c)
         
         blender = PersonaBlend()
         result = blender.blend(
             personalities=[personality_a, personality_b, personality_c],
-            weights=[0.33, 0.33, 0.34]
+            weights={"personality_a": 0.33, "personality_b": 0.33, "personality_c": 0.34}
         )
         
         assert result is not None
+        assert result.blended_personality is not None
     
     def test_blend_strategies(self, personality_a, personality_b):
         """✅ Estrategias de mezcla."""
@@ -355,10 +356,11 @@ class TestPersonaBlend:
         # Estrategia por defecto
         result_default = blender.blend(
             personalities=[personality_a, personality_b],
-            weights=[0.5, 0.5]
+            weights={"personality_a": 0.5, "personality_b": 0.5}
         )
         
         assert result_default is not None
+        assert result_default.blended_personality is not None
         
         # Si hay otras estrategias disponibles
         # result_max = blender.blend(..., strategy="max")
@@ -369,12 +371,12 @@ class TestPersonaBlend:
         blender = PersonaBlend()
         result = blender.blend(
             personalities=[personality_a, personality_b],
-            weights=[0.5, 0.5]
+            weights={"personality_a": 0.5, "personality_b": 0.5}
         )
         
         # La personalidad resultante debe ser válida
         validator = PersonalityValidator()
-        validation_result = validator.validate(result)
+        validation_result = validator.validate(result.blended_personality)
         
         assert validation_result.is_valid is True
 
@@ -385,33 +387,41 @@ class TestPersonaBlend:
 class TestPerformance:
     """Tests de rendimiento del motor base."""
     
-    def test_load_performance(self, valid_personality_dict, benchmark):
-        """✅ Carga < 100ms."""
-        def load():
-            return Personality(valid_personality_dict)
+    def test_load_performance(self, valid_personality_dict):
+        """✅ Carga rápida."""
+        import time
+        start = time.time()
+        personality = Personality(valid_personality_dict)
+        elapsed = time.time() - start
         
-        result = benchmark(load)
-        # benchmark provee stats automáticamente
+        assert personality is not None
+        assert elapsed < 1.0  # Debe cargar en menos de 1 segundo
     
-    def test_validation_performance(self, valid_personality_dict, benchmark):
-        """✅ Validación < 50ms."""
+    def test_validation_performance(self, valid_personality_dict):
+        """✅ Validación rápida."""
+        import time
         personality = Personality(valid_personality_dict)
         validator = PersonalityValidator()
         
-        def validate():
-            return validator.validate(personality)
+        start = time.time()
+        result = validator.validate(personality)
+        elapsed = time.time() - start
         
-        result = benchmark(validate)
+        assert result.is_valid
+        assert elapsed < 1.0  # Debe validar en menos de 1 segundo
     
-    def test_compilation_performance(self, valid_personality_dict, benchmark):
-        """✅ Compilación < 200ms."""
+    def test_compilation_performance(self, valid_personality_dict):
+        """✅ Compilación rápida."""
+        import time
         personality = Personality(valid_personality_dict)
         compiler = PersonalityCompiler()
         
-        def compile():
-            return compiler.compile(personality, LLMProvider.OPENAI)
+        start = time.time()
+        result = compiler.compile(personality, LLMProvider.OPENAI)
+        elapsed = time.time() - start
         
-        result = benchmark(compile)
+        assert result is not None
+        assert elapsed < 2.0  # Debe compilar en menos de 2 segundos
     
     def test_no_memory_leaks(self, valid_personality_dict):
         """✅ No memory leaks."""

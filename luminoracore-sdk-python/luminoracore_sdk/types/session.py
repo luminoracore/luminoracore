@@ -157,6 +157,7 @@ class MemoryConfig:
     max_entries: int = 1000
     decay_factor: float = 0.1
     importance_threshold: float = 0.5
+    ttl: Optional[int] = None  # Time-to-live in seconds (None = no expiration)
     
     # Memory types to track
     track_topics: bool = True

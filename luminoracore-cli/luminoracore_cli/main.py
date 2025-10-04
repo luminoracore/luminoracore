@@ -44,15 +44,13 @@ app = typer.Typer(
 )
 
 # Global options
-@app.callback()
+@app.callback(invoke_without_command=True)
 def main(
     ctx: typer.Context,
-    version: Optional[bool] = typer.Option(
-        None,
+    version: bool = typer.Option(
+        False,
         "--version",
-        "-v",
         help="Show version and exit",
-        is_flag=True,
     ),
     config_file: Optional[Path] = typer.Option(
         None,
@@ -107,7 +105,12 @@ def main(
     """
     if version:
         console.print(f"LuminoraCore CLI v{__version__}")
-        raise typer.Exit()
+        raise typer.Exit(0)
+    
+    # If no command provided, show help
+    if ctx.invoked_subcommand is None and not version:
+        console.print(ctx.get_help())
+        raise typer.Exit(0)
     
     # Configure console based on options
     if no_color:
@@ -130,11 +133,12 @@ def main(
         raise typer.Exit(1)
 
 # Register commands
+# Note: Typer handles async commands internally
 app.command("validate", help="Validate personality files")(validate_command)
 app.command("compile", help="Compile personalities to prompts")(compile_command)
 app.command("create", help="Create new personalities")(create_command)
 app.command("list", help="List available personalities")(list_command)
-app.command("test", help="Test personalities interactively")(lambda *args, **kwargs: asyncio.run(test_command(*args, **kwargs)))
+app.command("test", help="Test personalities interactively")(test_command)
 app.command("serve", help="Start development server")(serve_command)
 app.command("blend", help="Blend multiple personalities")(blend_command)
 app.command("update", help="Update personality cache")(update_command)
@@ -142,7 +146,7 @@ app.command("init", help="Initialize new project")(init_command)
 app.command("info", help="Show personality information")(info_command)
 
 # Exception handling
-@app.callback(invoke_without_command=True)
+# @app.callback(invoke_without_command=True)  # DISABLED: conflicts with main callback
 def handle_exceptions(ctx: typer.Context) -> None:
     """Global exception handler."""
     try:
