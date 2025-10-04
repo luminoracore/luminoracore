@@ -9,6 +9,37 @@
 
 **LuminoraCore** es una plataforma completa de gestión de personalidades de IA que consta de tres componentes poderosos que trabajan juntos para proporcionar sistemas avanzados de personalidades de IA, herramientas de línea de comandos e integración de SDK de Python.
 
+---
+
+## 🚀 ¿Primera Vez Aquí? EMPIEZA AQUÍ
+
+### ⚡ Instalación Rápida (1 comando)
+
+```bash
+# Windows
+.\instalar_todo.ps1
+
+# Linux/Mac
+./instalar_todo.sh
+```
+
+### 📚 Guías de Inicio
+
+| Documento | Tiempo | Descripción |
+|-----------|--------|-------------|
+| **[INICIO_RAPIDO.md](INICIO_RAPIDO.md)** ⭐⭐⭐ | 5 min | Instalación express y primeros pasos |
+| **[GUIA_INSTALACION_USO.md](GUIA_INSTALACION_USO.md)** ⭐⭐⭐ | 30 min | Guía completa paso a paso |
+| **[COMO_USAR_LUMINORACORE.md](COMO_USAR_LUMINORACORE.md)** | 10 min | Referencia rápida de comandos |
+| **[CHEATSHEET.md](CHEATSHEET.md)** | 2 min | CheatSheet para imprimir |
+
+**¿No sabes por dónde empezar?** → Lee [INICIO_RAPIDO.md](INICIO_RAPIDO.md) primero.
+
+**¿Quieres todos los detalles?** → Lee [GUIA_INSTALACION_USO.md](GUIA_INSTALACION_USO.md).
+
+**¿Buscas algo específico?** → Consulta [INDICE_DOCUMENTACION.md](INDICE_DOCUMENTACION.md).
+
+---
+
 ## 🏗️ Arquitectura General
 
 LuminoraCore está construido como una plataforma modular con tres componentes principales:
