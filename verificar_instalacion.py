@@ -1,58 +1,58 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Script de Verificación de Instalación - LuminoraCore
-====================================================
+Installation Verification Script - LuminoraCore
+===============================================
 
-Este script verifica:
-  1. Entorno virtual activo
-  2. Motor Base (luminoracore)
+This script verifies:
+  1. Active virtual environment
+  2. Base Engine (luminoracore)
   3. CLI (luminoracore-cli)
   4. SDK (luminoracore-sdk-python)
-  5. Providers disponibles (7 en total)
-  6. Dependencias opcionales
-  7. API Keys configuradas
+  5. Available providers (7 total)
+  6. Optional dependencies
+  7. Configured API Keys
 
-NOTA IMPORTANTE SOBRE API KEYS:
+IMPORTANT NOTE ABOUT API KEYS:
 -------------------------------
-Las API keys se configuran como VARIABLES DE ENTORNO, NO en archivos de código.
+API keys are configured as ENVIRONMENT VARIABLES, NOT in code files.
 
-Esto es por seguridad: nunca debes poner API keys directamente en tu código.
+This is for security: you should never put API keys directly in your code.
 
-¿Cómo configurar una API key?
+How to configure an API key?
 
   Windows PowerShell:
-    $env:DEEPSEEK_API_KEY="sk-tu-api-key-aqui"
+    $env:DEEPSEEK_API_KEY="sk-your-api-key-here"
   
   Linux/Mac:
-    export DEEPSEEK_API_KEY="sk-tu-api-key-aqui"
+    export DEEPSEEK_API_KEY="sk-your-api-key-here"
 
-Las API keys son necesarias solo si quieres hacer llamadas REALES a los LLMs.
-Para testing y desarrollo, el sistema funciona sin ellas.
+API keys are only needed if you want to make REAL calls to LLMs.
+For testing and development, the system works without them.
 
-Más información: GUIA_INSTALACION_USO.md (sección "Configurar API Keys")
+More information: INSTALLATION_GUIDE.md (section "API Key Configuration")
 """
 
 import sys
 import os
 
-# Fix encoding para Windows
+# Fix encoding for Windows
 if sys.platform == 'win32':
     import codecs
     sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
     sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
 
 print("=" * 70)
-print("VERIFICACION DE INSTALACION - LUMINORACORE")
+print("INSTALLATION VERIFICATION - LUMINORACORE")
 print("=" * 70)
 print()
 
-# Verificar entorno virtual
+# Verify virtual environment
 if hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix):
-    print("✅ Entorno virtual activado")
+    print("✅ Virtual environment activated")
 else:
-    print("⚠️  WARNING: No estas en un entorno virtual")
-    print("   Recomendacion: Activa tu venv antes de continuar")
+    print("⚠️  WARNING: Not in a virtual environment")
+    print("   Recommendation: Activate your venv before continuing")
 
 print(f"   Python: {sys.version.split()[0]}")
 print(f"   Path: {sys.executable}")
@@ -61,40 +61,40 @@ print()
 tests = []
 errors = []
 
-# Test 1: Motor Base o SDK
-print("1. MOTOR BASE / SDK (luminoracore)")
+# Test 1: Base Engine or SDK
+print("1. BASE ENGINE / SDK (luminoracore)")
 print("-" * 70)
 
-# Intentar importar desde Motor Base standalone
+# Try importing from standalone Base Engine
 motor_base_ok = False
 try:
     from luminoracore import Personality, PersonalityValidator, PersonalityCompiler
     from luminoracore.core.schema import LLMProvider
     import luminoracore
     version = getattr(luminoracore, '__version__', 'unknown')
-    print(f"✅ Motor Base instalado correctamente (v{version})")
+    print(f"✅ Base Engine installed correctly (v{version})")
     print(f"   - Personality: OK")
     print(f"   - PersonalityValidator: OK")
     print(f"   - PersonalityCompiler: OK")
     print(f"   - LLMProvider: OK")
     motor_base_ok = True
 except ImportError:
-    # Intentar importar desde SDK (que tiene su propio sistema)
+    # Try importing from SDK (which has its own system)
     try:
         from luminoracore import LuminoraCoreClient
         from luminoracore.providers import ProviderFactory
         import luminoracore
         version = getattr(luminoracore, '__version__', 'unknown')
-        print(f"✅ SDK instalado correctamente (v{version})")
-        print(f"   ℹ️  Usando SDK (incluye funcionalidad del Motor Base)")
+        print(f"✅ SDK installed correctly (v{version})")
+        print(f"   ℹ️  Using SDK (includes Base Engine functionality)")
         print(f"   - LuminoraCoreClient: OK")
         print(f"   - ProviderFactory: OK")
         motor_base_ok = True
     except ImportError as e:
         print(f"❌ ERROR: {e}")
-        print("   Solucion: cd luminoracore && pip install -e .")
-        print("   O: cd luminoracore-sdk-python && pip install -e '.[openai]'")
-        errors.append("Motor Base/SDK no instalado")
+        print("   Solution: cd luminoracore && pip install -e .")
+        print("   Or: cd luminoracore-sdk-python && pip install -e '.[openai]'")
+        errors.append("Base Engine/SDK not installed")
 
 tests.append(motor_base_ok)
 print()
@@ -105,9 +105,9 @@ print("-" * 70)
 try:
     import luminoracore_cli
     from luminoracore_cli import __version__ as cli_version
-    print(f"✅ Instalado correctamente (v{cli_version})")
+    print(f"✅ Installed correctly (v{cli_version})")
     
-    # Verificar que el comando está disponible
+    # Verify command is available
     import subprocess
     result = subprocess.run(
         ['luminoracore', '--version'],
@@ -116,37 +116,37 @@ try:
         timeout=5
     )
     if result.returncode == 0:
-        print(f"   - Comando 'luminoracore': OK")
+        print(f"   - Command 'luminoracore': OK")
     else:
-        print(f"   ⚠️  Comando 'luminoracore' no disponible en PATH")
+        print(f"   ⚠️  Command 'luminoracore' not available in PATH")
     
     tests.append(True)
 except ImportError as e:
     print(f"❌ ERROR: {e}")
-    print("   Solucion: cd luminoracore-cli && pip install -e .")
+    print("   Solution: cd luminoracore-cli && pip install -e .")
     tests.append(False)
-    errors.append("CLI no instalado")
+    errors.append("CLI not installed")
 except FileNotFoundError:
-    print(f"⚠️  Paquete importable pero comando no encontrado")
-    print("   Reinstala: cd luminoracore-cli && pip install -e .")
+    print(f"⚠️  Package importable but command not found")
+    print("   Reinstall: cd luminoracore-cli && pip install -e .")
     tests.append(True)
 except Exception as e:
     print(f"⚠️  WARNING: {e}")
     tests.append(True)
 print()
 
-# Test 3: SDK (verificación adicional si no se detectó antes)
-print("3. SDK - VERIFICACION COMPLETA (luminoracore-sdk-python)")
+# Test 3: SDK (additional verification if not detected before)
+print("3. SDK - COMPLETE VERIFICATION (luminoracore-sdk-python)")
 print("-" * 70)
 sdk_ok = False
 try:
     from luminoracore import LuminoraCoreClient
     from luminoracore.types.provider import ProviderConfig
-    print(f"✅ SDK completamente funcional")
+    print(f"✅ SDK fully functional")
     print(f"   - LuminoraCoreClient: OK")
     print(f"   - ProviderConfig: OK")
     
-    # Verificar StorageConfig (puede estar en diferentes lugares)
+    # Verify StorageConfig (may be in different locations)
     try:
         from luminoracore.types.storage import StorageConfig
         print(f"   - StorageConfig: OK")
@@ -155,25 +155,25 @@ try:
             from luminoracore.types.session import StorageConfig
             print(f"   - StorageConfig: OK")
         except ImportError:
-            print(f"   ⚠️  StorageConfig: No encontrado (opcional)")
+            print(f"   ⚠️  StorageConfig: Not found (optional)")
     
     sdk_ok = True
 except ImportError as e:
     print(f"❌ ERROR: {e}")
-    print("   Solucion: cd luminoracore-sdk-python && pip install -e '.[openai]'")
-    errors.append("SDK no instalado completamente")
+    print("   Solution: cd luminoracore-sdk-python && pip install -e '.[openai]'")
+    errors.append("SDK not fully installed")
 
 tests.append(sdk_ok)
 print()
 
 # Test 4: Providers
-print("4. PROVIDERS DISPONIBLES")
+print("4. AVAILABLE PROVIDERS")
 print("-" * 70)
 providers_status = []
 try:
     from luminoracore.providers import ProviderFactory
     
-    # Lista de providers esperados
+    # List of expected providers
     expected_providers = [
         "openai", "anthropic", "deepseek", "mistral", 
         "cohere", "google", "llama"
@@ -191,17 +191,17 @@ try:
             providers_status.append(False)
     
     if all(providers_status):
-        print(f"\n✅ Todos los providers ({len(expected_providers)}) disponibles")
+        print(f"\n✅ All providers ({len(expected_providers)}) available")
     else:
         failed = len([p for p in providers_status if not p])
-        print(f"\n⚠️  {failed} provider(s) con problemas")
+        print(f"\n⚠️  {failed} provider(s) with problems")
         
 except ImportError as e:
-    print(f"❌ ERROR: No se pueden cargar providers: {e}")
+    print(f"❌ ERROR: Cannot load providers: {e}")
 print()
 
-# Test 5: Dependencias opcionales
-print("5. DEPENDENCIAS OPCIONALES")
+# Test 5: Optional dependencies
+print("5. OPTIONAL DEPENDENCIES")
 print("-" * 70)
 optional_deps = {
     'openai': 'OpenAI API',
@@ -216,15 +216,15 @@ for dep, desc in optional_deps.items():
         __import__(dep)
         print(f"  ✅ {dep:12s} - {desc}")
     except ImportError:
-        print(f"  ⚪ {dep:12s} - {desc} (no instalado)")
+        print(f"  ⚪ {dep:12s} - {desc} (not installed)")
 
 print()
 
-# Test 6: Configuración
-print("6. CONFIGURACION DE API KEYS")
+# Test 6: Configuration
+print("6. API KEYS CONFIGURATION")
 print("-" * 70)
-print("Las API keys son necesarias para hacer llamadas reales a los LLMs.")
-print("Se configuran como variables de entorno (NO en el código).")
+print("API keys are needed to make real calls to LLMs.")
+print("They are configured as environment variables (NOT in code).")
 print()
 
 config_vars = {
@@ -244,80 +244,80 @@ for var, url in config_vars.items():
         print(f"  ✅ {var}")
         api_keys_found += 1
     else:
-        print(f"  ⚪ {var} (no configurada)")
+        print(f"  ⚪ {var} (not configured)")
         keys_no_configuradas.append((var, url))
 
 if api_keys_found == 0:
-    print("\n⚠️  Ninguna API key configurada")
-    print("   Para hacer llamadas reales a LLMs, necesitas configurar al menos una.")
+    print("\n⚠️  No API keys configured")
+    print("   To make real calls to LLMs, you need to configure at least one.")
     print()
-    print("   📖 ¿Cómo configurar API keys?")
+    print("   📖 How to configure API keys?")
     print()
     print("   Windows PowerShell:")
-    print("   $env:DEEPSEEK_API_KEY=\"sk-tu-api-key-aqui\"")
+    print("   $env:DEEPSEEK_API_KEY=\"sk-your-api-key-here\"")
     print()
     print("   Linux/Mac:")
-    print("   export DEEPSEEK_API_KEY=\"sk-tu-api-key-aqui\"")
+    print("   export DEEPSEEK_API_KEY=\"sk-your-api-key-here\"")
     print()
-    print("   📝 Donde obtener API keys:")
+    print("   📝 Where to get API keys:")
     for var, url in keys_no_configuradas:
         provider_name = var.replace('_API_KEY', '').title()
         print(f"   - {provider_name}: {url}")
 elif api_keys_found < len(config_vars):
-    print(f"\n✅ {api_keys_found} API key(s) configurada(s)")
+    print(f"\n✅ {api_keys_found} API key(s) configured")
     print()
-    print("   💡 Tip: Configura más providers si los necesitas:")
+    print("   💡 Tip: Configure more providers if you need them:")
     print()
-    print("   Windows: $env:PROVIDER_API_KEY=\"tu-key\"")
-    print("   Linux/Mac: export PROVIDER_API_KEY=\"tu-key\"")
+    print("   Windows: $env:PROVIDER_API_KEY=\"your-key\"")
+    print("   Linux/Mac: export PROVIDER_API_KEY=\"your-key\"")
 else:
-    print(f"\n✅ Todas las API keys ({api_keys_found}) están configuradas!")
+    print(f"\n✅ All API keys ({api_keys_found}) are configured!")
 
 print()
 
-# Resumen Final
+# Final Summary
 print("=" * 70)
-print("RESUMEN")
+print("SUMMARY")
 print("=" * 70)
 
 if all(tests):
-    print("🎉 INSTALACION COMPLETA Y CORRECTA")
+    print("🎉 INSTALLATION COMPLETE AND CORRECT")
     print()
-    print("Componentes instalados:")
+    print("Installed components:")
     if motor_base_ok:
-        print("  ✅ Motor Base/SDK (luminoracore)")
+        print("  ✅ Base Engine/SDK (luminoracore)")
     print("  ✅ CLI (luminoracore-cli)")
     if sdk_ok:
-        print("  ✅ SDK completo (con providers y cliente)")
+        print("  ✅ Complete SDK (with providers and client)")
     print()
     if api_keys_found == 0:
-        print("⚠️  Nota: No tienes API keys configuradas (aún)")
+        print("⚠️  Note: You don't have API keys configured (yet)")
         print()
-        print("Esto está bien para empezar. Puedes:")
-        print("  1. Explorar el sistema sin hacer llamadas a LLMs reales")
-        print("  2. Ver ejemplos y documentación")
-        print("  3. Configurar API keys cuando las necesites")
+        print("This is fine to get started. You can:")
+        print("  1. Explore the system without making real LLM calls")
+        print("  2. View examples and documentation")
+        print("  3. Configure API keys when you need them")
         print()
-        print("📖 Para configurar API keys, consulta:")
-        print("   GUIA_INSTALACION_USO.md (sección 'Configurar API Keys')")
+        print("📖 To configure API keys, check:")
+        print("   INSTALLATION_GUIDE.md (section 'API Key Configuration')")
         print()
-    print("Siguientes pasos:")
-    print("  1. Lee: INICIO_RAPIDO.md")
+    print("Next steps:")
+    print("  1. Read: QUICK_START.md")
     if sdk_ok and api_keys_found > 0:
-        print("  2. Prueba: luminoracore test --provider deepseek")
-        print("  3. Ejecuta ejemplos: python ejemplo_quick_start_sdk.py")
+        print("  2. Test: luminoracore test --provider deepseek")
+        print("  3. Run examples: python ejemplo_quick_start_sdk.py")
     else:
-        print("  2. Configura tus API keys")
-        print("  3. Prueba: luminoracore --help")
-        print("  4. Ejecuta ejemplos disponibles")
+        print("  2. Configure your API keys")
+        print("  3. Test: luminoracore --help")
+        print("  4. Run available examples")
 else:
-    print("⚠️  ALGUNOS COMPONENTES FALTAN")
+    print("⚠️  SOME COMPONENTS MISSING")
     print()
-    print("Problemas encontrados:")
+    print("Problems found:")
     for error in errors:
         print(f"  ❌ {error}")
     print()
-    print("Consulta: GUIA_INSTALACION_USO.md seccion 'Solucion de Problemas'")
+    print("Check: INSTALLATION_GUIDE.md section 'Troubleshooting'")
 
 print("=" * 70)
 print()
