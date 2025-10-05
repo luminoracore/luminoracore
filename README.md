@@ -30,10 +30,10 @@
 
 ```bash
 # 1. Download the verification script (if you don't have it)
-curl -O https://raw.githubusercontent.com/your-user/luminoracore/main/verificar_instalacion.py
+curl -O https://raw.githubusercontent.com/your-user/luminoracore/main/verify_installation.py
 
 # 2. Run the verification
-python verificar_instalacion.py
+python verify_installation.py
 ```
 
 **This script automatically verifies:**
@@ -57,7 +57,7 @@ python verificar_instalacion.py
 
 **Want all the details?** → Read [INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md).
 
-**Installation problems?** → Run `python verificar_instalacion.py` (see [INSTALLATION_VERIFICATION.md](INSTALLATION_VERIFICATION.md))
+**Installation problems?** → Run `python verify_installation.py` (see [INSTALLATION_VERIFICATION.md](INSTALLATION_VERIFICATION.md))
 
 **Looking for something specific?** → Check [DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md).
 

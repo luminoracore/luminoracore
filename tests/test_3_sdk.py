@@ -1,18 +1,18 @@
 """
 Test Suite 3: LuminoraCore SDK
 ==============================
-Tests exhaustivos del SDK de Python para LuminoraCore.
+Comprehensive tests for the LuminoraCore Python SDK.
 
-Cobertura:
-1. Inicialización del cliente
-2. Configuración de providers
-3. Gestión de sesiones
-4. Envío de mensajes (mocked)
-5. Gestión de memoria
+Coverage:
+1. Client initialization
+2. Provider configuration
+3. Session management
+4. Message sending (mocked)
+5. Memory management
 6. PersonaBlend
 7. Storage backends
-8. Manejo de errores
-9. API async/await
+8. Error handling
+9. Async/await API
 10. Type safety
 """
 
@@ -53,7 +53,7 @@ pytestmark = pytest.mark.skipif(not SDK_AVAILABLE, reason="SDK not installed")
 
 @pytest.fixture
 def valid_personality_dict():
-    """Personalidad válida para tests del SDK."""
+    """Valid personality for SDK tests."""
     return {
         "name": "TestBot",
         "description": "A friendly and professional test bot for automated testing",
@@ -97,7 +97,7 @@ Always maintain these characteristics in your responses.""",
 
 @pytest.fixture
 def temp_personalities_dir(valid_personality_dict, tmp_path):
-    """Directorio temporal con personalidades de prueba."""
+    """Temporary directory with test personalities."""
     personalities_dir = tmp_path / "personalities"
     personalities_dir.mkdir()
     
@@ -111,7 +111,7 @@ def temp_personalities_dir(valid_personality_dict, tmp_path):
 
 @pytest.fixture
 def provider_config():
-    """Configuración de provider para tests (mock)."""
+    """Provider configuration for tests (mock)."""
     return ProviderConfig(
         name="openai",
         api_key="test-key-12345",
@@ -131,7 +131,7 @@ async def client_with_personalities(temp_personalities_dir):
 
 @pytest.fixture
 def storage_config_memory():
-    """Storage config para memoria RAM."""
+    """Storage config for RAM memory."""
     return StorageConfig(
         storage_type="memory"
     )

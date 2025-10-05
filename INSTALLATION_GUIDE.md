@@ -447,14 +447,14 @@ cd ..
 **Download the script:**
 ```bash
 # If you're in the cloned repository, download the script:
-curl -O https://raw.githubusercontent.com/your-user/luminoracore/main/verificar_instalacion.py
+curl -O https://raw.githubusercontent.com/your-user/luminoracore/main/verify_installation.py
 
 # Or copy manually from repository
 ```
 
 **Run verification:**
 ```bash
-python verificar_instalacion.py
+python verify_installation.py
 ```
 
 **Expected output:**

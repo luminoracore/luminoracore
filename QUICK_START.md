@@ -32,10 +32,10 @@ chmod +x instalar_todo.sh
 
 ```bash
 # Download the script (if you don't have it)
-curl -O https://raw.githubusercontent.com/your-user/luminoracore/main/verificar_instalacion.py
+curl -O https://raw.githubusercontent.com/your-user/luminoracore/main/verify_installation.py
 
 # Run complete verification
-python verificar_instalacion.py
+python verify_installation.py
 ```
 
 **Expected output:** `🎉 INSTALLATION COMPLETE AND CORRECT`

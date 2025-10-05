@@ -1,6 +1,6 @@
 """
 Test Suite 2: CLI (luminoracore-cli)
-Prueba exhaustiva de todos los comandos del CLI
+Comprehensive testing of all CLI commands
 """
 import pytest
 import os
@@ -27,12 +27,12 @@ from luminoracore import Personality
 
 @pytest.fixture
 def cli_runner():
-    """Click CLI runner para tests."""
+    """Click CLI runner for tests."""
     return CliRunner()
 
 @pytest.fixture
 def valid_personality_dict():
-    """Personalidad válida para tests."""
+    """Valid personality for tests."""
     return {
         "persona": {
             "name": "TestCLI",
@@ -62,7 +62,7 @@ def valid_personality_dict():
 
 @pytest.fixture
 def personality_file(valid_personality_dict, tmp_path):
-    """Archivo temporal con personalidad válida."""
+    """Temporary file with valid personality."""
     file_path = tmp_path / "test_cli.json"
     with open(file_path, 'w', encoding='utf-8') as f:
         json.dump(valid_personality_dict, f, indent=2)
@@ -70,7 +70,7 @@ def personality_file(valid_personality_dict, tmp_path):
 
 @pytest.fixture
 def personalities_dir(valid_personality_dict, tmp_path):
-    """Directorio temporal con múltiples personalidades."""
+    """Temporary directory with multiple personalities."""
     personalities_dir = tmp_path / "personalities"
     personalities_dir.mkdir()
     

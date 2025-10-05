@@ -1,14 +1,14 @@
 # 🧪 Installation Verification Guide
 
 **Version:** 1.0.0  
-**Script:** `verificar_instalacion.py`  
+**Script:** `verify_installation.py`  
 **Updated:** October 2025
 
 ---
 
 ## 📌 What is this script?
 
-`verificar_instalacion.py` is an **automatic diagnostic script** that verifies LuminoraCore is correctly installed and working.
+`verify_installation.py` is an **automatic diagnostic script** that verifies LuminoraCore is correctly installed and working.
 
 ---
 
@@ -38,24 +38,24 @@
 ```bash
 # If you cloned the complete repository, you already have it:
 cd LuminoraCoreBase
-ls verificar_instalacion.py   # Should exist
+ls verify_installation.py   # Should exist
 ```
 
 ### Option 2: Download Directly
 
 ```bash
 # Download from GitHub (update URL with your actual repository)
-curl -O https://raw.githubusercontent.com/your-user/luminoracore/main/verificar_instalacion.py
+curl -O https://raw.githubusercontent.com/your-user/luminoracore/main/verify_installation.py
 
 # Or with wget:
-wget https://raw.githubusercontent.com/your-user/luminoracore/main/verificar_instalacion.py
+wget https://raw.githubusercontent.com/your-user/luminoracore/main/verify_installation.py
 ```
 
 ### Option 3: Copy Manually
 
 If you have access to the source code, copy the file from:
 ```
-LuminoraCoreBase/verificar_instalacion.py
+LuminoraCoreBase/verify_installation.py
 ```
 
 ---
@@ -75,7 +75,7 @@ source venv/bin/activate
 ### Step 2: Run the script
 
 ```bash
-python verificar_instalacion.py
+python verify_installation.py
 ```
 
 ### Step 3: Review the output
@@ -327,7 +327,7 @@ Check: INSTALLATION_GUIDE.md section 'Troubleshooting'
 **Solution:**
 ```bash
 # Use python3 instead of python
-python3 verificar_instalacion.py
+python3 verify_installation.py
 ```
 
 ---
@@ -337,8 +337,8 @@ python3 verificar_instalacion.py
 **Solution:**
 ```bash
 # Give execution permissions (Linux/Mac)
-chmod +x verificar_instalacion.py
-python verificar_instalacion.py
+chmod +x verify_installation.py
+python verify_installation.py
 ```
 
 ---
@@ -373,7 +373,7 @@ The script includes a fix for Windows, but if you see strange characters:
 ```bash
 # Use PowerShell with UTF-8
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-python verificar_instalacion.py
+python verify_installation.py
 ```
 
 ---
@@ -420,7 +420,7 @@ cd luminoracore-sdk-python
 pip install -e ".[anthropic]"
 
 # Verify again
-python verificar_instalacion.py
+python verify_installation.py
 ```
 
 ---
@@ -442,7 +442,7 @@ $env:OPENAI_API_KEY="sk-your-api-key"
 export OPENAI_API_KEY="sk-your-api-key"
 
 # Verify again
-python verificar_instalacion.py
+python verify_installation.py
 ```
 
 ---
@@ -475,7 +475,7 @@ cd luminoracore
 ./instalar_todo.sh
 
 # 2. Verify
-python verificar_instalacion.py
+python verify_installation.py
 
 # ✅ Result: Everything installed correctly
 ```
@@ -486,14 +486,14 @@ python verificar_instalacion.py
 
 ```bash
 # Before installing
-python verificar_instalacion.py
+python verify_installation.py
 # ❌ Anthropic Provider: ERROR
 
 # Install
 pip install -e ".[anthropic]"
 
 # After installing
-python verificar_instalacion.py
+python verify_installation.py
 # ✅ Anthropic Provider: OK
 ```
 
@@ -503,14 +503,14 @@ python verificar_instalacion.py
 
 ```bash
 # Before configuring
-python verificar_instalacion.py
+python verify_installation.py
 # ⚪ OPENAI_API_KEY (not configured)
 
 # Configure
 export OPENAI_API_KEY="sk-..."
 
 # After configuring
-python verificar_instalacion.py
+python verify_installation.py
 # ✅ OPENAI_API_KEY configured
 ```
 
@@ -522,7 +522,7 @@ Before reporting an error on GitHub or asking for help:
 
 ```bash
 # 1. Run the script
-python verificar_instalacion.py > diagnostico.txt
+python verify_installation.py > diagnostico.txt
 
 # 2. Attach diagnostico.txt to your report
 ```
@@ -535,11 +535,11 @@ This helps developers understand your configuration.
 
 | When | Command | Purpose |
 |------|---------|---------|
-| **After installing** | `python verificar_instalacion.py` | Confirm installation |
-| **Something doesn't work** | `python verificar_instalacion.py` | Diagnose problem |
-| **Add provider** | `python verificar_instalacion.py` | Verify availability |
-| **Configure API key** | `python verificar_instalacion.py` | Confirm configuration |
-| **Report error** | `python verificar_instalacion.py > diag.txt` | Generate diagnostics |
+| **After installing** | `python verify_installation.py` | Confirm installation |
+| **Something doesn't work** | `python verify_installation.py` | Diagnose problem |
+| **Add provider** | `python verify_installation.py` | Verify availability |
+| **Configure API key** | `python verify_installation.py` | Confirm configuration |
+| **Report error** | `python verify_installation.py > diag.txt` | Generate diagnostics |
 
 ---
 
@@ -572,10 +572,10 @@ echo $env:OPENAI_API_KEY  # Windows
 - **Main documentation:** [INSTALLATION_GUIDE.md](./INSTALLATION_GUIDE.md)
 - **Troubleshooting:** [INSTALLATION_GUIDE.md#troubleshooting](./INSTALLATION_GUIDE.md)
 - **Quick start:** [QUICK_START.md](./QUICK_START.md)
-- **Source script:** `verificar_instalacion.py`
+- **Source script:** `verify_installation.py`
 
 ---
 
 **🎓 PRO TIP:**  
-Run `python verificar_instalacion.py` after each major change to your environment. It's fast, comprehensive, and saves debugging time!
+Run `python verify_installation.py` after each major change to your environment. It's fast, comprehensive, and saves debugging time!
 

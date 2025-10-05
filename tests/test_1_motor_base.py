@@ -1,6 +1,6 @@
 """
-Test Suite 1: Motor Base (luminoracore)
-Prueba exhaustiva del motor base: carga, validación, compilación, blend
+Test Suite 1: Base Engine (luminoracore)
+Comprehensive testing of the base engine: loading, validation, compilation, blending
 """
 import pytest
 import os
@@ -24,7 +24,7 @@ from luminoracore import (
 
 @pytest.fixture
 def valid_personality_dict():
-    """Personalidad válida como diccionario (cumple JSON Schema)."""
+    """Valid personality as dictionary (meets JSON Schema)."""
     return {
         "persona": {
             "name": "TestBot",
@@ -55,7 +55,7 @@ def valid_personality_dict():
 
 @pytest.fixture
 def valid_personality_file(valid_personality_dict, tmp_path):
-    """Personalidad válida en archivo JSON temporal."""
+    """Valid personality in temporary JSON file."""
     file_path = tmp_path / "test_personality.json"
     with open(file_path, 'w', encoding='utf-8') as f:
         json.dump(valid_personality_dict, f, indent=2)
@@ -63,38 +63,38 @@ def valid_personality_file(valid_personality_dict, tmp_path):
 
 @pytest.fixture
 def invalid_personality_dict():
-    """Personalidad inválida (falta campos requeridos)."""
+    """Invalid personality (missing required fields)."""
     return {
         "name": "invalid",
-        # Falta casi todo
+        # Missing almost everything
     }
 
 # ============================================================================
-# TEST 1: CARGA DE PERSONALIDADES
+# TEST 1: PERSONALITY LOADING
 # ============================================================================
 
 class TestPersonalityLoading:
-    """Tests de carga de personalidades."""
+    """Tests for personality loading."""
     
     def test_load_from_valid_file(self, valid_personality_file):
-        """✅ Cargar desde archivo JSON válido."""
+        """✅ Load from valid JSON file."""
         personality = Personality(valid_personality_file)
         assert personality is not None
         assert personality.persona.name == "TestBot"
     
     def test_load_from_dict(self, valid_personality_dict):
-        """✅ Cargar desde diccionario Python."""
+        """✅ Load from Python dictionary."""
         personality = Personality(valid_personality_dict)
         assert personality is not None
         assert personality.persona.name == "TestBot"
     
     def test_load_nonexistent_file(self):
-        """✅ Manejo de archivo inexistente."""
+        """✅ Handle non-existent file."""
         with pytest.raises((FileNotFoundError, PersonalityError)):
             Personality("/nonexistent/path/personality.json")
     
     def test_load_invalid_json_file(self, tmp_path):
-        """✅ Manejo de JSON inválido."""
+        """✅ Handle invalid JSON."""
         file_path = tmp_path / "invalid.json"
         with open(file_path, 'w') as f:
             f.write("{invalid json content")
@@ -103,7 +103,7 @@ class TestPersonalityLoading:
             Personality(str(file_path))
     
     def test_load_invalid_schema(self, invalid_personality_dict):
-        """✅ Manejo de schema incorrecto."""
+        """✅ Handle incorrect schema."""
         with pytest.raises(PersonalityError):
             Personality(invalid_personality_dict)
 

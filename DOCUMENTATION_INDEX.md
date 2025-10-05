@@ -127,7 +127,7 @@
 | `ejemplo_quick_start_core.py` | Base engine (luminoracore) |
 | `ejemplo_quick_start_cli.py` | CLI (luminoracore-cli) |
 | `ejemplo_quick_start_sdk.py` | SDK (luminoracore-sdk) |
-| `verificar_instalacion.py` | Complete installation |
+| `verify_installation.py` | Complete installation |
 
 ### Tests
 
@@ -222,7 +222,7 @@ luminoracore/
 │   └── instalar_todo.sh                Linux/Mac
 │
 ├── ✅ Verification Scripts
-│   ├── verificar_instalacion.py
+│   ├── verify_installation.py
 │   ├── ejemplo_quick_start_core.py
 │   ├── ejemplo_quick_start_cli.py
 │   └── ejemplo_quick_start_sdk.py
@@ -244,7 +244,7 @@ QUICK_START.md
     ↓
 instalar_todo.ps1 / instalar_todo.sh
     ↓
-verificar_instalacion.py
+verify_installation.py
     ↓
 INSTALLATION_GUIDE.md
     ↓
