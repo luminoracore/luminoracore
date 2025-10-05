@@ -1,145 +1,145 @@
 # 🧪 LuminoraCore Test Suite - v1.0
 
-**Estado**: ✅ **100% Tests Ejecutables Pasando**  
-**Última actualización**: 2025-10-05  
-**Cobertura**: 90/90 tests passing (100% ejecutables)
+**Status**: ✅ **100% Executable Tests Passing**  
+**Last Updated**: 2025-10-05  
+**Coverage**: 90/90 tests passing (100% executable)
 
 ---
 
-## 📊 Resumen de Tests
+## 📊 Test Summary
 
 ```
-✅ Motor Base:  28/28 (100%) ████████████████████████
+✅ Base Engine: 28/28 (100%) ████████████████████████
 ✅ CLI:         25/26 (100%)*████████████████████████
 ✅ SDK:         37/37 (100%) ████████████████████████
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📊 TOTAL:       90/91 (99% - 100% ejecutables)
-⏭️ SKIPPED:     1     (API key condicional)
-❌ FALLANDO:    0     (NINGUNO)
+📊 TOTAL:       90/91 (99% - 100% executable)
+⏭️ SKIPPED:     1     (conditional API key)
+❌ FAILING:      0     (NONE)
 ```
 
-\* *1 test skipped condicional (requiere OPENAI_API_KEY)*
+\* *1 test skipped conditionally (requires OPENAI_API_KEY)*
 
 ---
 
 ## 📋 Test Suites
 
-| Suite | Archivo | Tests | Pasando | Estado | Tiempo |
-|-------|---------|-------|---------|--------|--------|
-| **1. Motor Base** | `test_1_motor_base.py` | 28 | 28 | ✅ 100% | ~9s |
+| Suite | File | Tests | Passing | Status | Time |
+|-------|------|-------|---------|--------|------|
+| **1. Base Engine** | `test_1_motor_base.py` | 28 | 28 | ✅ 100% | ~9s |
 | **2. CLI** | `test_2_cli.py` | 26 | 25 | ✅ 100%* | ~2s |
 | **3. SDK** | `test_3_sdk.py` | 37 | 37 | ✅ 100% | ~0.5s |
 | **TOTAL** | | **91** | **90** | **✅ 99%** | **~12s** |
 
-\* *25 passing + 1 skipped (API key condicional) = 100% ejecutables*
+\* *25 passing + 1 skipped (conditional API key) = 100% executable*
 
 ---
 
-## 🎯 Filosofía de Testing
+## 🎯 Testing Philosophy
 
-Esta suite de tests valida **COMPLETAMENTE** todas las funcionalidades core de LuminoraCore:
+This test suite validates **COMPLETELY** all core functionalities of LuminoraCore:
 
-> "100% de tests ejecutables pasando. Cero bugs bloqueantes. Código listo para producción."
+> "100% executable tests passing. Zero blocking bugs. Production-ready code."
 
-### Tipos de Tests
+### Test Types
 
-#### ✅ Tests Unitarios (Actuales - 90 tests)
-Validan la **lógica y estructura** del código:
-- ✅ Validación de JSON Schema
-- ✅ Compilación de prompts
-- ✅ Manejo de errores
-- ✅ Storage local (memoria + JSON)
-- ✅ Estructura de datos
+#### ✅ Unit Tests (Current - 90 tests)
+Validate **logic and structure** of the code:
+- ✅ JSON Schema validation
+- ✅ Prompt compilation
+- ✅ Error handling
+- ✅ Local storage (memory + JSON)
+- ✅ Data structure
 
-**No requieren**:
-- API keys reales
-- Conexiones a bases de datos externas
-- Conexiones de red
+**Do not require**:
+- Real API keys
+- External database connections
+- Network connections
 
-#### ⚠️ Tests de Integración Real (Futuro)
-Validarían conexiones reales:
-- Llamadas a APIs de LLMs (OpenAI, Anthropic, DeepSeek, etc.)
-- Conexiones a bases de datos (Redis, PostgreSQL, MongoDB)
-- Latencias y timeouts reales
+#### ⚠️ Real Integration Tests (Future)
+Would validate real connections:
+- Real LLM API calls (OpenAI, Anthropic, DeepSeek, etc.)
+- Real database connections (Redis, PostgreSQL, MongoDB)
+- Real latencies and timeouts
 
-**Requieren**: API keys, servidores, configuración adicional
+**Require**: API keys, servers, additional configuration
 
 ---
 
-## 🚀 Ejecución Rápida
+## 🚀 Quick Execution
 
-### Ejecutar TODOS los Tests
+### Run ALL Tests
 
 ```bash
-# Desde el directorio raíz del proyecto
+# From the project root directory
 python run_tests.py
 
-# O con pytest directamente
+# Or with pytest directly
 pytest tests/ -v
 ```
 
-**Salida esperada**:
+**Expected output**:
 ```
 90 passed, 1 skipped in 12.00s
 ```
 
-### Ejecutar Suite Específica
+### Run Specific Suite
 
 ```bash
-# Solo Motor Base (28 tests)
+# Base Engine only (28 tests)
 pytest tests/test_1_motor_base.py -v
 
-# Solo CLI (26 tests)
+# CLI only (26 tests)
 pytest tests/test_2_cli.py -v
 
-# Solo SDK (37 tests)
+# SDK only (37 tests)
 pytest tests/test_3_sdk.py -v
 ```
 
-### Ejecutar Test Específico
+### Run Specific Test
 
 ```bash
-# Un test en particular
+# A specific test
 pytest tests/test_1_motor_base.py::TestPersonalityLoading::test_load_from_valid_file -v
 ```
 
 ---
 
-## 📦 Instalación
+## 📦 Installation
 
-### Requisitos
+### Requirements
 
 ```bash
-# Instalar pytest y dependencias
+# Install pytest and dependencies
 pip install pytest pytest-asyncio
 ```
 
-### Setup Completo
+### Complete Setup
 
 ```bash
-# 1. Navegar al directorio raíz
+# 1. Navigate to root directory
 cd LuminoraCoreBase
 
-# 2. Instalar Motor Base
+# 2. Install Base Engine
 cd luminoracore
 pip install -e .
 cd ..
 
-# 3. Instalar CLI
+# 3. Install CLI
 cd luminoracore-cli
 pip install -e .
 cd ..
 
-# 4. Instalar SDK
+# 4. Install SDK
 cd luminoracore-sdk-python
 pip install -e .
 cd ..
 
-# 5. Ejecutar tests
+# 5. Run tests
 python run_tests.py
 ```
 
-**Instalación automática** (recomendado):
+**Automatic installation** (recommended):
 
 ```bash
 # Windows
@@ -151,99 +151,99 @@ python run_tests.py
 
 ---
 
-## 📖 Contenido de cada Suite
+## 📖 Content of Each Suite
 
-### 1. Motor Base (test_1_motor_base.py)
+### 1. Base Engine (test_1_motor_base.py)
 
-**28 tests - 100% pasando**
+**28 tests - 100% passing**
 
-#### Carga de Personalidades (6 tests)
-- ✅ Cargar desde archivo JSON válido
-- ✅ Cargar desde diccionario
-- ✅ Cargar desde string JSON
-- ✅ Error con archivo no existente
-- ✅ Error con JSON inválido
-- ✅ Cargar múltiples personalidades
+#### Personality Loading (6 tests)
+- ✅ Load from valid JSON file
+- ✅ Load from dictionary
+- ✅ Load from JSON string
+- ✅ Error with non-existent file
+- ✅ Error with invalid JSON
+- ✅ Load multiple personalities
 
-#### Validación (5 tests)
-- ✅ Validar personalidad válida
-- ✅ Error con campos requeridos faltantes
-- ✅ Error con tipos incorrectos
-- ✅ Validar valores enum
-- ✅ Modo strict vs permissive
+#### Validation (5 tests)
+- ✅ Validate valid personality
+- ✅ Error with missing required fields
+- ✅ Error with incorrect types
+- ✅ Validate enum values
+- ✅ Strict vs permissive mode
 
-#### Compilación (7 tests)
-- ✅ Compilar para OpenAI
-- ✅ Compilar para Anthropic
-- ✅ Compilar para DeepSeek
-- ✅ Compilar para Mistral
-- ✅ Compilar para Llama
-- ✅ Compilar para Cohere
-- ✅ Compilar para Google
+#### Compilation (7 tests)
+- ✅ Compile for OpenAI
+- ✅ Compile for Anthropic
+- ✅ Compile for DeepSeek
+- ✅ Compile for Mistral
+- ✅ Compile for Llama
+- ✅ Compile for Cohere
+- ✅ Compile for Google
 
 #### PersonaBlend (5 tests)
-- ✅ Blend de 2 personalidades
-- ✅ Blend con pesos iguales
-- ✅ Blend con pesos diferentes
-- ✅ Error con pesos inválidos
-- ✅ Validación de blend resultante
+- ✅ Blend 2 personalities
+- ✅ Blend with equal weights
+- ✅ Blend with different weights
+- ✅ Error with invalid weights
+- ✅ Validate blended result
 
 #### Performance (5 tests)
-- ✅ Carga rápida (<100ms)
-- ✅ Validación rápida (<50ms)
-- ✅ Compilación rápida (<100ms)
-- ✅ Blend rápido (<200ms)
-- ✅ Cache funciona correctamente
+- ✅ Fast loading (<100ms)
+- ✅ Fast validation (<50ms)
+- ✅ Fast compilation (<100ms)
+- ✅ Fast blending (<200ms)
+- ✅ Cache works correctly
 
 ---
 
 ### 2. CLI (test_2_cli.py)
 
-**26 tests - 25 pasando + 1 skipped (100% ejecutables)**
+**26 tests - 25 passing + 1 skipped (100% executable)**
 
 #### Validate Command (5 tests)
-- ✅ Validar archivo válido
-- ✅ Validar directorio
-- ✅ Error con archivo inválido
-- ✅ Validar con --strict
-- ✅ Validar directorio vacío
+- ✅ Validate valid file
+- ✅ Validate directory
+- ✅ Error with invalid file
+- ✅ Validate with --strict
+- ✅ Validate empty directory
 
 #### Compile Command (5 tests)
-- ✅ Compilar para OpenAI
-- ✅ Compilar para Anthropic
-- ✅ Compilar para DeepSeek
-- ✅ Error con provider inválido
-- ✅ Output a archivo
+- ✅ Compile for OpenAI
+- ✅ Compile for Anthropic
+- ✅ Compile for DeepSeek
+- ✅ Error with invalid provider
+- ✅ Output to file
 
 #### Info Command (2 tests)
-- ✅ Info básica
-- ✅ Info detallada (--detailed)
+- ✅ Basic info
+- ✅ Detailed info (--detailed)
 
 #### List Command (3 tests)
-- ✅ Listar personalidades (tabla)
-- ✅ Listar formato JSON
-- ✅ Listar directorio vacío
+- ✅ List personalities (table)
+- ✅ List JSON format
+- ✅ List empty directory
 
 #### Blend Command (1 test)
-- ✅ Blend dos personalidades
+- ✅ Blend two personalities
 
 #### Update Command (1 test)
-- ✅ Actualizar versión
+- ✅ Update version
 
 #### Test Command (2 tests)
-- ✅ Test en modo mock
-- ⏭️ Test con API real (requiere OPENAI_API_KEY)
+- ✅ Test in mock mode
+- ⏭️ Test with real API (requires OPENAI_API_KEY)
 
 #### Create Command (3 tests)
-- ✅ Crear con template
-- ✅ Crear interactivo
-- ✅ Crear con validación
+- ✅ Create with template
+- ✅ Create interactive
+- ✅ Create with validation
 
 #### Init Command (2 tests)
-- ✅ Inicializar nuevo proyecto
-- ✅ Inicializar en directorio existente
+- ✅ Initialize new project
+- ✅ Initialize in existing directory
 
-#### Otros Comandos (2 tests)
+#### Other Commands (2 tests)
 - ✅ --version
 - ✅ --help
 
@@ -251,81 +251,81 @@ python run_tests.py
 
 ### 3. SDK (test_3_sdk.py)
 
-**37 tests - 100% pasando**
+**37 tests - 100% passing**
 
-#### Inicialización (5 tests)
-- ✅ Cliente básico
-- ✅ Cliente con storage memory
-- ✅ Cliente con storage JSON
-- ✅ Cliente con personalities dir
-- ✅ Cliente con memory config
+#### Initialization (5 tests)
+- ✅ Basic client
+- ✅ Client with memory storage
+- ✅ Client with JSON storage
+- ✅ Client with personalities dir
+- ✅ Client with memory config
 
-#### Gestión de Personalidades (4 tests)
-- ✅ Cargar personalidad
-- ✅ Listar personalidades
-- ✅ Personalidad no encontrada
-- ✅ Validar campos requeridos
+#### Personality Management (4 tests)
+- ✅ Load personality
+- ✅ List personalities
+- ✅ Personality not found
+- ✅ Validate required fields
 
-#### Providers LLM (5 tests)
-- ✅ Factory OpenAI
-- ✅ Factory Anthropic
-- ✅ Factory DeepSeek
-- ✅ Error con provider inválido
-- ✅ Validación de configuración
+#### LLM Providers (5 tests)
+- ✅ OpenAI Factory
+- ✅ Anthropic Factory
+- ✅ DeepSeek Factory
+- ✅ Error with invalid provider
+- ✅ Configuration validation
 
-#### Sesiones (6 tests)
-- ✅ Crear sesión
-- ✅ Crear sesión con config
-- ✅ Obtener sesión
-- ✅ Sesión no encontrada
-- ✅ Eliminar sesión
-- ✅ Sesión no encontrada devuelve None
+#### Sessions (6 tests)
+- ✅ Create session
+- ✅ Create session with config
+- ✅ Get session
+- ✅ Session not found
+- ✅ Delete session
+- ✅ Session not found returns None
 
-#### Conversaciones (3 tests)
-- ✅ Historial vacío
-- ✅ Añadir mensaje
-- ✅ Múltiples mensajes
+#### Conversations (3 tests)
+- ✅ Empty history
+- ✅ Add message
+- ✅ Multiple messages
 
-#### Memoria (4 tests)
-- ✅ Almacenar memoria
-- ✅ Recuperar memoria inexistente
-- ✅ Eliminar memoria
-- ✅ Memoria con datos complejos
+#### Memory (4 tests)
+- ✅ Store memory
+- ✅ Retrieve non-existent memory
+- ✅ Delete memory
+- ✅ Memory with complex data
 
-#### Manejo de Errores (3 tests)
-- ✅ Error con personalidad inválida
-- ✅ Error con provider config inválida
-- ✅ API key faltante
+#### Error Handling (3 tests)
+- ✅ Error with invalid personality
+- ✅ Error with invalid provider config
+- ✅ Missing API key
 
 #### PersonaBlend (2 tests)
-- ✅ Blend de dos personalidades
-- ✅ Blend con pesos iguales
+- ✅ Blend two personalities
+- ✅ Blend with equal weights
 
 #### Storage Backends (3 tests)
-- ✅ Storage en memoria
-- ✅ Storage en JSON file
-- ✅ Persistencia de storage
+- ✅ Memory storage
+- ✅ JSON file storage
+- ✅ Storage persistence
 
-#### API Async/Await (2 tests)
-- ✅ Sesiones concurrentes
-- ✅ Carga concurrente de personalidades
+#### Async/Await API (2 tests)
+- ✅ Concurrent sessions
+- ✅ Concurrent personality loading
 
 ---
 
-## 🔬 Cobertura de Funcionalidades
+## 🔬 Feature Coverage
 
-| Funcionalidad | Motor Base | CLI | SDK | Estado |
-|---------------|------------|-----|-----|--------|
-| **Carga de personalidades** | ✅ | ✅ | ✅ | 100% |
-| **Validación JSON Schema** | ✅ | ✅ | ✅ | 100% |
-| **Compilación 7 providers** | ✅ | ✅ | ✅ | 100% |
+| Feature | Base Engine | CLI | SDK | Status |
+|---------|-------------|-----|-----|--------|
+| **Personality Loading** | ✅ | ✅ | ✅ | 100% |
+| **JSON Schema Validation** | ✅ | ✅ | ✅ | 100% |
+| **7 Provider Compilation** | ✅ | ✅ | ✅ | 100% |
 | **PersonaBlend™** | ✅ | ✅ | ✅ | 100% |
-| **Storage memoria** | - | - | ✅ | 100% |
-| **Storage JSON** | - | - | ✅ | 100% |
-| **Sesiones** | - | - | ✅ | 100% |
-| **Conversaciones** | - | - | ✅ | 100% |
-| **Memoria persistente** | - | - | ✅ | 100% |
-| **Manejo de errores** | ✅ | ✅ | ✅ | 100% |
+| **Memory Storage** | - | - | ✅ | 100% |
+| **JSON Storage** | - | - | ✅ | 100% |
+| **Sessions** | - | - | ✅ | 100% |
+| **Conversations** | - | - | ✅ | 100% |
+| **Persistent Memory** | - | - | ✅ | 100% |
+| **Error Handling** | ✅ | ✅ | ✅ | 100% |
 | **Templates** | - | ✅ | - | 100% |
 | **Async/Await** | - | - | ✅ | 100% |
 
@@ -336,30 +336,30 @@ python run_tests.py
 ### Error: "module not found"
 
 ```bash
-# Asegúrate de instalar todos los componentes
+# Make sure to install all components
 pip install -e luminoracore/
 pip install -e luminoracore-cli/
 pip install -e luminoracore-sdk-python/
 ```
 
-### Tests no se encuentran
+### Tests not found
 
 ```bash
-# Ejecuta desde el directorio raíz
+# Run from root directory
 cd LuminoraCoreBase
 python run_tests.py
 ```
 
-### Error con imports
+### Import errors
 
 ```bash
-# Windows: Reinstala Motor Base en modo normal
+# Windows: Reinstall Base Engine in normal mode
 cd luminoracore
 pip uninstall luminoracore -y
 pip install .
 cd ..
 
-# Linux/Mac: Modo editable funciona
+# Linux/Mac: Editable mode works
 cd luminoracore
 pip install -e .
 cd ..
@@ -367,64 +367,64 @@ cd ..
 
 ---
 
-## 📚 Documentación Adicional
+## 📚 Additional Documentation
 
-- **`ESTRATEGIA_TESTS.md`** - Explicación de la estrategia de 2 niveles
-- **`MASTER_TEST_SUITE.md`** - Plan completo de testing (173 tests futuros)
-- **`../GUIA_VERIFICACION_INSTALACION.md`** - Verificar instalación completa
+- **`ESTRATEGIA_TESTS.md`** - Explanation of 2-level testing strategy
+- **`MASTER_TEST_SUITE.md`** - Complete testing documentation (173 future tests)
+- **`../INSTALLATION_VERIFICATION.md`** - Verify complete installation
 
 ---
 
-## 🎯 Estado del Proyecto
+## 🎯 Project Status
 
-### ✅ COMPLETADO
+### ✅ COMPLETED
 
-- [x] 90/90 tests ejecutables pasando (100%)
-- [x] Motor Base: 28/28 (100%)
-- [x] CLI: 25/26 (100% - 1 skipped condicional)
+- [x] 90/90 executable tests passing (100%)
+- [x] Base Engine: 28/28 (100%)
+- [x] CLI: 25/26 (100% - 1 conditionally skipped)
 - [x] SDK: 37/37 (100%)
-- [x] Cero bugs bloqueantes
-- [x] Todas las funcionalidades core validadas
-- [x] Storage local (memoria + JSON) funcionando
-- [x] 7 Providers LLM implementados
-- [x] PersonaBlend™ funcionando
-- [x] Documentación completa
+- [x] Zero blocking bugs
+- [x] All core functionalities validated
+- [x] Local storage (memory + JSON) working
+- [x] 7 LLM providers implemented
+- [x] PersonaBlend™ working
+- [x] Complete documentation
 
-### ⏳ FUTURO (Tests de Integración Real)
+### ⏳ FUTURE (Real Integration Tests)
 
-- [ ] Tests con APIs reales (requiere API keys de 7 providers)
-- [ ] Tests con Redis real (requiere servidor Redis)
-- [ ] Tests con PostgreSQL real (requiere servidor PostgreSQL)
-- [ ] Tests con MongoDB real (requiere servidor MongoDB)
-- [ ] Tests de carga y concurrencia
-- [ ] Tests de latencia y performance real
-- [ ] Tests end-to-end con usuarios reales
+- [ ] Tests with real APIs (requires API keys from 7 providers)
+- [ ] Tests with real Redis (requires Redis server)
+- [ ] Tests with real PostgreSQL (requires PostgreSQL server)
+- [ ] Tests with real MongoDB (requires MongoDB server)
+- [ ] Load and concurrency tests
+- [ ] Real latency and performance tests
+- [ ] End-to-end tests with real users
 
 ---
 
-## 🚀 Listo para Producción
+## 🚀 Ready for Production
 
-**El proyecto LuminoraCore está 100% testeado y listo para usuarios:**
+**The LuminoraCore project is 100% tested and ready for users:**
 
 ```bash
-# Ejecutar verificación completa
+# Run complete verification
 python run_tests.py
 
-# Resultado esperado:
+# Expected result:
 # 90 passed, 1 skipped in ~12s
-# ✅ 100% tests ejecutables pasando
+# ✅ 100% executable tests passing
 ```
 
-**Todas las funcionalidades core funcionan perfectamente.**
+**All core functionalities work perfectly.**
 
 ---
 
-## 📞 Soporte
+## 📞 Support
 
-- **Ejecutar tests**: `python run_tests.py`
-- **Reportar bugs**: GitHub Issues con label "tests"
-- **Documentación**: Ver archivos `.md` en este directorio
+- **Run tests**: `python run_tests.py`
+- **Report bugs**: GitHub Issues with label "tests"
+- **Documentation**: See `.md` files in this directory
 
 ---
 
-**¡100% Completado y Listo para Producción! 🎉**
+**100% Completed and Ready for Production! 🎉**
