@@ -150,7 +150,7 @@ Official Python SDK for advanced AI personality management.
 - **✅ PersonaBlend™ Technology**: Real-time personality blending
 - **✅ Async/Await Support**: Fully asynchronous API
 - **✅ Real API Connections**: Real connections to all LLM providers
-- **✅ Complete Analytics**: Token, cost, and usage tracking
+- **✅ Token Usage Tracking**: Real-time token monitoring and metrics
 
 ### Quick Start
 ```python

@@ -22,7 +22,7 @@
 - **✅ Type Safety**: Comprehensive type definitions and validation
 - **✅ Real API Connections**: Real APIs to all LLM providers
 - **✅ Robust Error Handling**: Automatic retries and fallbacks
-- **✅ Complete Analytics**: Token, cost, and usage tracking
+- **✅ Token Usage Tracking**: Real-time token monitoring and metrics
 
 ## Installation
 
@@ -71,8 +71,7 @@ async def main():
     )
     
     print(f"Response: {response.content}")
-    print(f"Tokens used: {response.usage}")
-    print(f"Cost: ${response.cost}")
+    print(f"Tokens: {response.usage}")
     
     # Get metrics
     metrics = await client.get_session_metrics(session_id)

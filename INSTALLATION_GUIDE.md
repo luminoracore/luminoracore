@@ -807,8 +807,7 @@ async def main():
         
         print("✅ Response received:")
         print(f"   Content: {response.content[:200]}...")
-        print(f"   Tokens used: {response.usage}")
-        print(f"   Estimated cost: ${response.cost}")
+        print(f"   Tokens: {response.usage}")
         
     except Exception as e:
         print(f"⚠️  Error calling API: {e}")
