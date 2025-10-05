@@ -347,7 +347,10 @@ This is the fundamental component that all others need.
 
 #### 🪟 WINDOWS (Normal Installation - Recommended)
 
+**🚨 CRITICAL: Windows has specific installation requirements**
+
 ```powershell
+# OPTION 1: Manual Installation (Step by step)
 # Navigate to base engine folder
 cd luminoracore
 
@@ -363,7 +366,29 @@ pip install .
 
 # Return to root
 cd ..
+
+# Install CLI
+cd luminoracore-cli
+pip install .  # ← NORMAL mode for Windows
+cd ..
+
+# Install SDK
+cd luminoracore-sdk-python
+pip install ".[all]"  # ← CRITICAL: Must use ".[all]"
+cd ..
 ```
+
+**🚨 OPTION 2: Automated Installation (Recommended for Windows)**
+
+```powershell
+# Use the automated Windows installer
+.\install_windows.ps1
+```
+
+**⚠️ WINDOWS TROUBLESHOOTING:**
+- If you get permission errors, run PowerShell as Administrator
+- If CLI doesn't work, use `python -m luminoracore_cli` instead of `luminoracore`
+- If SDK fails, make sure you use `pip install ".[all]"` not `pip install .`
 
 **🚨 IMPORTANT FOR WINDOWS:**  
 On Windows, the Base Engine must be installed in **normal mode** (`pip install .`) instead of editable (`pip install -e .`) due to issues with pip's editable finder. CLI and SDK can be installed in editable mode without problems.
@@ -421,24 +446,32 @@ cd ..
 cd luminoracore-sdk-python
 
 # ⚠️ IMPORTANT: On Windows, editable mode (-e) can cause problems
-# Recommended: Normal installation
+# ⚠️ CRITICAL: You MUST use ".[all]" to install all LLM providers
+# Without ".[all]", the SDK will NOT work with real LLM APIs
+
+# ✅ REQUIRED: Install SDK with ALL providers (Windows & Linux)
 pip install ".[all]"
 
-# Alternative (only if you need to modify code):
-# pip install -e ".[all]"  # NOTE: May fail on Windows
+# ❌ DON'T DO THIS: pip install .  (This only installs basic SDK)
+# ❌ DON'T DO THIS: pip install -e ".[all]"  (May fail on Windows)
 
-# Optional: Only specific providers
-pip install ".[openai]"      # Only OpenAI
-pip install ".[anthropic]"   # Only Anthropic
-pip install ".[deepseek]"    # Only DeepSeek (economical)
-pip install ".[mistral]"     # Only Mistral AI
-pip install ".[llama]"       # Only Llama (via Replicate)
-pip install ".[cohere]"      # Only Cohere
-pip install ".[google]"      # Only Google Gemini
+# Alternative: Only specific providers (if you don't want all)
+# pip install ".[openai]"      # Only OpenAI
+# pip install ".[anthropic]"   # Only Anthropic
+# pip install ".[deepseek]"    # Only DeepSeek (economical)
+# pip install ".[mistral]"     # Only Mistral AI
+# pip install ".[llama]"       # Only Llama (via Replicate)
+# pip install ".[cohere]"      # Only Cohere
+# pip install ".[google]"      # Only Google Gemini
 
 # Return to root
 cd ..
 ```
+
+**🚨 CRITICAL WARNING:**
+- **WITHOUT `".[all]"`:** SDK will fail when trying to use LLM providers
+- **WITHOUT `".[all]"`:** You'll get `ImportError: No module named 'openai'` errors
+- **WITHOUT `".[all]"`:** Only basic SDK functions work, NO real LLM calls
 
 ### Step 6: Verify installation
 

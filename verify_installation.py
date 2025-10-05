@@ -81,8 +81,8 @@ try:
 except ImportError:
     # Try importing from SDK (which has its own system)
     try:
-        from luminoracore import LuminoraCoreClient
-        from luminoracore.providers import ProviderFactory
+        from luminoracore_sdk import LuminoraCoreClient
+        from luminoracore_sdk.providers import ProviderFactory
         import luminoracore
         version = getattr(luminoracore, '__version__', 'unknown')
         print(f"✅ SDK installed correctly (v{version})")
@@ -140,8 +140,8 @@ print("3. SDK - COMPLETE VERIFICATION (luminoracore-sdk-python)")
 print("-" * 70)
 sdk_ok = False
 try:
-    from luminoracore import LuminoraCoreClient
-    from luminoracore.types.provider import ProviderConfig
+    from luminoracore_sdk import LuminoraCoreClient
+    from luminoracore_sdk.types.provider import ProviderConfig
     print(f"✅ SDK fully functional")
     print(f"   - LuminoraCoreClient: OK")
     print(f"   - ProviderConfig: OK")
@@ -171,7 +171,7 @@ print("4. AVAILABLE PROVIDERS")
 print("-" * 70)
 providers_status = []
 try:
-    from luminoracore.providers import ProviderFactory
+    from luminoracore_sdk.providers import ProviderFactory
     
     # List of expected providers
     expected_providers = [
@@ -181,7 +181,7 @@ try:
     
     for provider_name in expected_providers:
         try:
-            from luminoracore.types.provider import ProviderConfig
+            from luminoracore_sdk.types.provider import ProviderConfig
             config = ProviderConfig(name=provider_name, api_key="test")
             provider = ProviderFactory.create_provider(config)
             print(f"  ✅ {provider_name.capitalize():12s} - {provider.__class__.__name__}")
