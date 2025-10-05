@@ -1,54 +1,54 @@
-# 🧪 ESTRATEGIA DE TESTS - 2 NIVELES
+# 🧪 TESTING STRATEGY - 2 LEVELS
 
-**Fecha**: 4 de Octubre de 2025  
-**Aprobado por**: Usuario
+**Date**: October 4, 2025  
+**Approved by**: User
 
 ---
 
-## 📊 VISIÓN GENERAL
+## 📊 OVERVIEW
 
-LuminoraCore utiliza una **estrategia de 2 niveles** para tests:
+LuminoraCore uses a **2-level strategy** for testing:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  NIVEL 1: TESTS DE DESARROLLO (Rápidos, cada componente)   │
+│  LEVEL 1: DEVELOPMENT TESTS (Fast, per component)          │
 │                                                             │
-│  luminoracore/tests/        → Motor Base                   │
+│  luminoracore/tests/        → Base Engine                  │
 │  luminoracore-cli/tests/    → CLI                          │
 │  luminoracore-sdk-python/tests/ → SDK                      │
 │                                                             │
-│  • Ejecutar durante desarrollo diario                      │
-│  • Feedback rápido                                          │
-│  • Tests unitarios básicos                                  │
+│  • Run during daily development                             │
+│  • Quick feedback                                           │
+│  • Basic unit tests                                          │
 └─────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────┐
-│  NIVEL 2: SUITE DE VALIDACIÓN (Exhaustivos, pre-lanzar)    │
+│  LEVEL 2: VALIDATION SUITE (Comprehensive, pre-release)    │
 │                                                             │
-│  tests/                     → 173 tests completos          │
+│  tests/                     → 173 complete tests           │
 │                                                             │
-│  • Ejecutar ANTES de lanzamiento v1.0                      │
-│  • Tests exhaustivos de TODO                                │
-│  • APIs reales, DBs reales                                  │
-│  • Escenarios end-to-end                                    │
+│  • Run BEFORE v1.0 release                                  │
+│  • Comprehensive tests of EVERYTHING                        │
+│  • Real APIs, real databases                                │
+│  • End-to-end scenarios                                      │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🎯 NIVEL 1: TESTS DE DESARROLLO
+## 🎯 LEVEL 1: DEVELOPMENT TESTS
 
-### Propósito
-Tests **rápidos** para desarrollo diario de cada componente.
+### Purpose
+**Fast** tests for daily development of each component.
 
-### Ubicación y Ejecución
+### Location and Execution
 
-#### Motor Base
+#### Base Engine
 ```bash
 cd luminoracore
 pytest tests/ -v
 
-# Archivos:
+# Files:
 # - test_personality.py (12 tests)
 # - test_validator.py (13 tests)
 ```
@@ -58,7 +58,7 @@ pytest tests/ -v
 cd luminoracore-cli
 pytest tests/ -v
 
-# Archivos:
+# Files:
 # - test_config.py
 # - test_validate.py
 # - conftest.py (fixtures)
@@ -69,37 +69,37 @@ pytest tests/ -v
 cd luminoracore-sdk-python
 pytest tests/ -v
 
-# Archivos:
+# Files:
 # - unit/test_client.py
 # - integration/test_full_session.py
 ```
 
-### Características
-- ✅ **Rápidos**: < 30 segundos
-- ✅ **Mocks**: Usan mocks en lugar de APIs/DBs reales
-- ✅ **Unitarios**: Un componente a la vez
-- ✅ **Feedback inmediato**: Para desarrollo diario
+### Characteristics
+- ✅ **Fast**: < 30 seconds
+- ✅ **Mocks**: Use mocks instead of real APIs/databases
+- ✅ **Unit**: One component at a time
+- ✅ **Immediate feedback**: For daily development
 
-### Cuándo Ejecutar
-- ✅ Después de cada cambio en el código
-- ✅ Antes de cada commit
-- ✅ Durante desarrollo activo
-- ✅ Para debugging rápido
+### When to Run
+- ✅ After each code change
+- ✅ Before each commit
+- ✅ During active development
+- ✅ For quick debugging
 
 ---
 
-## 🏆 NIVEL 2: SUITE DE VALIDACIÓN
+## 🏆 LEVEL 2: VALIDATION SUITE
 
-### Propósito
-Tests **exhaustivos** para validación completa antes del lanzamiento.
+### Purpose
+**Comprehensive** tests for complete validation before release.
 
-### Ubicación y Ejecución
+### Location and Execution
 
 ```bash
-# Desde la raíz del proyecto
+# From project root
 pytest tests/ -v
 
-# O ejecutar suites específicas
+# Or run specific suites
 pytest tests/test_1_motor_base.py -v
 pytest tests/test_2_cli.py -v
 pytest tests/test_3_providers.py -v
@@ -108,38 +108,38 @@ pytest tests/test_5_sessions.py -v
 pytest tests/test_6_integration.py -v
 ```
 
-### Estructura
+### Structure
 
-| Suite | Archivo | Tests | Descripción |
-|-------|---------|-------|-------------|
-| 1 | `test_1_motor_base.py` | 30 | Motor Base: carga, validación, compilación, blend |
-| 2 | `test_2_cli.py` | 25 | CLI: todos los comandos (validate, compile, create, etc.) |
-| 3 | `test_3_providers.py` | 49 | Providers: 7 LLMs con APIs **REALES** |
-| 4 | `test_4_storage.py` | 36 | Storage: 6 tipos (memory, json, sqlite, redis, pg, mongo) |
-| 5 | `test_5_sessions.py` | 25 | Sessions: crear, mensajes, historial, memoria |
-| 6 | `test_6_integration.py` | 8 | Integración: escenarios end-to-end completos |
+| Suite | File | Tests | Description |
+|-------|------|-------|-------------|
+| 1 | `test_1_motor_base.py` | 30 | Base Engine: load, validation, compilation, blend |
+| 2 | `test_2_cli.py` | 25 | CLI: all commands (validate, compile, create, etc.) |
+| 3 | `test_3_providers.py` | 49 | Providers: 7 LLMs with **REAL** APIs |
+| 4 | `test_4_storage.py` | 36 | Storage: 6 types (memory, json, sqlite, redis, pg, mongo) |
+| 5 | `test_5_sessions.py` | 25 | Sessions: create, messages, history, memory |
+| 6 | `test_6_integration.py` | 8 | Integration: complete end-to-end scenarios |
 | **TOTAL** | | **173** | |
 
-### Características
-- ✅ **Exhaustivos**: Cubren TODAS las características
-- ✅ **Reales**: APIs reales, databases reales (no mocks)
-- ✅ **Integración**: Tests end-to-end completos
-- ✅ **Validación**: Criterios de aceptación para v1.0
+### Characteristics
+- ✅ **Comprehensive**: Cover ALL features
+- ✅ **Real**: Real APIs, real databases (no mocks)
+- ✅ **Integration**: Complete end-to-end tests
+- ✅ **Validation**: Acceptance criteria for v1.0
 
-### Cuándo Ejecutar
-- 🎯 **ANTES del lanzamiento v1.0** (obligatorio)
-- 🎯 Antes de merge a `main`
-- 🎯 En CI/CD (GitHub Actions)
-- 🎯 Para validación de release
-- 🎯 Después de cambios arquitectónicos
+### When to Run
+- 🎯 **BEFORE v1.0 release** (mandatory)
+- 🎯 Before merge to `main`
+- 🎯 In CI/CD (GitHub Actions)
+- 🎯 For release validation
+- 🎯 After architectural changes
 
-### Requisitos
+### Requirements
 
 ```bash
-# Dependencias
+# Dependencies
 pip install pytest pytest-asyncio pytest-cov pytest-benchmark
 
-# API Keys (para test_3_providers.py)
+# API Keys (for test_3_providers.py)
 export OPENAI_API_KEY="sk-..."
 export ANTHROPIC_API_KEY="sk-ant-..."
 export DEEPSEEK_API_KEY="sk-..."
@@ -147,157 +147,157 @@ export MISTRAL_API_KEY="..."
 export COHERE_API_KEY="..."
 export GOOGLE_API_KEY="..."
 
-# Databases (para test_4_storage.py)
+# Databases (for test_4_storage.py)
 docker-compose -f tests/docker-compose.yml up -d
 ```
 
 ---
 
-## ✅ CRITERIOS DE ACEPTACIÓN v1.0
+## ✅ v1.0 ACCEPTANCE CRITERIA
 
-Para lanzar v1.0, la **Suite de Validación** debe cumplir:
+To release v1.0, the **Validation Suite** must meet:
 
-### Mínimo Obligatorio
-- ✅ **Test Suite 1** (Motor Base): 100% passing
+### Minimum Required
+- ✅ **Test Suite 1** (Base Engine): 100% passing
 - ✅ **Test Suite 2** (CLI): 100% passing
-- ✅ **Test Suite 3** (Providers): ≥ 5/7 providers funcionando
-- ✅ **Test Suite 4** (Storage): ≥ 3/6 storage types funcionando (memory, json, sqlite)
+- ✅ **Test Suite 3** (Providers): ≥ 5/7 providers working
+- ✅ **Test Suite 4** (Storage): ≥ 3/6 storage types working (memory, json, sqlite)
 - ✅ **Test Suite 5** (Sessions): 100% passing
-- ✅ **Test Suite 6** (Integration): ≥ 6/8 escenarios passing
+- ✅ **Test Suite 6** (Integration): ≥ 6/8 scenarios passing
 
 ### Ideal
 - 🏆 **173/173 tests passing** (100%)
-- 🏆 **7/7 providers funcionando**
-- 🏆 **6/6 storage types funcionando**
-- 🏆 **8/8 escenarios end-to-end**
+- 🏆 **7/7 providers working**
+- 🏆 **6/6 storage types working**
+- 🏆 **8/8 end-to-end scenarios**
 
-### Métricas de Calidad
+### Quality Metrics
 - ✅ **Coverage**: ≥ 70% (ideal 85%+)
-- ✅ **Flaky tests**: 0 (tests que fallan intermitentemente)
-- ✅ **Tiempo de ejecución**: < 10 minutos (sin APIs reales)
-- ✅ **Documentación**: README.md en `tests/` actualizado
+- ✅ **Flaky tests**: 0 (tests that fail intermittently)
+- ✅ **Execution time**: < 10 minutes (without real APIs)
+- ✅ **Documentation**: README.md in `tests/` updated
 
 ---
 
-## 🚀 FLUJO DE TRABAJO
+## 🚀 WORKFLOW
 
-### Durante Desarrollo Diario
+### During Daily Development
 
 ```bash
-# 1. Trabajas en el Motor Base
+# 1. Work on Base Engine
 cd luminoracore
-# ... haces cambios ...
+# ... make changes ...
 
-# 2. Ejecutas tests rápidos (Nivel 1)
+# 2. Run fast tests (Level 1)
 pytest tests/ -v
 
-# 3. Si pasan, commiteas
+# 3. If they pass, commit
 git add .
-git commit -m "feat: nueva funcionalidad"
+git commit -m "feat: new functionality"
 ```
 
-### Antes de Lanzamiento
+### Before Release
 
 ```bash
-# 1. Asegúrate de estar en la raíz
-cd /ruta/a/LuminoraCoreBase
+# 1. Make sure you're at the root
+cd /path/to/LuminoraCoreBase
 
-# 2. Ejecuta Suite de Validación completa (Nivel 2)
+# 2. Run complete Validation Suite (Level 2)
 pytest tests/ -v --cov
 
-# 3. Verifica que TODOS pasen
+# 3. Verify that ALL pass
 # Expected: 173 passed in X.XXs
 
-# 4. Si pasan, estás listo para lanzar v1.0
+# 4. If they pass, you're ready to release v1.0
 git tag v1.0.0
 git push origin v1.0.0
 ```
 
 ---
 
-## 📋 CHECKLIST PRE-LANZAMIENTO
+## 📋 PRE-RELEASE CHECKLIST
 
 ```markdown
-- [ ] Tests de Desarrollo (Nivel 1) - Todos passing
+- [ ] Development Tests (Level 1) - All passing
   - [ ] luminoracore/tests/ (25 tests)
   - [ ] luminoracore-cli/tests/ (15 tests)
   - [ ] luminoracore-sdk-python/tests/ (27 tests)
 
-- [ ] Suite de Validación (Nivel 2) - Criterios cumplidos
-  - [ ] Test Suite 1: Motor Base (30 tests)
+- [ ] Validation Suite (Level 2) - Criteria met
+  - [ ] Test Suite 1: Base Engine (30 tests)
   - [ ] Test Suite 2: CLI (25 tests)
   - [ ] Test Suite 3: Providers (≥35/49 tests)
   - [ ] Test Suite 4: Storage (≥18/36 tests)
   - [ ] Test Suite 5: Sessions (25 tests)
   - [ ] Test Suite 6: Integration (≥6/8 tests)
 
-- [ ] Documentación
-  - [ ] tests/README.md actualizado
-  - [ ] CHANGELOG.md actualizado
-  - [ ] README.md con badge de tests
+- [ ] Documentation
+  - [ ] tests/README.md updated
+  - [ ] CHANGELOG.md updated
+  - [ ] README.md with test badges
 
 - [ ] CI/CD
-  - [ ] GitHub Actions configurado
-  - [ ] Tests ejecutándose en 3 OS (Windows, Linux, macOS)
-  - [ ] Coverage report generado
+  - [ ] GitHub Actions configured
+  - [ ] Tests running on 3 OS (Windows, Linux, macOS)
+  - [ ] Coverage report generated
 
 - [ ] Manual
-  - [ ] Instalación validada en 3 OS
-  - [ ] Ejemplos ejecutados manualmente
-  - [ ] Documentación revisada
+  - [ ] Installation validated on 3 OS
+  - [ ] Examples run manually
+  - [ ] Documentation reviewed
 ```
 
 ---
 
-## 🔧 MANTENIMIENTO
+## 🔧 MAINTENANCE
 
-### Agregar Nuevo Test de Desarrollo (Nivel 1)
+### Adding New Development Test (Level 1)
 
-1. Identifica el componente (motor, CLI, SDK)
-2. Ve al directorio de tests apropiado
-3. Agrega el test en el archivo existente
-4. Ejecuta: `pytest tests/ -v`
+1. Identify the component (engine, CLI, SDK)
+2. Go to the appropriate test directory
+3. Add the test to the existing file
+4. Run: `pytest tests/ -v`
 
-### Agregar Nuevo Test de Validación (Nivel 2)
+### Adding New Validation Test (Level 2)
 
-1. Identifica la suite correcta (1-6)
-2. Agrega el test en `tests/test_X_nombre.py`
-3. Actualiza el contador en `tests/README.md`
-4. Ejecuta: `pytest tests/test_X_nombre.py -v`
+1. Identify the correct suite (1-6)
+2. Add the test to `tests/test_X_name.py`
+3. Update the counter in `tests/README.md`
+4. Run: `pytest tests/test_X_name.py -v`
 
-### Actualizar Criterios de Aceptación
+### Updating Acceptance Criteria
 
-1. Edita este archivo (`ESTRATEGIA_TESTS.md`)
-2. Comunica los cambios al equipo
-3. Actualiza `tests/README.md` si es necesario
+1. Edit this file (`ESTRATEGIA_TESTS.md`)
+2. Communicate changes to the team
+3. Update `tests/README.md` if necessary
 
 ---
 
-## 🎓 FILOSOFÍA
+## 🎓 PHILOSOPHY
 
-> **"No lanzaremos nada que sea una mierda."**
+> **"We will not release anything that is garbage."**
 > 
-> Los tests no son solo código que valida código.
-> Son nuestra **garantía de calidad** y **promesa al usuario**.
+> Tests are not just code that validates code.
+> They are our **quality guarantee** and **promise to the user**.
 > 
-> - **Nivel 1**: Velocidad para iterar rápido
-> - **Nivel 2**: Confianza para lanzar sin miedo
+> - **Level 1**: Speed to iterate fast
+> - **Level 2**: Confidence to release without fear
 
-**Ambos niveles son igualmente importantes.**
-
----
-
-## 📞 CONTACTO
-
-**Preguntas sobre tests**: Ver `tests/README.md`
-
-**Issues con tests**: GitHub Issues con label "tests"
-
-**Proponer nuevos tests**: Pull Request con actualización de esta estrategia
+**Both levels are equally important.**
 
 ---
 
-**Última actualización**: 2025-01-04  
-**Versión**: 1.0  
-**Estado**: ✅ Aprobado e implementado
+## 📞 CONTACT
+
+**Questions about tests**: See `tests/README.md`
+
+**Test issues**: GitHub Issues with label "tests"
+
+**Propose new tests**: Pull Request with update to this strategy
+
+---
+
+**Last updated**: 2025-01-04  
+**Version**: 1.0  
+**Status**: ✅ Approved and implemented
 

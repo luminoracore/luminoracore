@@ -1,13 +1,13 @@
 # ⚡ LuminoraCore CheatSheet
 
-## 🚀 Instalación Rápida
+## 🚀 Quick Installation
 
 ```bash
-# Todo en uno
+# All-in-one
 .\instalar_todo.ps1        # Windows
 ./instalar_todo.sh         # Linux/Mac
 
-# Manual - Solo Core
+# Manual - Core only
 cd luminoracore && pip install -e . && cd ..
 
 # Manual - Core + CLI
@@ -21,7 +21,7 @@ cd luminoracore-sdk-python && pip install -e ".[openai]" && cd ..
 
 ---
 
-## ✅ Verificación
+## ✅ Verification
 
 ```bash
 python ejemplo_quick_start_core.py
@@ -31,10 +31,10 @@ python ejemplo_quick_start_sdk.py
 
 ---
 
-## 🧠 Motor Base (Python)
+## 🧠 Base Engine (Python)
 
 ```python
-# Imports básicos
+# Basic imports
 from luminoracore import (
     Personality,
     PersonalityValidator,
@@ -43,20 +43,20 @@ from luminoracore import (
     LLMProvider
 )
 
-# Cargar personalidad
-p = Personality("archivo.json")
+# Load personality
+p = Personality("file.json")
 
-# Validar
+# Validate
 validator = PersonalityValidator()
 result = validator.validate(p)
 print(result.is_valid)
 
-# Compilar
+# Compile
 compiler = PersonalityCompiler()
 compiled = compiler.compile(p, LLMProvider.OPENAI)
 print(compiled.prompt)
 
-# Mezclar
+# Blend
 blender = PersonalityBlender()
 blended = blender.blend([p1, p2], [0.6, 0.4])
 ```
@@ -66,37 +66,37 @@ blended = blender.blend([p1, p2], [0.6, 0.4])
 ## 🛠️ CLI
 
 ```bash
-# Ayuda
+# Help
 luminoracore --help
 
-# Listar
+# List
 luminoracore list
 luminoracore list --detailed
 
-# Validar
-luminoracore validate archivo.json
-luminoracore validate carpeta/ --strict
+# Validate
+luminoracore validate file.json
+luminoracore validate folder/ --strict
 
-# Compilar
-luminoracore compile archivo.json --provider openai
-luminoracore compile archivo.json --provider anthropic -o out.txt
+# Compile
+luminoracore compile file.json --provider openai
+luminoracore compile file.json --provider anthropic -o out.txt
 
-# Crear
+# Create
 luminoracore create --interactive
-luminoracore create --name "Mi Bot" --archetype helper
+luminoracore create --name "My Bot" --archetype helper
 
-# Mezclar
-luminoracore blend archivo1.json:0.7 archivo2.json:0.3
+# Blend
+luminoracore blend file1.json:0.7 file2.json:0.3
 luminoracore blend p1.json:0.5 p2.json:0.3 p3.json:0.2 -o mix.json
 
-# Servidor
+# Server
 luminoracore serve
 luminoracore serve --port 3000
 ```
 
 ---
 
-## 🐍 SDK (Aplicaciones)
+## 🐍 SDK (Applications)
 
 ```python
 import asyncio
@@ -105,44 +105,44 @@ from luminoracore.types.provider import ProviderConfig
 from luminoracore.types.session import StorageConfig
 
 async def main():
-    # Cliente
+    # Client
     client = LuminoraCoreClient(
         storage_config=StorageConfig(storage_type="memory")
     )
     await client.initialize()
     
-    # Cargar personalidad
-    await client.load_personality("nombre", {
-        "name": "nombre",
-        "system_prompt": "Tu prompt aquí",
+    # Load personality
+    await client.load_personality("name", {
+        "name": "name",
+        "system_prompt": "Your prompt here",
         "metadata": {"version": "1.0.0"}
     })
     
-    # Proveedor
+    # Provider
     config = ProviderConfig(
         name="openai",
-        api_key="tu-key",
+        api_key="your-key",
         model="gpt-3.5-turbo"
     )
     
-    # Sesión
+    # Session
     session_id = await client.create_session(
-        personality_name="nombre",
+        personality_name="name",
         provider_config=config
     )
     
-    # Mensaje
+    # Message
     response = await client.send_message(
         session_id=session_id,
-        message="Hola"
+        message="Hello"
     )
     print(response.content)
     
-    # Memoria
+    # Memory
     await client.store_memory(session_id, "key", "value")
     memory = await client.get_memory(session_id, "key")
     
-    # Limpieza
+    # Cleanup
     await client.cleanup()
 
 asyncio.run(main())
@@ -166,38 +166,38 @@ export COHERE_API_KEY="..."
 
 ---
 
-## 📦 Providers Soportados
+## 📦 Supported Providers
 
-| Provider | Modelo Ejemplo | Instalación SDK |
-|----------|---------------|-----------------|
+| Provider | Example Model | SDK Installation |
+|----------|---------------|------------------|
 | OpenAI | gpt-3.5-turbo, gpt-4 | `pip install -e ".[openai]"` |
 | Anthropic | claude-3-sonnet | `pip install -e ".[anthropic]"` |
 | Cohere | command | `pip install -e ".[cohere]"` |
 | Google | gemini-pro | `pip install -e ".[google]"` |
-| Mistral | mistral-large | Incluido |
-| Llama | llama-2 | Incluido |
+| Mistral | mistral-large | Included |
+| Llama | llama-2 | Included |
 
 ---
 
-## 🎯 Tabla de Decisión
+## 🎯 Decision Table
 
-| Necesito | Usa |
-|----------|-----|
-| Solo validar archivos | **CLI** |
-| Crear personalidades interactivamente | **CLI** |
-| Mezclar personalidades | **Core** o **CLI** |
-| Compilar prompts en Python | **Core** |
-| Chatbot con API real | **SDK** |
-| Interfaz web de prueba | **CLI** `serve` |
-| App de producción | **SDK** |
+| I need | Use |
+|--------|-----|
+| Just validate files | **CLI** |
+| Create personalities interactively | **CLI** |
+| Blend personalities | **Core** or **CLI** |
+| Compile prompts in Python | **Core** |
+| Chatbot with real API | **SDK** |
+| Web interface for testing | **CLI** `serve` |
+| Production app | **SDK** |
 
 ---
 
-## 🔧 Solución Rápida de Problemas
+## 🔧 Quick Problem Solving
 
 ```bash
 # ModuleNotFoundError
-.\venv\Scripts\Activate.ps1  # Activar venv
+.\venv\Scripts\Activate.ps1  # Activate venv
 cd luminoracore && pip install -e . && cd ..
 
 # Command not found (CLI)
@@ -209,90 +209,90 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 ---
 
-## 📂 Estructura de Personalidad JSON
+## 📂 Personality JSON Structure
 
 ```json
 {
   "persona": {
-    "name": "Nombre",
+    "name": "Name",
     "version": "1.0.0",
-    "description": "Descripción",
-    "author": "Autor",
-    "language": "es",
+    "description": "Description",
+    "author": "Author",
+    "language": "en",
     "tags": ["tag1", "tag2"],
     "compatibility": ["openai", "anthropic"]
   },
   "core_traits": {
     "archetype": "helper",
     "temperament": "friendly",
-    "primary_motivation": "ayudar",
-    "expertise_areas": ["área1"],
-    "communication_style": "claro"
+    "primary_motivation": "help",
+    "expertise_areas": ["area1"],
+    "communication_style": "clear"
   },
   "linguistic_profile": {
-    "tone": ["amigable"],
-    "formality_level": "semiformal",
-    "syntax": "estructurado",
-    "vocabulary": ["claro"],
+    "tone": ["friendly"],
+    "formality_level": "semi-formal",
+    "syntax": "structured",
+    "vocabulary": ["clear"],
     "fillers": [],
-    "humor_style": "ligero"
+    "humor_style": "light"
   },
   "behavioral_rules": [
-    "Regla 1",
-    "Regla 2"
+    "Rule 1",
+    "Rule 2"
   ],
   "constraints": {
-    "topics_to_avoid": ["tema"],
-    "ethical_guidelines": ["guía"],
-    "prohibited_behaviors": ["comportamiento"]
+    "topics_to_avoid": ["topic"],
+    "ethical_guidelines": ["guideline"],
+    "prohibited_behaviors": ["behavior"]
   },
   "examples": {
     "sample_responses": [
       {
-        "input": "Pregunta",
-        "output": "Respuesta"
+        "input": "Question",
+        "output": "Answer"
       }
     ],
-    "tone_examples": ["Ejemplo"],
-    "boundary_examples": ["Límite"]
+    "tone_examples": ["Example"],
+    "boundary_examples": ["Boundary"]
   }
 }
 ```
 
 ---
 
-## 🔗 Links Rápidos
+## 🔗 Quick Links
 
-- **Inicio:** [INICIO_RAPIDO.md](INICIO_RAPIDO.md)
-- **Guía Completa:** [GUIA_INSTALACION_USO.md](GUIA_INSTALACION_USO.md)
-- **Referencia:** [COMO_USAR_LUMINORACORE.md](COMO_USAR_LUMINORACORE.md)
-- **Índice:** [INDICE_DOCUMENTACION.md](INDICE_DOCUMENTACION.md)
+- **Start:** [QUICK_START.md](QUICK_START.md)
+- **Complete Guide:** [INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md)
+- **Reference:** [CREATING_PERSONALITIES.md](CREATING_PERSONALITIES.md)
+- **Index:** [DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)
 
 ---
 
-## 🎨 Ejemplos Rápidos
+## 🎨 Quick Examples
 
-### Validar archivo
+### Validate file
 ```bash
-luminoracore validate mi_archivo.json
+luminoracore validate my_file.json
 ```
 
-### Crear chatbot
+### Create chatbot
 ```python
-# Ver ejemplo_quick_start_sdk.py
+# See ejemplo_quick_start_sdk.py
 ```
 
-### Servidor web
+### Web server
 ```bash
 luminoracore serve
 ```
 
-### Mezclar personalidades
+### Blend personalities
 ```bash
 luminoracore blend p1.json:0.6 p2.json:0.4 -o mix.json
 ```
 
 ---
 
-**Imprime o guarda este archivo para referencia rápida! 📄**
+**Print or save this file for quick reference! 📄**
 
