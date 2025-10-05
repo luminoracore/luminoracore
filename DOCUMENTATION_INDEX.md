@@ -117,8 +117,8 @@
 
 | Script | Platform | Description |
 |--------|---------|-------------|
-| `instalar_todo.ps1` | Windows PowerShell | Automatically installs everything |
-| `instalar_todo.sh` | Linux/Mac | Automatically installs everything |
+| `install_all.ps1` | Windows PowerShell | Automatically installs everything |
+| `install_all.sh` | Linux/Mac | Automatically installs everything |
 
 ### Verification
 
@@ -218,8 +218,8 @@ luminoracore/
 │   └── ...
 │
 ├── 🔧 Installation Scripts
-│   ├── instalar_todo.ps1               Windows
-│   └── instalar_todo.sh                Linux/Mac
+│   ├── install_all.ps1               Windows
+│   └── install_all.sh                Linux/Mac
 │
 ├── ✅ Verification Scripts
 │   ├── verify_installation.py
@@ -242,7 +242,7 @@ luminoracore/
 ```
 QUICK_START.md
     ↓
-instalar_todo.ps1 / instalar_todo.sh
+install_all.ps1 / install_all.sh
     ↓
 verify_installation.py
     ↓

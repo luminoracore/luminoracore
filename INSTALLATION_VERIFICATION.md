@@ -472,7 +472,7 @@ python verify_installation.py
 # 1. Clone and install
 git clone https://github.com/your-user/luminoracore.git
 cd luminoracore
-./instalar_todo.sh
+./install_all.sh
 
 # 2. Verify
 python verify_installation.py

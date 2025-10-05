@@ -9,14 +9,14 @@
 ### Windows (PowerShell)
 
 ```powershell
-.\instalar_todo.ps1
+.\install_all.ps1
 ```
 
 ### Linux/Mac
 
 ```bash
-chmod +x instalar_todo.sh
-./instalar_todo.sh
+chmod +x install_all.sh
+./install_all.sh
 ```
 
 **This will install:**
@@ -286,8 +286,8 @@ luminoracore serve
 
 ```bash
 # Installation
-.\instalar_todo.ps1          # Windows
-./instalar_todo.sh           # Linux/Mac
+.\install_all.ps1          # Windows
+./install_all.sh           # Linux/Mac
 
 # Verification
 python ejemplo_quick_start_core.py
@@ -310,7 +310,7 @@ from luminoracore import LuminoraCoreClient  # SDK
 
 ## ✨ Next Steps
 
-1. ✅ **Install**: `.\instalar_todo.ps1` or `./instalar_todo.sh`
+1. ✅ **Install**: `.\install_all.ps1` or `./install_all.sh`
 2. ✅ **Verify**: Run the 3 quick start scripts
 3. ✅ **Explore**: Read [INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md)
 4. ✅ **Practice**: Run examples in `luminoracore/examples/`

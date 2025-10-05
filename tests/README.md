@@ -143,10 +143,10 @@ python run_tests.py
 
 ```bash
 # Windows
-.\instalar_todo.ps1
+.\install_all.ps1
 
 # Linux/Mac
-./instalar_todo.sh
+./install_all.sh
 ```
 
 ---

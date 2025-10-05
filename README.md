@@ -20,10 +20,10 @@
 
 ```bash
 # Windows
-.\instalar_todo.ps1
+.\install_all.ps1
 
 # Linux/Mac
-./instalar_todo.sh
+./install_all.sh
 ```
 
 ### ✅ Verify Installation
@@ -245,10 +245,10 @@ asyncio.run(main())
 
 ```bash
 # Windows
-.\instalar_todo.ps1
+.\install_all.ps1
 
 # Linux/Mac
-./instalar_todo.sh
+./install_all.sh
 ```
 
 ### Option 2: Manual Installation
@@ -304,16 +304,16 @@ pytest tests/test_3_sdk.py -v           # SDK (37 tests)
 ## 📖 Documentation
 
 ### 📚 Main Guides
-- **[INICIO_RAPIDO.md](INICIO_RAPIDO.md)** - Quick start (5 min)
-- **[GUIA_INSTALACION_USO.md](GUIA_INSTALACION_USO.md)** - Complete installation guide (30 min)
-- **[GUIA_CREAR_PERSONALIDADES.md](GUIA_CREAR_PERSONALIDADES.md)** - Creating personalities (15 min)
-- **[GUIA_VERIFICACION_INSTALACION.md](GUIA_VERIFICACION_INSTALACION.md)** - Installation verification
+- **[QUICK_START.md](QUICK_START.md)** - Quick start (5 min)
+- **[INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md)** - Complete installation guide (30 min)
+- **[CREATING_PERSONALITIES.md](CREATING_PERSONALITIES.md)** - Creating personalities (15 min)
+- **[INSTALLATION_VERIFICATION.md](INSTALLATION_VERIFICATION.md)** - Installation verification
 - **[CHEATSHEET.md](CHEATSHEET.md)** - Quick reference (2 min)
 
 ### 📋 Technical Documentation
 - **[MASTER_TEST_SUITE.md](MASTER_TEST_SUITE.md)** - Complete testing documentation
 - **[tests/ESTRATEGIA_TESTS.md](tests/ESTRATEGIA_TESTS.md)** - Testing strategy
-- **[INDICE_DOCUMENTACION.md](INDICE_DOCUMENTACION.md)** - Complete documentation index
+- **[DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)** - Complete documentation index
 
 ### 🔧 Component Documentation
 - **[luminoracore/README.md](luminoracore/README.md)** - Core Engine

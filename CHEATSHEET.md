@@ -4,8 +4,8 @@
 
 ```bash
 # All-in-one
-.\instalar_todo.ps1        # Windows
-./instalar_todo.sh         # Linux/Mac
+.\install_all.ps1        # Windows
+./install_all.sh         # Linux/Mac
 
 # Manual - Core only
 cd luminoracore && pip install -e . && cd ..
