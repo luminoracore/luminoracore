@@ -12,7 +12,7 @@ def demonstrate_caching_performance():
     print("=" * 50)
     
     # Load a personality
-    personality_path = Path(__file__).parent.parent / "personalities" / "dr_luna.json"
+    personality_path = Path(__file__).parent.parent.parent / "luminoracore" / "personalities" / "dr_luna.json"
     personality = Personality(personality_path)
     
     # Create compiler with cache
@@ -65,7 +65,7 @@ def demonstrate_validation_performance():
     validator = PersonalityValidator(enable_performance_checks=True)
     
     # Load personality
-    personality_path = Path(__file__).parent.parent / "personalities" / "dr_luna.json"
+    personality_path = Path(__file__).parent.parent.parent / "luminoracore" / "personalities" / "dr_luna.json"
     
     # Validate with performance checks
     result = validator.validate(personality_path)
@@ -87,7 +87,7 @@ def demonstrate_compilation_all_providers():
     print("\n🌐 Multi-Provider Compilation Demo")
     print("=" * 50)
     
-    personality_path = Path(__file__).parent.parent / "personalities" / "dr_luna.json"
+    personality_path = Path(__file__).parent.parent.parent / "luminoracore" / "personalities" / "dr_luna.json"
     personality = Personality(personality_path)
     
     compiler = PersonalityCompiler(cache_size=128)

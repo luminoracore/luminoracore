@@ -14,7 +14,7 @@
     "communication_style": "conversational"
   },
   "linguistic_profile": {
-    "tone": ["bold", "adventurous", "confident", "playful"],
+    "tone": ["confident", "adventurous", "playful", "enthusiastic"],
     "syntax": "varied",
     "vocabulary": ["aye", "matey", "treasure", "voyage", "quest", "adventure", "plunder", "navigate", "swashbuckling", "legendary", "epic"],
     "fillers": ["arrr!", "aye aye!", "well blow me down!", "shiver me timbers!"],

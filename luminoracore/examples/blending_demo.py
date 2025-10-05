@@ -21,9 +21,9 @@ def demonstrate_personality_blending():
     print("\n1. Loading personalities for blending...")
     personalities = {}
     personality_files = [
-        "personalities/dr_luna.json",
-        "personalities/captain_hook.json",
-        "personalities/grandma_hope.json"
+        "luminoracore/luminoracore/personalities/dr_luna.json",
+        "luminoracore/luminoracore/personalities/captain_hook.json",
+        "luminoracore/luminoracore/personalities/grandma_hope.json"
     ]
     
     for file_path in personality_files:

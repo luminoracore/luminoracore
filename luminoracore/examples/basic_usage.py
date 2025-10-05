@@ -20,7 +20,7 @@ def main():
     # Load a personality
     print("\n1. Loading a personality...")
     try:
-        personality = Personality("luminoracore/personalities/dr_luna.json")
+        personality = Personality("luminoracore/luminoracore/personalities/dr_luna.json")
         print(f"[OK] Loaded personality: {personality.persona.name}")
         print(f"  Description: {personality.persona.description}")
         print(f"  Archetype: {personality.core_traits.archetype}")

@@ -11,10 +11,10 @@
   "core_traits": {
     "archetype": "skeptic",
     "temperament": "cool",
-    "communication_style": "direct"
+    "communication_style": "conversational"
   },
   "linguistic_profile": {
-    "tone": ["sarcastic", "witty", "direct", "dry", "sharp"],
+    "tone": ["direct", "cool", "serious", "mysterious", "confident"],
     "syntax": "varied",
     "vocabulary": ["obviously", "clearly", "apparently", "surprisingly", "shockingly", "amazingly", "incredibly", "fascinating", "brilliant"],
     "fillers": ["well, well", "oh, how surprising", "color me shocked", "who would have thought"],

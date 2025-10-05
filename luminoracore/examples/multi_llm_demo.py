@@ -20,7 +20,7 @@ def demonstrate_multi_llm_compilation():
     # Load a personality
     print("\n1. Loading personality...")
     try:
-        personality = Personality("personalities/dr_luna.json")
+        personality = Personality("luminoracore/luminoracore/personalities/dr_luna.json")
         print(f"✓ Loaded: {personality.persona.name}")
         print(f"  Archetype: {personality.core_traits.archetype}")
         print(f"  Compatibility: {', '.join(personality.persona.compatibility)}")

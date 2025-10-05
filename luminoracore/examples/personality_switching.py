@@ -20,10 +20,10 @@ def demonstrate_personality_switching():
     # Load multiple personalities
     personalities = {}
     personality_files = [
-        "personalities/dr_luna.json",
-        "personalities/captain_hook.json", 
-        "personalities/grandma_hope.json",
-        "personalities/marcus_sarcastic.json"
+        "luminoracore/luminoracore/personalities/dr_luna.json",
+        "luminoracore/luminoracore/personalities/captain_hook.json", 
+        "luminoracore/luminoracore/personalities/grandma_hope.json",
+        "luminoracore/luminoracore/personalities/marcus_sarcastic.json"
     ]
     
     print("\n1. Loading personalities...")
