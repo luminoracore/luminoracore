@@ -177,7 +177,6 @@ class TestClientInitialization:
         client = LuminoraCoreClient(storage_config=storage_config_memory)
         assert client.storage is not None
     
-    @pytest.mark.skip(reason="JSON file storage inicialización pendiente - Bug conocido")
     @pytest.mark.asyncio
     async def test_client_with_json_storage(self, storage_config_json):
         """✅ Inicializar con storage JSON."""
@@ -486,7 +485,6 @@ class TestMemory:
 class TestPersonaBlend:
     """Tests de blending de personalidades."""
     
-    @pytest.mark.skip(reason="PersonaBlend API no completamente implementada en SDK - Feature para v2.0")
     @pytest.mark.asyncio
     async def test_blend_two_personalities(self, temp_personalities_dir, valid_personality_dict):
         """✅ Blend de dos personalidades."""
@@ -504,7 +502,7 @@ class TestPersonaBlend:
         client = LuminoraCoreClient(personalities_dir=temp_personalities_dir)
         await client.initialize()
         
-        blended = await client.personality_blender.blend(
+        blended = await client.personality_blender.blend_personalities(
             personalities=[
                 await client.personality_manager.get_personality("TestBot"),
                 await client.personality_manager.get_personality("TestBot2")
@@ -516,7 +514,6 @@ class TestPersonaBlend:
         assert hasattr(blended, "name") or "name" in blended
         assert hasattr(blended, "system_prompt") or "system_prompt" in blended
     
-    @pytest.mark.skip(reason="PersonaBlend API no completamente implementada en SDK - Feature para v2.0")
     @pytest.mark.asyncio
     async def test_blend_with_equal_weights(self, temp_personalities_dir, valid_personality_dict):
         """✅ Blend con pesos iguales."""
@@ -532,7 +529,7 @@ class TestPersonaBlend:
         client = LuminoraCoreClient(personalities_dir=temp_personalities_dir)
         await client.initialize()
         
-        blended = await client.personality_blender.blend(
+        blended = await client.personality_blender.blend_personalities(
             personalities=[
                 await client.personality_manager.get_personality("TestBot"),
                 await client.personality_manager.get_personality("TestBot3")
@@ -569,7 +566,6 @@ class TestStorageBackends:
         session = await client.session_manager.get_session(session_id)
         assert session is not None
     
-    @pytest.mark.skip(reason="JSON file storage inicialización pendiente - Bug conocido")
     @pytest.mark.asyncio
     async def test_json_file_storage(self, storage_config_json, provider_config, temp_personalities_dir):
         """✅ Storage en archivo JSON."""
@@ -590,7 +586,6 @@ class TestStorageBackends:
         # El archivo puede no existir hasta que se persista
         # assert json_file.exists()  # Puede ser lazy
     
-    @pytest.mark.skip(reason="JSON file storage persistencia pendiente - Bug conocido")
     @pytest.mark.asyncio
     async def test_storage_persistence(self, storage_config_json, provider_config, temp_personalities_dir):
         """✅ Persistencia de datos en storage."""
@@ -678,7 +673,6 @@ class TestAsyncAPI:
         assert len(session_ids) == 3
         assert len(set(session_ids)) == 3  # Todos únicos
     
-    @pytest.mark.skip(reason="Timeout en carga concurrente - Race condition conocida")
     @pytest.mark.asyncio
     async def test_concurrent_personality_loads(self, client_with_personalities):
         """✅ Cargar personalidades concurrentemente."""
@@ -691,7 +685,7 @@ class TestAsyncAPI:
         personalities = await asyncio.gather(*tasks)
         
         assert len(personalities) == 3
-        assert all(p["persona"]["name"] == "TestBot" for p in personalities)
+        assert all(p.name == "TestBot" for p in personalities)
 
 
 # ============================================================================
@@ -701,7 +695,6 @@ class TestAsyncAPI:
 class TestBasicIntegration:
     """Tests de integración básica."""
     
-    @pytest.mark.skip(reason="Depende de features no completadas (PersonaBlend, Storage JSON)")
     @pytest.mark.asyncio
     async def test_complete_workflow(self, temp_personalities_dir, provider_config, storage_config_memory):
         """✅ Flujo completo: init -> session -> conversation -> cleanup."""
@@ -718,6 +711,9 @@ class TestBasicIntegration:
             provider_config=provider_config
         )
         assert session_id is not None
+        
+        # 2.5. Crear conversación
+        await client.conversation_manager.create_conversation(session_id)
         
         # 3. Añadir mensajes a conversación
         await client.conversation_manager.add_message(

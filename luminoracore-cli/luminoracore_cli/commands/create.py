@@ -13,6 +13,7 @@ from luminoracore_cli.utils.errors import CLIError
 from luminoracore_cli.utils.console import console, error_console
 from luminoracore_cli.utils.files import write_json_file
 from luminoracore_cli.templates import get_template, list_templates
+from luminoracore_cli.templates.loader import TemplateType
 from luminoracore_cli.core.validator import PersonalityValidator
 
 
@@ -412,7 +413,7 @@ def create_from_template(template: str, name: Optional[str] = None, archetype: O
     """Create personality from template."""
     try:
         # Load template
-        template_data = get_template("personality", template)
+        template_data = get_template(template, TemplateType.PERSONALITY)
         
         if verbose:
             console.print(f"[blue]Using template: {template}[/blue]")
@@ -449,6 +450,10 @@ def create_from_template(template: str, name: Optional[str] = None, archetype: O
                 return obj
         
         personality_data = replace_vars(personality_data)
+        
+        # Override name if provided
+        if name and "persona" in personality_data:
+            personality_data["persona"]["name"] = name
         
         # Validate personality
         if verbose:

@@ -12,6 +12,7 @@ from luminoracore_cli.utils.errors import CLIError
 from luminoracore_cli.utils.console import console, error_console
 from luminoracore_cli.utils.files import read_json_file, write_json_file
 from luminoracore_cli.templates import get_template, list_templates
+from luminoracore_cli.templates.loader import TemplateType
 
 
 def init_command(
@@ -80,7 +81,7 @@ def init_command(
         
         # Load template
         try:
-            template_data = get_template("project", template)
+            template_data = get_template(template, TemplateType.PROJECT)
         except Exception as e:
             error_console.print(f"[red]Error loading template '{template}': {e}[/red]")
             return 1

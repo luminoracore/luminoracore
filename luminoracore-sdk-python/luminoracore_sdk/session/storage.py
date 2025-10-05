@@ -1,7 +1,9 @@
 """Storage backend for LuminoraCore SDK."""
 
 import asyncio
+import json
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 import logging
 from datetime import datetime
@@ -126,6 +128,97 @@ class InMemoryStorage(SessionStorage):
         """Check if session exists in memory."""
         async with self._lock:
             return session_id in self._sessions
+
+
+class JSONFileStorage(SessionStorage):
+    """JSON File storage implementation for sessions."""
+    
+    def __init__(self, config: StorageConfig):
+        """Initialize JSON File storage."""
+        super().__init__(config)
+        self.file_path = Path(config.connection_string) if config.connection_string else Path("sessions.json")
+        self._lock = asyncio.Lock()
+        self._data = {}
+        self._loaded = False
+    
+    async def _load_data(self):
+        """Load data from JSON file."""
+        if not self._loaded:
+            async with self._lock:
+                if self.file_path.exists():
+                    try:
+                        with open(self.file_path, 'r', encoding='utf-8') as f:
+                            self._data = json.load(f)
+                    except (json.JSONDecodeError, IOError) as e:
+                        logger.error(f"Error loading JSON file: {e}")
+                        self._data = {}
+                else:
+                    self._data = {}
+                self._loaded = True
+    
+    def _make_serializable(self, obj):
+        """Convert objects to JSON-serializable format."""
+        if isinstance(obj, dict):
+            return {k: self._make_serializable(v) for k, v in obj.items()}
+        elif isinstance(obj, (list, tuple)):
+            return [self._make_serializable(item) for item in obj]
+        elif hasattr(obj, '__dict__'):
+            # Convert dataclass or object to dict
+            return self._make_serializable(obj.__dict__)
+        elif isinstance(obj, (str, int, float, bool, type(None))):
+            return obj
+        else:
+            # Fallback: try to convert to string
+            return str(obj)
+    
+    async def _save_data(self):
+        """Save data to JSON file."""
+        async with self._lock:
+            self.file_path.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                # Convert data to JSON-serializable format
+                serializable_data = self._make_serializable(self._data)
+                with open(self.file_path, 'w', encoding='utf-8') as f:
+                    json.dump(serializable_data, f, indent=2, ensure_ascii=False)
+            except (IOError, TypeError) as e:
+                logger.error(f"Error saving JSON file: {e}")
+                raise StorageError(f"Failed to save to JSON file: {e}")
+    
+    async def save_session(self, session_id: str, session_data: Dict[str, Any]) -> bool:
+        """Save session data to JSON file."""
+        await self._load_data()
+        async with self._lock:
+            self._data[session_id] = session_data
+        await self._save_data()
+        return True
+    
+    async def load_session(self, session_id: str) -> Optional[Dict[str, Any]]:
+        """Load session data from JSON file."""
+        await self._load_data()
+        async with self._lock:
+            return self._data.get(session_id)
+    
+    async def delete_session(self, session_id: str) -> bool:
+        """Delete session data from JSON file."""
+        await self._load_data()
+        async with self._lock:
+            if session_id in self._data:
+                del self._data[session_id]
+                await self._save_data()
+                return True
+        return False
+    
+    async def list_sessions(self) -> List[str]:
+        """List all session IDs in JSON file."""
+        await self._load_data()
+        async with self._lock:
+            return list(self._data.keys())
+    
+    async def session_exists(self, session_id: str) -> bool:
+        """Check if session exists in JSON file."""
+        await self._load_data()
+        async with self._lock:
+            return session_id in self._data
 
 
 class RedisStorage(SessionStorage):
@@ -446,6 +539,8 @@ def create_storage(config: StorageConfig) -> SessionStorage:
     """
     if config.storage_type == StorageType.MEMORY:
         return InMemoryStorage(config)
+    elif config.storage_type in (StorageType.JSON, StorageType.FILE):
+        return JSONFileStorage(config)
     elif config.storage_type == StorageType.REDIS:
         return RedisStorage(config)
     elif config.storage_type == StorageType.POSTGRES:

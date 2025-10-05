@@ -29,6 +29,8 @@ class StorageType(str, Enum):
     POSTGRES = "postgres"
     MONGODB = "mongodb"
     FILE = "file"
+    JSON = "json"  # Alias for FILE
+    SQLITE = "sqlite"
 
 
 @dataclass
