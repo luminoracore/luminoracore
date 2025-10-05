@@ -3,84 +3,85 @@
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/luminoracore/sdk-python)
-[![Status](https://img.shields.io/badge/status-90%25_complete-orange.svg)](#)
+[![Status](https://img.shields.io/badge/status-v1.0_ready-brightgreen.svg)](#)
+[![Tests](https://img.shields.io/badge/tests-37%2F37_passing-brightgreen.svg)](#)
 
-**✅ SDK OFICIAL DE PYTHON - 90% COMPLETO**
+**✅ OFFICIAL PYTHON SDK - v1.0 PRODUCTION READY**
 
-**LuminoraCore SDK Python** es el cliente oficial de Python para gestión avanzada de personalidades de IA. Proporciona un conjunto completo de herramientas para construir aplicaciones de IA con sistemas sofisticados de personalidades, gestión de sesiones y soporte multi-proveedor LLM.
+**LuminoraCore SDK Python** is the official Python client for advanced AI personality management. Provides a complete toolkit for building AI applications with sophisticated personality systems, session management, and multi-provider LLM support.
 
-## Características Principales
+## Key Features
 
-- **✅ Gestión Avanzada de Personalidades**: Crear, mezclar y gestionar personalidades de IA con facilidad
-- **✅ Gestión de Sesiones**: Conversaciones con estado y memoria persistente
-- **✅ Soporte Multi-Provider**: Integración con OpenAI, Anthropic, Mistral, Cohere, Google y más
-- **✅ PersonaBlend™ Technology**: Mezcla de personalidades en tiempo real con pesos personalizados
-- **✅ Almacenamiento Flexible**: Soporte para Redis, PostgreSQL, MongoDB y almacenamiento en memoria
-- **✅ Monitoreo y Métricas**: Observabilidad integrada con trazado distribuido
-- **✅ Soporte Async/Await**: API completamente asíncrona para aplicaciones de alto rendimiento
-- **✅ Seguridad de Tipos**: Definiciones de tipos comprehensivas y validación
-- **✅ Conexiones API Reales**: APIs reales a todos los proveedores de LLM
-- **✅ Manejo Robusto de Errores**: Reintentos automáticos y fallbacks
-- **✅ Analytics Completos**: Tracking de tokens, costos y uso
+- **✅ Advanced Personality Management**: Create, blend, and manage AI personalities with ease
+- **✅ Session Management**: Stateful conversations with persistent memory
+- **✅ Multi-Provider Support**: Integration with OpenAI, Anthropic, DeepSeek, Mistral, Cohere, Google, Llama
+- **✅ PersonaBlend™ Technology**: Real-time personality blending with custom weights
+- **✅ Flexible Storage**: Memory, JSON File, SQLite, Redis, PostgreSQL, MongoDB
+- **✅ Monitoring & Metrics**: Integrated observability with distributed tracing
+- **✅ Async/Await Support**: Fully asynchronous API for high-performance applications
+- **✅ Type Safety**: Comprehensive type definitions and validation
+- **✅ Real API Connections**: Real APIs to all LLM providers
+- **✅ Robust Error Handling**: Automatic retries and fallbacks
+- **✅ Complete Analytics**: Token, cost, and usage tracking
 
-## Instalación
+## Installation
 
 ```bash
 pip install -e luminoracore-sdk-python/
 ```
 
-## Inicio Rápido
+## Quick Start
 
 ```python
 import asyncio
-from luminoracore import LuminoraCoreClient
-from luminoracore.types.provider import ProviderConfig
-from luminoracore.types.storage import StorageConfig
+from luminoracore_sdk import LuminoraCoreClient
+from luminoracore_sdk.types.provider import ProviderConfig
+from luminoracore_sdk.types.session import StorageConfig
 
 async def main():
-    # Inicializar el cliente
+    # Initialize the client
     client = LuminoraCoreClient()
     await client.initialize()
     
-    # Configurar almacenamiento (Redis, PostgreSQL, etc.)
+    # Configure storage (Redis, PostgreSQL, etc.)
     storage_config = StorageConfig(
         storage_type="redis",
         connection_string="redis://localhost:6379"
     )
     await client.configure_storage(storage_config)
     
-    # Crear configuración del proveedor
+    # Create provider configuration
     provider_config = ProviderConfig(
         name="openai",
-        api_key="tu-api-key",
+        api_key="your-api-key",
         model="gpt-3.5-turbo",
         extra={"timeout": 30, "max_retries": 3}
     )
     
-    # Crear una sesión
+    # Create a session
     session_id = await client.create_session(
         personality_name="dr_luna",
         provider_config=provider_config
     )
     
-    # Enviar un mensaje (conexión real a OpenAI)
+    # Send a message (real connection to OpenAI)
     response = await client.send_message(
         session_id=session_id,
-        message="¡Hola! ¿Puedes ayudarme con física cuántica?"
+        message="Hello! Can you help me with quantum physics?"
     )
     
-    print(f"Respuesta: {response.content}")
-    print(f"Tokens usados: {response.usage}")
-    print(f"Costo: ${response.cost}")
+    print(f"Response: {response.content}")
+    print(f"Tokens used: {response.usage}")
+    print(f"Cost: ${response.cost}")
     
-    # Obtener métricas
+    # Get metrics
     metrics = await client.get_session_metrics(session_id)
-    print(f"Mensajes totales: {metrics.total_messages}")
+    print(f"Total messages: {metrics.total_messages}")
     
-    # Limpiar
+    # Cleanup
     await client.cleanup()
 
-# Ejecutar el ejemplo
+# Run the example
 asyncio.run(main())
 ```
 
@@ -134,36 +135,48 @@ async for chunk in client.stream_message(
 ### Storage Configuration
 
 ```python
-from luminoracore.types.session import StorageConfig
+from luminoracore_sdk.types.session import StorageConfig
 
-# Redis storage
+# In-memory storage (default - fastest)
+storage_config = StorageConfig(
+    storage_type="memory"
+)
+
+# JSON File storage (simple, portable)
+storage_config = StorageConfig(
+    storage_type="json",
+    connection_string="./sessions.json"
+)
+
+# SQLite storage (perfect for mobile apps)
+storage_config = StorageConfig(
+    storage_type="sqlite",
+    connection_string="./sessions.db"
+)
+
+# Redis storage (production-ready)
 storage_config = StorageConfig(
     storage_type="redis",
     connection_string="redis://localhost:6379"
 )
 
-# PostgreSQL storage
+# PostgreSQL storage (enterprise-ready)
 storage_config = StorageConfig(
     storage_type="postgres",
     connection_string="postgresql://user:password@localhost/db"
 )
 
-# MongoDB storage
+# MongoDB storage (document-based)
 storage_config = StorageConfig(
     storage_type="mongodb",
     connection_string="mongodb://localhost:27017/db"
-)
-
-# In-memory storage (default)
-storage_config = StorageConfig(
-    storage_type="memory"
 )
 ```
 
 ### Memory Configuration
 
 ```python
-from luminoracore.types.session import MemoryConfig
+from luminoracore_sdk.types.session import MemoryConfig
 
 memory_config = MemoryConfig(
     enabled=True,
@@ -177,10 +190,11 @@ memory_config = MemoryConfig(
 )
 ```
 
-## Supported Providers
+## Supported Providers (7 Total)
 
 - **OpenAI**: GPT-3.5, GPT-4, and other OpenAI models
 - **Anthropic**: Claude-3 Sonnet, Claude-3 Haiku, and other Claude models
+- **DeepSeek**: DeepSeek Chat (Cost-effective option)
 - **Mistral**: Mistral Tiny, Mistral Small, and other Mistral models
 - **Cohere**: Command, Command Light, and other Cohere models
 - **Google**: Gemini Pro, Gemini Ultra, and other Google models

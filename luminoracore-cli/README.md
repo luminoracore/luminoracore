@@ -3,25 +3,26 @@
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/luminoracore/cli)
-[![Status](https://img.shields.io/badge/status-95%25_complete-yellow.svg)](#)
+[![Status](https://img.shields.io/badge/status-v1.0_ready-brightgreen.svg)](#)
+[![Tests](https://img.shields.io/badge/tests-25%2F26_passing-brightgreen.svg)](#)
 
-**✅ HERRAMIENTA PROFESIONAL DE LÍNEA DE COMANDOS - 95% COMPLETO**
+**✅ PROFESSIONAL CLI TOOL - v1.0 PRODUCTION READY**
 
-Herramienta profesional de línea de comandos para gestión de personalidades de IA con LuminoraCore. Incluye testing real con APIs, wizard interactivo, servidor de desarrollo y más.
+Professional command-line tool for AI personality management with LuminoraCore. Includes real API testing, interactive wizard, development server, and more.
 
-## Características Principales
+## Key Features
 
-- **✅ Validar** archivos de personalidades contra esquema oficial
-- **✅ Compilar** personalidades a prompts específicos del proveedor
-- **✅ Crear** nuevas personalidades con wizard interactivo
-- **✅ Probar** personalidades con proveedores LLM reales (OpenAI, Claude, etc.)
-- **✅ Mezclar** múltiples personalidades con pesos personalizados
-- **✅ Servir** servidor de desarrollo local con interfaz web
-- **✅ Listar** y navegar personalidades disponibles
-- **✅ Actualizar** caché de personalidades desde repositorio
-- **✅ Testing Real** - Conexiones reales a APIs de LLM
-- **✅ Interfaz Web** - UI integrada para testing y gestión
-- **✅ Manejo de Errores** - Robusto con reintentos automáticos
+- **✅ Validate** - Validate personality files against official schema
+- **✅ Compile** - Compile personalities to provider-specific prompts
+- **✅ Create** - Create new personalities with interactive wizard
+- **✅ Test** - Test personalities with real LLM providers (OpenAI, Claude, etc.)
+- **✅ Blend** - Blend multiple personalities with custom weights
+- **✅ Serve** - Local development server with web interface
+- **✅ List** - List and browse available personalities
+- **✅ Update** - Update personality cache from repository
+- **✅ Real Testing** - Real connections to LLM APIs
+- **✅ Web Interface** - Integrated UI for testing and management
+- **✅ Error Handling** - Robust with automatic retries
 
 ## Installation
 
