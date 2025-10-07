@@ -334,6 +334,8 @@ We welcome contributions! Please see our [Contributing Guide](luminoracore/CONTR
 - 🧪 Add tests
 - 🔧 Fix issues
 
+**This is an open-source project by Ruly Altamira.**
+
 ---
 
 ## 📄 License
@@ -362,8 +364,7 @@ This project is licensed under the MIT License - see the [LICENSE](luminoracore/
 
 ## 📞 Support
 
-- 📧 **Email**: team@luminoracore.dev
-- 💬 **Discord**: [Join our community](https://discord.gg/luminoracore)
+- 📧 **Email**: contact@luminoracore.com
 - 🐛 **Issues**: [GitHub Issues](https://github.com/luminoracore/luminoracore/issues)
 - 📖 **Wiki**: [GitHub Wiki](https://github.com/luminoracore/luminoracore/wiki)
 
@@ -379,9 +380,9 @@ This project is licensed under the MIT License - see the [LICENSE](luminoracore/
 
 <div align="center">
 
-**Made with ❤️ by the LuminoraCore Team**
+**Made with ❤️ by Ereace - Ruly Altamirano**
 
-[⭐ Star us on GitHub](https://github.com/luminoracore/luminoracore) • [🐛 Report Issues](https://github.com/luminoracore/luminoracore/issues) • [💬 Join Discord](https://discord.gg/luminoracore)
+[⭐ Star us on GitHub](https://github.com/luminoracore/luminoracore) • [🐛 Report Issues](https://github.com/luminoracore/luminoracore/issues) • [📧 Contact](mailto:contact@luminoracore.com)
 
 **✅ v1.0 PRODUCTION READY - 90/91 Tests Passing (100% Executable)**
 
