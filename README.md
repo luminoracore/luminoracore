@@ -241,7 +241,18 @@ asyncio.run(main())
 
 ## 📦 Installation
 
-### Option 1: Automated Installation (Recommended)
+### Option 1: PyPI (When Published) ⭐ RECOMMENDED
+
+```bash
+# Install from PyPI (worldwide distribution)
+pip install luminoracore
+pip install luminoracore-cli
+pip install "luminoracore-sdk[all]"
+```
+
+**Status:** 🚧 Not yet published - [See Publishing Guide](PUBLISHING_GUIDE.md)
+
+### Option 2: Automated Installation from Source
 
 ```bash
 # Windows
@@ -251,34 +262,20 @@ asyncio.run(main())
 ./install_all.sh
 ```
 
-### Option 2: Manual Installation
+### Option 3: Install from Wheels (Pre-built Packages)
 
 ```bash
-# 1. Install Core Engine
-cd luminoracore
-pip install -e .
+# 1. Build packages (only needed once)
+.\build_all_packages.ps1  # Windows
+./build_all_packages.sh   # Linux/Mac
 
-# 2. Install CLI
-cd ../luminoracore-cli
-pip install -e .
-
-# 3. Install SDK
-cd ../luminoracore-sdk-python
-pip install -e ".[all]"
+# 2. Install from releases/ folder
+pip install releases/luminoracore-1.0.0-py3-none-any.whl
+pip install releases/luminoracore_cli-1.0.0-py3-none-any.whl
+pip install releases/luminoracore_sdk-1.0.0-py3-none-any.whl
 ```
 
-### Option 3: Individual Components
-
-```bash
-# Just the Core Engine
-pip install -e luminoracore/
-
-# Just the CLI
-pip install luminoracore-cli
-
-# Just the SDK
-pip install -e luminoracore-sdk-python/
-```
+**📖 Complete guide:** [DOWNLOAD.md](DOWNLOAD.md)
 
 ---
 
@@ -314,6 +311,11 @@ pytest tests/test_3_sdk.py -v           # SDK (37 tests)
 - **[MASTER_TEST_SUITE.md](MASTER_TEST_SUITE.md)** - Complete testing documentation
 - **[tests/ESTRATEGIA_TESTS.md](tests/ESTRATEGIA_TESTS.md)** - Testing strategy
 - **[DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)** - Complete documentation index
+
+### 🚀 Distribution & Publishing
+- **[DOWNLOAD.md](DOWNLOAD.md)** - Download and installation options
+- **[PUBLISHING_GUIDE.md](PUBLISHING_GUIDE.md)** - How to build and publish packages
+- **[BUILDING_MODULAR_AI_PERSONALITIES.md](BUILDING_MODULAR_AI_PERSONALITIES.md)** - Technical article/tutorial
 
 ### 🔧 Component Documentation
 - **[luminoracore/README.md](luminoracore/README.md)** - Core Engine
@@ -355,10 +357,12 @@ This project is licensed under the MIT License - see the [LICENSE](luminoracore/
 - [x] Production-ready stable release
 
 ### 🔮 Future Releases
-- [ ] **v1.1.0** - Additional LLM providers
-- [ ] **v1.2.0** - Personality marketplace
-- [ ] **v1.3.0** - Advanced blending algorithms
-- [ ] **v2.0.0** - Real-time personality adaptation
+- [ ] **v1.1.0** (Q1 2026) - Memory Intelligence: Automatic fact extraction, episodic memory, vector search
+- [ ] **v1.2.0** (Q2 2026) - Relationship Intelligence: Affinity system, mood tracking, personality adaptation
+- [ ] **v1.3.0** (Q3 2026) - Enterprise features: Analytics dashboard, A/B testing, webhooks
+- [ ] **v2.0.0** (Q4 2026) - AI-Native: Self-learning personalities, multi-modal support
+
+**[📖 Complete Roadmap](ROADMAP.md)**
 
 ---
 

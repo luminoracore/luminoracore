@@ -29,6 +29,37 @@
 - Step-by-step examples
 - 11 example personalities included
 
+---
+
+## 📦 Distribution & Publishing
+
+### [DOWNLOAD.md](DOWNLOAD.md) ⭐
+**Download and installation options.**
+- PyPI installation (when published)
+- Wheel files (.whl)
+- Docker images
+- Platform-specific instructions
+
+### [PUBLISHING_GUIDE.md](PUBLISHING_GUIDE.md)
+**How to build and publish packages.**
+- Build wheels (.whl)
+- Test locally
+- Publish to PyPI
+- Create GitHub releases
+- Version management
+
+### [QUICK_REFERENCE_DISTRIBUTION.md](QUICK_REFERENCE_DISTRIBUTION.md)
+**Quick reference for distribution.**
+- Use in other local projects
+- Build packages
+- Publish to PyPI
+- Complete workflow diagram
+
+**Scripts:**
+- `build_all_packages.ps1` / `.sh` - Build packages
+- `install_from_local.ps1` - Install from local wheels
+- `publish_to_pypi.ps1` / `.sh` - Publish to PyPI
+
 ### 4. [INSTALLATION_VERIFICATION.md](INSTALLATION_VERIFICATION.md) ⭐
 **How to use the verification script.**
 - What the script automatically verifies
