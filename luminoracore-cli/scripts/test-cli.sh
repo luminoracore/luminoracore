@@ -83,6 +83,15 @@ run_test "Init Command Help" "python -m luminoracore_cli init --help"
 # Test 14: Check info command help
 run_test "Info Command Help" "python -m luminoracore_cli info --help"
 
+# Test 14a: Check migrate command help (v1.1)
+run_test "Migrate Command Help (v1.1)" "python -m luminoracore_cli migrate --help" 2>/dev/null || echo -e "${YELLOW}(v1.1 migrate command not available)${NC}"
+
+# Test 14b: Check memory command help (v1.1)
+run_test "Memory Command Help (v1.1)" "python -m luminoracore_cli memory --help" 2>/dev/null || echo -e "${YELLOW}(v1.1 memory command not available)${NC}"
+
+# Test 14c: Check snapshot command help (v1.1)
+run_test "Snapshot Command Help (v1.1)" "python -m luminoracore_cli snapshot --help" 2>/dev/null || echo -e "${YELLOW}(v1.1 snapshot command not available)${NC}"
+
 # Test 15: Test list command (should work even without personalities)
 run_test "List Command Execution" "python -m luminoracore_cli list"
 
