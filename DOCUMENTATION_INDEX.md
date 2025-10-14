@@ -95,6 +95,8 @@
 |----------|-------------|
 | `luminoracore-sdk-python/README.md` | SDK documentation |
 | `luminoracore-sdk-python/docs/api_reference.md` | Complete API reference |
+| `luminoracore-sdk-python/DOCKER.md` ⭐ | Docker deployment guide (v1.1) |
+| `luminoracore-sdk-python/ENV_VARIABLES.md` ⭐ | Environment variables guide |
 
 ---
 
@@ -183,13 +185,18 @@
 
 ### v1.1 Examples
 
-| Example | Description |
-|---------|-------------|
-| `examples/v1_1_affinity_demo.py` | Affinity system demo |
-| `examples/v1_1_memory_demo.py` | Memory system demo |
-| `examples/v1_1_dynamic_personality_demo.py` | Dynamic compilation demo |
-| `luminoracore/examples/v1_1_quick_example.py` | Core v1.1 quick example |
-| `luminoracore-sdk-python/examples/v1_1_sdk_usage.py` | SDK v1.1 complete demo |
+| Example | Description | Features |
+|---------|-------------|----------|
+| `examples/v1_1_complete_workflow.py` ⭐ | **Workflow completo de producción** | TODAS las features integradas |
+| `examples/v1_1_feature_flags_demo.py` ⭐ | **Feature flags deep dive** | Configuración dinámica |
+| `examples/v1_1_migrations_demo.py` ⭐ | **Database migrations deep dive** | Gestión de esquema |
+| `examples/v1_1_affinity_demo.py` | Affinity system demo | Tracking de relación |
+| `examples/v1_1_memory_demo.py` | Memory system demo | Facts + Episodes |
+| `examples/v1_1_dynamic_personality_demo.py` | Dynamic compilation demo | Personalidad adaptativa |
+| `luminoracore/examples/v1_1_quick_example.py` | Core v1.1 quick example | Vista rápida |
+| `luminoracore-sdk-python/examples/v1_1_sdk_usage.py` | SDK v1.1 complete demo | SDK completo |
+
+⭐ = **NUEVO** - Ejemplos agregados para cobertura 100%
 
 ---
 

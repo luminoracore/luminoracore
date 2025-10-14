@@ -334,6 +334,30 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - 🐛 [Issue Tracker](https://github.com/luminoracore/sdk-python/issues)
 - 📧 [Email Support](mailto:support@luminoracore.com)
 
+## Docker Deployment
+
+LuminoraCore SDK includes complete Docker support for v1.1:
+
+```bash
+# Quick start with Docker
+docker-compose up -d
+
+# Production deployment
+docker-compose -f docker-compose.production.yml up -d
+
+# With monitoring
+docker-compose -f docker-compose.production.yml --profile monitoring up -d
+```
+
+**See [DOCKER.md](DOCKER.md) for complete Docker guide.**
+
+**Features:**
+- ✅ Auto-migrations on startup
+- ✅ Health checks configured
+- ✅ Multi-service stack (Redis, PostgreSQL, MongoDB)
+- ✅ Monitoring (Prometheus, Grafana)
+- ✅ Production-ready configuration
+
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md) for a list of changes and version history.

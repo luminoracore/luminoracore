@@ -188,6 +188,33 @@ asyncio.run(main())
 
 ---
 
+## 🐳 Docker Deployment
+
+LuminoraCore v1.1 incluye soporte completo para Docker:
+
+```bash
+# Quick start
+cd luminoracore-sdk-python
+docker-compose up -d
+
+# Production
+docker-compose -f docker-compose.production.yml up -d
+
+# With monitoring (Prometheus + Grafana)
+docker-compose -f docker-compose.production.yml --profile monitoring up -d
+```
+
+**Incluye:**
+- ✅ Auto-migrations al iniciar
+- ✅ Health checks configurados
+- ✅ Stack completo (Redis, PostgreSQL, MongoDB)
+- ✅ Monitoring opcional (Prometheus, Grafana)
+- ✅ Feature flags via environment variables
+
+**[📖 Guía completa de Docker](luminoracore-sdk-python/DOCKER.md)**
+
+---
+
 ## 🔧 Supported LLM Providers (7 Total)
 
 | Provider | Status | Models |
@@ -467,10 +494,16 @@ luminora-cli migrate --status
 - [STEP_BY_STEP_IMPLEMENTATION.md](mejoras_v1.1/STEP_BY_STEP_IMPLEMENTATION.md) - Implementation guide
 
 **Examples:**
+- `examples/v1_1_complete_workflow.py` ⭐ - **Workflow completo de producción**
+- `examples/v1_1_feature_flags_demo.py` ⭐ - Feature flags deep dive
+- `examples/v1_1_migrations_demo.py` ⭐ - Database migrations deep dive
 - `examples/v1_1_affinity_demo.py` - Affinity system
 - `examples/v1_1_memory_demo.py` - Memory system
+- `examples/v1_1_dynamic_personality_demo.py` - Dynamic personality
 - `luminoracore/examples/v1_1_quick_example.py` - Quick demo
 - `luminoracore-sdk-python/examples/v1_1_sdk_usage.py` - SDK demo
+
+⭐ = **NUEVO** - Cobertura 100% de características v1.1
 
 ---
 

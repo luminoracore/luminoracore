@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "luminoracore-cli"
-version = "1.0.0"
-description = "Professional CLI tool for LuminoraCore personality management"
+version = "1.1.0"
+description = "Professional CLI tool for LuminoraCore personality management with database migrations and memory tools"
 readme = "README.md"
 license = {file = "LICENSE"}
 authors = [

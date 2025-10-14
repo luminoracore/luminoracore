@@ -5,7 +5,7 @@ A comprehensive framework for creating, validating, and managing AI personalitie
 across multiple LLM providers.
 """
 
-__version__ = "0.1.0"
+__version__ = "1.1.0"
 __author__ = "LuminoraCore Team"
 __email__ = "team@luminoracore.dev"
 __license__ = "MIT"
