@@ -15,15 +15,35 @@ from .config import (
     require_feature
 )
 
+# v1.1 exports - personality extensions
+from .personality_v1_1 import (
+    PersonalityV11Extensions,
+    HierarchicalConfig,
+    MoodSystemConfig,
+    RelationshipLevelConfig,
+    AffinityRange
+)
+
+# v1.1 exports - compiler
+from .compiler_v1_1 import DynamicPersonalityCompiler
+
 __all__ = [
     # v1.0
     "Personality",
     "PersonalityError",
     "PersonalitySchema",
-    # v1.1
+    # v1.1 - config
     "V11Features",
     "FeatureFlagManager",
     "get_features",
     "is_enabled",
-    "require_feature"
+    "require_feature",
+    # v1.1 - personality
+    "PersonalityV11Extensions",
+    "HierarchicalConfig",
+    "MoodSystemConfig",
+    "RelationshipLevelConfig",
+    "AffinityRange",
+    # v1.1 - compiler
+    "DynamicPersonalityCompiler"
 ]
