@@ -1,0 +1,17 @@
+{
+  "v1_1_features": {
+    "episodic_memory": false,
+    "semantic_search": false,
+    "fact_extraction": false,
+    "hierarchical_personality": false,
+    "mood_system": false,
+    "affinity_system": false,
+    "conversation_analytics": false,
+    "snapshot_export": false
+  },
+  "metadata": {
+    "environment": "v1.0-compatible",
+    "description": "All v1.1 features disabled - pure v1.0 behavior"
+  }
+}
+

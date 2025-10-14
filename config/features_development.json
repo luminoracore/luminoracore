@@ -1,0 +1,17 @@
+{
+  "v1_1_features": {
+    "episodic_memory": true,
+    "semantic_search": true,
+    "fact_extraction": true,
+    "hierarchical_personality": true,
+    "mood_system": true,
+    "affinity_system": true,
+    "conversation_analytics": true,
+    "snapshot_export": true
+  },
+  "metadata": {
+    "environment": "development",
+    "description": "Full feature set for development and testing"
+  }
+}
+
