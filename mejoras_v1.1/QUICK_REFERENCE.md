@@ -1,35 +1,35 @@
 # Quick Reference - LuminoraCore v1.1
 
-**Respuestas rápidas a las preguntas más comunes**
+**Quick answers to the most common questions**
 
 ---
 
-## 🎯 Modelo en Una Frase
+## 🎯 Model in One Sentence
 
-> **LuminoraCore define Templates JSON (estándar compartible), ejecuta Instances (estado en BBDD), y exporta Snapshots (backup JSON).**
+> **LuminoraCore defines JSON Templates (shareable standard), runs Instances (state in DB), and exports Snapshots (JSON backup).**
 
 ---
 
-## ❓ Preguntas Frecuentes
+## ❓ Frequently Asked Questions
 
-### 1. ¿El JSON de personalidad se actualiza?
+### 1. Does personality JSON get updated?
 
-**NO.** El template JSON es **inmutable**.
+**NO.** The template JSON is **immutable**.
 
 ```
-Template (alicia.json)  → NO cambia nunca
-Estado (PostgreSQL)     → SÍ cambia constantemente
-Snapshot (backup.json)  → Foto del estado, NO cambia después de exportar
+Template (alicia.json)  → NEVER changes
+State (PostgreSQL)      → YES, changes constantly
+Snapshot (backup.json)  → Photo of state, doesn't change after export
 ```
 
 ---
 
-### 2. ¿Dónde persiste el estado?
+### 2. Where does state persist?
 
-**En BBDD** (tu elección: SQLite, PostgreSQL, MongoDB, etc.)
+**In DB** (your choice: SQLite, PostgreSQL, MongoDB, etc.)
 
 ```sql
--- Estado del usuario Diego con Alicia
+-- Diego's state with Alicia
 SELECT * FROM user_affinity WHERE user_id='diego';
 → affinity: 45, level: "friend"
 
@@ -42,356 +42,195 @@ SELECT * FROM user_facts WHERE user_id='diego';
 
 ---
 
-### 3. ¿Se recompila con cada mensaje?
+### 3. Recompile with each message?
 
-**SÍ, pero toma solo 5ms** (el LLM toma 1500ms, la compilación es irrelevante).
-
-```
-Compilar: 5ms (0.3% del tiempo)
-LLM: 1500ms (99.7% del tiempo)
-```
-
----
-
-### 4. ¿Es más lento que v1.0?
-
-**NO.** Overhead de solo ~55ms (3.5%), y el procesamiento pesado va en background.
+**YES, but takes only 5ms** (LLM takes 1500ms, compilation is irrelevant).
 
 ```
-v1.0: 1500ms (solo LLM)
-v1.1: 1555ms (LLM + compilación + caché)
-      + 400ms background (no bloquea)
-
-Usuario ve respuesta igual de rápido
+Compile: 5ms (0.3% of time)
+LLM: 1500ms (99.7% of time)
 ```
 
 ---
 
-### 5. ¿Qué pasa con mis BBDD actuales?
+### 4. Is it slower than v1.0?
 
-**Siguen funcionando.** Solo se agregan tablas nuevas.
+**NO.** Only ~55ms overhead (3.5%), and heavy processing goes in background.
 
 ```
-Antes (v1.0):
+v1.0: 1500ms (only LLM)
+v1.1: 1555ms (LLM + compilation + cache)
+      + 400ms background (doesn't block)
+
+User sees response just as fast
+```
+
+---
+
+### 5. What happens to my current DBs?
+
+**They keep working.** Only new tables are added.
+
+```
+Before (v1.0):
 - sessions
 - messages
 
-Después (v1.1):
-- sessions ← Sin cambios
-- messages ← Sin cambios
-- user_affinity ← NUEVA
-- user_facts ← NUEVA
-- episodes ← NUEVA
-- (opcionales: message_embeddings, session_moods)
+After (v1.1):
+- sessions ← No changes
+- messages ← No changes
+- user_affinity ← NEW
+- user_facts ← NEW
+- episodes ← NEW
+- (optional: message_embeddings, session_moods)
 ```
 
 ---
 
-### 6. ¿BBDD vectorial reemplaza SQLite/JSON?
+### 6. Does vector DB replace SQLite/JSON?
 
-**NO.** Es **adicional** (solo para semantic search).
+**NO.** It's **additional** (only for semantic search).
 
 ```
-SQLite/PostgreSQL → Guarda mensajes, facts, episodios (SIEMPRE)
-pgvector/Pinecone → Solo para búsqueda semántica (OPCIONAL)
+SQLite/PostgreSQL → Stores messages, facts, episodes (ALWAYS)
+pgvector/Pinecone → Only for semantic search (OPTIONAL)
 ```
 
-Puedes usar v1.1 sin vector search ✅
+You can use v1.1 without vector search ✅
 
 ---
 
-### 7. ¿Cómo recupera recuerdos?
+### 7. How does it retrieve memories?
 
-**Multi-source** (combina varias fuentes):
+**Multi-source** (combines multiple sources):
 
 ```python
-# Usuario pregunta: "Recuerdas cuando hablamos de mi perro?"
+# User asks: "Remember when we talked about my dog?"
 
-# Sistema busca en paralelo:
-1. Mensajes recientes (últimos 10) ← Siempre
-2. Facts del usuario (pet_name="Max") ← Si existen
-3. Episodios (búsqueda por tags) ← Si existen
-4. Vector search (similitud semántica) ← Si habilitado
+# System searches in parallel:
+1. Recent messages (last 10) ← Always
+2. User facts (pet_name="Max") ← If they exist
+3. Episodes (search by tags) ← If they exist
+4. Vector search (semantic similarity) ← If enabled
 
-# Combina todo y lo envía al LLM
+# Combines everything and sends to LLM
 ```
 
 ---
 
-### 8. ¿Memoria del LLM o de LuminoraCore?
+### 8. LLM memory or LuminoraCore memory?
 
-**Ambas se complementan:**
+**Both complement each other:**
 
 ```
-LLM Context Window (corto plazo):
-- Últimos 10-20 mensajes
-- Rápido, siempre disponible
-- Limitado a ventana reciente
+LLM Context Window (short-term):
+- Last 10-20 messages
+- Fast, always available
+- Limited to recent window
 
-LuminoraCore Memory (largo plazo):
-- Todos los mensajes (ilimitado)
-- Facts, episodios, embeddings
-- Búsqueda cuando se necesita
+LuminoraCore Memory (long-term):
+- All messages (unlimited)
+- Facts, episodes, embeddings
+- Search when needed
 
-JUNTOS:
-LLM recibe: mensajes recientes + memoria relevante de LuminoraCore
+TOGETHER:
+LLM receives: recent messages + relevant memory from LuminoraCore
 ```
 
 ---
 
-### 9. ¿Cómo se exporta el estado?
+### 9. How to export state?
 
-**Snapshots** (JSON exportado):
+**Snapshots** (exported JSON):
 
 ```python
-# Exportar estado completo
+# Export complete state
 snapshot = await client.export_snapshot(session_id)
 
-# Guardar
+# Save
 save_json("backup.json", snapshot)
 
-# Importar
+# Import
 new_session = await client.import_snapshot("backup.json")
-# Restaura exactamente el estado guardado
+# Restores exactly the saved state
 ```
 
 ---
 
-### 10. ¿Casa con la propuesta de valor original?
+### 10. Fits original value proposition?
 
-**SÍ.** El estándar JSON ahora cubre:
+**YES.** The JSON standard now covers:
 
-1. **Templates** (v1.0) - Cómo definir personalidades
-2. **Snapshots** (v1.1 nuevo) - Cómo exportar estados
-3. **Instances** (v1.1 nuevo) - Cómo ejecutar personalidades
+1. **Templates** (v1.0) - How to define personalities
+2. **Snapshots** (v1.1 new) - How to export states
+3. **Instances** (v1.1 new) - How to execute personalities
 
-**El JSON sigue siendo el corazón del sistema.**
+**JSON is still the heart of the system.**
 
 ---
 
-## 📊 Tres Capas (Resumen)
+## 📊 Three Layers (Summary)
 
 | | Template | Instance | Snapshot |
 |---|----------|----------|----------|
-| **Qué es** | Blueprint | Estado vivo | Foto del estado |
-| **Formato** | JSON | BBDD | JSON |
+| **What is it** | Blueprint | Live state | State photo |
+| **Format** | JSON | DB | JSON |
 | **Mutable** | ❌ | ✅ | ❌ |
-| **Compartible** | ✅ | ❌ | ✅ |
-| **Ejemplo** | alicia_base.json | affinity=45 en PostgreSQL | diego_backup.json |
+| **Shareable** | ✅ | ❌ | ✅ |
+| **Example** | alicia_base.json | affinity=45 in PostgreSQL | diego_backup.json |
 
 ---
 
-## ⚡ Configuraciones Rápidas
+## ✅ To Remember
 
-### Mínima (Simple)
+### Template JSON Does NOT Update
 
 ```python
-LuminoraCoreClient(
-    storage_config={"backend": "sqlite"},
-    personality_config={"enable_hierarchical": True},
-    memory_config={"enable_all": False}
-)
-```
-
-**Requiere:** Template JSON + SQLite
-
----
-
-### Recomendada (Balanceada)
-
-```python
-LuminoraCoreClient(
-    storage_config={"backend": "postgresql"},
-    personality_config={
-        "enable_hierarchical": True,
-        "enable_moods": True
-    },
-    memory_config={
-        "enable_episodic_memory": True,
-        "enable_fact_extraction": True,
-        "enable_semantic_search": False
-    }
-)
-```
-
-**Requiere:** Template JSON + PostgreSQL
-
----
-
-### Completa (Full Features)
-
-```python
-LuminoraCoreClient(
-    storage_config={
-        "backend": "postgresql",
-        "cache": "redis",
-        "vector_store": "pgvector"
-    },
-    personality_config={"enable_all": True},
-    memory_config={"enable_all": True}
-)
-```
-
-**Requiere:** Template JSON + PostgreSQL + Redis + pgvector
-
----
-
-## 🔧 Comandos Útiles
-
-```bash
-# Crear template desde wizard
-luminora-cli create-personality --version 1.1 --interactive
-
-# Validar template
-luminora-cli validate alicia.json
-
-# Exportar snapshot
-luminora-cli export-snapshot --session session_123 --output backup.json
-
-# Importar snapshot
-luminora-cli import-snapshot backup.json --user nuevo_usuario
-
-# Migrar BBDD de v1.0 a v1.1
-luminora-cli migrate --from 1.0 --to 1.1
-```
-
----
-
-## 📚 Documentos por Prioridad
-
-### 🔥 DEBE LEER (Críticos)
-
-1. [`RESUMEN_VISUAL.md`](./RESUMEN_VISUAL.md) (15 min) ⭐⭐⭐
-2. [`MODELO_CONCEPTUAL_REVISADO.md`](./MODELO_CONCEPTUAL_REVISADO.md) (20 min) ⭐⭐⭐
-3. [`FLUJO_DATOS_Y_PERSISTENCIA.md`](./FLUJO_DATOS_Y_PERSISTENCIA.md) (25 min) ⭐⭐⭐
-
-**Total: 1 hora**
-
----
-
-### 📖 DEBERÍA LEER (Importantes)
-
-4. [`INTEGRACION_CON_SISTEMA_ACTUAL.md`](./INTEGRACION_CON_SISTEMA_ACTUAL.md) (20 min) ⭐⭐
-5. [`EJEMPLOS_PERSONALIDADES_JSON.md`](./EJEMPLOS_PERSONALIDADES_JSON.md) (15 min) ⭐⭐
-
-**Total: +35 min**
-
----
-
-### 📚 LECTURA COMPLETA (Para implementar)
-
-6. [`SISTEMA_MEMORIA_AVANZADO.md`](./SISTEMA_MEMORIA_AVANZADO.md) (45 min)
-7. [`SISTEMA_PERSONALIDADES_JERARQUICAS.md`](./SISTEMA_PERSONALIDADES_JERARQUICAS.md) (40 min)
-8. [`ARQUITECTURA_TECNICA.md`](./ARQUITECTURA_TECNICA.md) (35 min)
-9. [`PLAN_IMPLEMENTACION.md`](./PLAN_IMPLEMENTACION.md) (30 min)
-10. [`CASOS_DE_USO.md`](./CASOS_DE_USO.md) (25 min)
-
-**Total: +2.75 horas**
-
----
-
-## 💡 Conceptos Clave
-
-### Template = Receta de Cocina
-
-```
-La receta de un pastel:
-- Define ingredientes y pasos
-- NO cambia cuando cocinas
-- Puedes compartirla
-- Múltiples personas pueden usarla
-
-Template JSON:
-- Define personalidad y comportamientos
-- NO cambia con uso
-- Puedes compartirlo
-- Múltiples usuarios pueden usarlo
-```
-
-### Instance = Tu Pastel
-
-```
-Cuando cocinas:
-- Sigues la receta
-- Haces ajustes (más azúcar, menos harina)
-- Tu pastel es único
-- No modificas la receta original
-
-Instance de personalidad:
-- Sigue el template
-- Aplica modificadores (affinity, mood)
-- Tu conversación es única
-- No modifica el template original
-```
-
-### Snapshot = Foto del Pastel
-
-```
-Sacas una foto:
-- Captura cómo quedó
-- Puedes compartirla
-- Otros pueden intentar replicarlo
-- La foto no cambia
-
-Snapshot JSON:
-- Captura estado completo
-- Puedes compartirlo
-- Otros pueden importarlo
-- El snapshot no cambia
-```
-
----
-
-## ✅ Para Recordar
-
-### El JSON Template NO se actualiza
-
-```python
-# ❌ NUNCA
+# ❌ NEVER
 personality_json["affinity"] = 45
 save(personality_json)
 
-# ✅ SIEMPRE
+# ✅ ALWAYS
 await db.update_affinity(session_id, 45)
 ```
 
-### La Compilación es Rápida
+### Compilation is Fast
 
 ```
-Compilar: 5ms ≈ Irrelevante
-LLM: 1500ms ≈ 99% del tiempo
+Compile: 5ms ≈ Irrelevant
+LLM: 1500ms ≈ 99% of time
 ```
 
-### Background Tasks No Bloquean
+### Background Tasks Don't Block
 
 ```python
-# Foreground (bloquea)
+# Foreground (blocks)
 response = await llm.generate()  # 1500ms
-return response  # Usuario ve aquí ✅
+return response  # User sees here ✅
 
-# Background (no bloquea)
+# Background (doesn't block)
 asyncio.create_task(extract_facts())  # 300ms async
-# Usuario NO espera esto
+# User does NOT wait for this
 ```
 
-### Todo es Opcional
+### Everything is Optional
 
 ```python
-# Puedes habilitar solo lo que necesites
-enable_moods = True           # ✅
-enable_hierarchical = True    # ✅
-enable_semantic_search = False  # ❌ Disabled
-enable_episodic_memory = True  # ✅
+# You can enable only what you need
+enable_moods = True              # ✅
+enable_hierarchical = True       # ✅
+enable_semantic_search = False   # ❌ Disabled
+enable_episodic_memory = True    # ✅
 ```
 
 ---
 
-## 🎯 Próximos Pasos
+## 🎯 Next Steps
 
-1. **Si tienes dudas conceptuales:** Lee [`MODELO_CONCEPTUAL_REVISADO.md`](./MODELO_CONCEPTUAL_REVISADO.md)
-2. **Si tienes dudas de performance:** Lee [`FLUJO_DATOS_Y_PERSISTENCIA.md`](./FLUJO_DATOS_Y_PERSISTENCIA.md)
-3. **Si quieres ver código:** Lee [`EJEMPLOS_PERSONALIDADES_JSON.md`](./EJEMPLOS_PERSONALIDADES_JSON.md)
-4. **Si quieres implementar:** Lee [`PLAN_IMPLEMENTACION.md`](./PLAN_IMPLEMENTACION.md)
+1. **If you have conceptual doubts:** Read [`CONCEPTUAL_MODEL_REVISED.md`](./CONCEPTUAL_MODEL_REVISED.md)
+2. **If you have performance doubts:** Read [`DATA_FLOW_AND_PERSISTENCE.md`](./DATA_FLOW_AND_PERSISTENCE.md)
+3. **If you want to see code:** Read [`PERSONALITY_JSON_EXAMPLES.md`](./PERSONALITY_JSON_EXAMPLES.md)
+4. **If you want to implement:** Read [`IMPLEMENTATION_PLAN.md`](./IMPLEMENTATION_PLAN.md)
 
 ---
 
