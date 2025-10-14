@@ -365,6 +365,7 @@ This project is licensed under the MIT License - see the [LICENSE](luminoracore/
 - [x] **NEW:** Affinity management (0-100 points)
 - [x] **NEW:** Fact extraction from conversations
 - [x] **NEW:** Episodic memory for memorable moments
+- [x] **NEW:** Memory classification by importance
 - [x] **NEW:** Feature flags for safe rollout
 - [x] **NEW:** Database migrations system
 - [x] **NEW:** CLI commands (migrate, memory, snapshot)
@@ -372,16 +373,6 @@ This project is licensed under the MIT License - see the [LICENSE](luminoracore/
 - [x] Comprehensive documentation
 - [x] 100% backward compatible
 - [x] Production-ready stable release
-
-### ✅ v1.1.0 - Memory & Relationships (CURRENT - October 2025)
-- [x] **Hierarchical Personality System** - Relationship levels (stranger → friend → soulmate)
-- [x] **Affinity Management** - Point tracking and level progression
-- [x] **Fact Extraction** - Automatic learning from conversations
-- [x] **Episodic Memory** - Memorable moment detection
-- [x] **Memory Classification** - Smart organization by importance
-- [x] **Feature Flags** - Safe, gradual feature rollout
-- [x] **Database Migrations** - Structured schema management
-- [x] **104 Tests Passing** - Comprehensive test coverage
 
 **[📖 v1.1 Features](mejoras_v1.1/V1_1_FEATURES_SUMMARY.md)** | **[🚀 Quick Start](mejoras_v1.1/QUICK_START_V1_1.md)**
 
