@@ -39,6 +39,21 @@
 
 ---
 
+### 📦 Distribución de Cambios por Componente
+
+**IMPORTANTE:** Los cambios v1.1 afectan los **3 componentes** del proyecto.
+
+**Ver:** [ARQUITECTURA_MODULAR_v1.1.md](./ARQUITECTURA_MODULAR_v1.1.md) para detalles completos de:
+- Qué cambia en `luminoracore/` (core) - ~25 archivos nuevos, ~5000 LOC
+- Qué cambia en `luminoracore-cli/` (CLI) - ~8 archivos nuevos, ~2000 LOC
+- Qué cambia en `luminoracore-sdk-python/` (SDK) - ~8 archivos nuevos, ~1500 LOC
+- Orden de implementación (Core → CLI → SDK)
+- Dependencias entre componentes
+
+**Este documento muestra el PLAN general. Consulta ARQUITECTURA_MODULAR_v1.1.md para distribución detallada.**
+
+---
+
 ## Timeline General
 
 ```

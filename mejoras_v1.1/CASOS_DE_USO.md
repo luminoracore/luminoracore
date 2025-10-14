@@ -4,6 +4,28 @@
 
 ---
 
+## ⚠️ NOTA SOBRE IMPLEMENTACIÓN
+
+Estos casos de uso requieren cambios en los **3 componentes** del proyecto:
+
+```
+luminoracore/        (CORE) - Lógica de memoria, personalidades, providers
+    ↓
+luminoracore-cli/    (CLI)  - Comandos de setup, migración, testing
+    ↓
+luminoracore-sdk/    (SDK)  - API para desarrolladores
+```
+
+**Ver:** [ARQUITECTURA_MODULAR_v1.1.md](./ARQUITECTURA_MODULAR_v1.1.md) para:
+- Distribución completa de cambios
+- Qué archivos nuevos en cada componente
+- Orden de implementación
+- Dependencias entre componentes
+
+**Este documento muestra el RESULTADO final (casos de uso), no la implementación.**
+
+---
+
 ## 📋 Tabla de Contenidos
 
 1. [Waifu Dating Coach](#caso-1-waifu-dating-coach)

@@ -16,9 +16,9 @@
 
 ---
 
-## 📊 16 Documentos en Total - Clasificación
+## 📊 13 Documentos en Total - Clasificación
 
-### 🔥 ESENCIALES (DEBES LEER) - 5 Documentos
+### 🔥 ESENCIALES (DEBES LEER) - 6 Documentos
 
 **Estos son los que NECESITAS para entender y empezar a implementar:**
 
@@ -27,10 +27,11 @@
 | **1** | **RESUMEN_VISUAL.md** | 15 min | **Empezar aquí** - Explicación visual del modelo completo |
 | **2** | **MODELO_CONCEPTUAL_REVISADO.md** | 20 min | **Fundamental** - Templates/Instances/Snapshots |
 | **3** | **FLUJO_DATOS_Y_PERSISTENCIA.md** | 25 min | **Crítico** - Qué se guarda dónde, performance real |
-| **4** | **SISTEMA_MEMORIA_AVANZADO.md** | 45 min | Diseño del sistema de memoria completo |
-| **5** | **SISTEMA_PERSONALIDADES_JERARQUICAS.md** | 40 min | Diseño del sistema de personalidades |
+| **4** | **ARQUITECTURA_MODULAR_v1.1.md** | 15 min | **IMPORTANTE** - Qué cambia en Core/CLI/SDK ⭐ NUEVO |
+| **5** | **SISTEMA_MEMORIA_AVANZADO.md** | 45 min | Diseño del sistema de memoria completo |
+| **6** | **SISTEMA_PERSONALIDADES_JERARQUICAS.md** | 40 min | Diseño del sistema de personalidades |
 
-**Total: 2h 25min** ← **Esto es lo MÍNIMO para entender el sistema**
+**Total: 2h 40min** ← **Esto es lo MÍNIMO para entender el sistema**
 
 ---
 
@@ -73,17 +74,16 @@
 
 ---
 
-### 🗂️ META/INTERNOS (NO LEER) - 3 Documentos
+### ⚙️ CONFIGURACIÓN (2 Documentos) - **IMPORTANTE**
 
-**Estos son internos, NO necesitas leerlos:**
+**Para entender configuración de providers y optimizaciones:**
 
-| # | Documento | Propósito |
-|---|-----------|-----------|
-| **14** | **README.md** | Solo navegación, duplica info de INDEX |
-| **15** | **ALINEACION_DOCUMENTOS.md** | Verificación interna de consistencia |
-| **16** | **_DOCUMENTACION_COMPLETA.md** | Meta-índice de todos los docs |
+| # | Documento | Tiempo | Cuándo Leerlo |
+|---|-----------|--------|---------------|
+| **10** | **CONFIGURACION_PROVIDERS.md** | Variable | **Crítico** - Sistema de providers, nada hardcoded ⭐ NUEVO |
+| **11** | **OPTIMIZACIONES_Y_CONFIGURACION.md** | Variable | Para optimizar costes y performance ⭐ NUEVO |
 
-❌ **PUEDES IGNORAR ESTOS 3**
+**Total: Variable** → **Lee CONFIGURACION_PROVIDERS.md antes de codear**
 
 ---
 

@@ -4,6 +4,28 @@
 
 ---
 
+## ⚠️ NOTA IMPORTANTE
+
+Los ejemplos en este documento son **TEMPLATES** (Capa 1 del modelo de 3 capas).
+
+```
+Template (JSON) ← Estos ejemplos (inmutables, compartibles)
+    ↓
+Instance (BBDD) ← Estado runtime que evoluciona
+    ↓
+Snapshot (JSON) ← Exportación de Template + Estado
+```
+
+**Ver:** [MODELO_CONCEPTUAL_REVISADO.md](./MODELO_CONCEPTUAL_REVISADO.md) para el modelo completo.
+
+**Estos templates:**
+- ✅ Son inmutables (NO se modifican en runtime)
+- ✅ Son compartibles (puedes publicarlos)
+- ✅ Definen comportamientos POSIBLES
+- ✅ El estado dinámico va en BBDD
+
+---
+
 ## 📋 Tabla de Contenidos
 
 1. [Personalidad Básica v1.0](#personalidad-básica-v10-sin-cambios)

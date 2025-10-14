@@ -370,21 +370,24 @@ This project is licensed under the MIT License - see the [LICENSE](luminoracore/
 
 **Comprehensive design documentation for upcoming v1.1 features** (Noviembre 2025 - Marzo 2026)
 
-### 🎯 Quick Access
+### 🎯 START HERE
 
-| Document | Type | Time | Priority |
-|----------|------|------|----------|
-| **[Quick Reference](mejoras_v1.1/QUICK_REFERENCE.md)** | FAQ | 5 min | ⭐⭐⭐ EMPEZAR AQUÍ |
-| **[Visual Summary](mejoras_v1.1/RESUMEN_VISUAL.md)** | Overview | 15 min | ⭐⭐⭐ |
-| **[Conceptual Model](mejoras_v1.1/MODELO_CONCEPTUAL_REVISADO.md)** | Core Design | 20 min | ⭐⭐⭐ |
-| **[Data Flow & Persistence](mejoras_v1.1/FLUJO_DATOS_Y_PERSISTENCIA.md)** | Technical | 25 min | ⭐⭐⭐ |
-| **[Integration with Current System](mejoras_v1.1/INTEGRACION_CON_SISTEMA_ACTUAL.md)** | Technical | 20 min | ⭐⭐ |
-| **[JSON Personality Examples](mejoras_v1.1/EJEMPLOS_PERSONALIDADES_JSON.md)** | Examples | 15 min | ⭐⭐ |
+**→ [mejoras_v1.1/INICIO_AQUI.md](mejoras_v1.1/INICIO_AQUI.md)** ⭐⭐⭐⭐⭐ **NEW - YOUR ENTRY POINT**
 
-### 📚 Complete Documentation Set (13 documents)
+**This is your starting point.** It provides:
+- ✅ Documentation status (100% verified and aligned)
+- ✅ What's in the folder (18 organized documents)
+- ✅ 3 reading options (1h, 2h 40min, by topic)
+- ✅ Key concepts you need to know
+- ✅ Your immediate next step
 
-**Index:** [mejoras_v1.1/INDEX.md](mejoras_v1.1/INDEX.md) - Master index with all documents  
-**Main Guide:** [mejoras_v1.1/README.md](mejoras_v1.1/README.md) - Complete guide to improvements
+### 📚 Complete Documentation Set
+
+**18 documents | ~95,000 words | ~17,500 lines**
+
+- **Navigation:** [INDEX.md](mejoras_v1.1/INDEX.md) | [GUIA_LECTURA.md](mejoras_v1.1/GUIA_LECTURA.md)
+- **Verification:** [VERIFICACION_ALINEACION.md](mejoras_v1.1/VERIFICACION_ALINEACION.md) - Quality assurance report
+- **Quick Access:** [QUICK_REFERENCE.md](mejoras_v1.1/QUICK_REFERENCE.md) - FAQ
 
 ### 🎯 Key Improvements Documented
 

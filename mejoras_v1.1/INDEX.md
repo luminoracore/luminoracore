@@ -6,36 +6,70 @@
 
 ## 🚀 EMPIEZA AQUÍ
 
-### ¿No sabes qué leer?
+### ¿Primera vez leyendo esta documentación?
+
+**→ [INICIO_AQUI.md](./INICIO_AQUI.md)** (5 min) ⭐⭐⭐⭐⭐ **NUEVO**
+
+**Este es tu punto de entrada.** Te dice:
+- ✅ Estado de la documentación (100% verificada)
+- ✅ Qué hay en esta carpeta (18 documentos organizados)
+- ✅ 3 opciones de lectura (1h, 2h 40min, por tema)
+- ✅ Conceptos clave que debes saber
+- ✅ Tu próximo paso inmediato
+
+**Alternativamente:**
 
 **→ [GUIA_LECTURA.md](./GUIA_LECTURA.md)** (5 min) ⭐⭐⭐⭐⭐
 
-Esta guía te dice:
-- ✅ Qué documentos son ESENCIALES (5 docs, 2h 25min)
-- ✅ Qué documentos son OPCIONALES (5 docs, 2h 10min)
-- ✅ En qué orden leerlos
-- ✅ Cuáles puedes ignorar
-
-**Lee la guía primero, luego vuelve aquí para acceder a los documentos.**
+Para un enfoque más detallado con clasificación completa de documentos.
 
 ---
 
-## 📊 Resumen Rápido
-
-**Total: 13 documentos organizados en 4 categorías**
+## 📚 18 Documentos Organizados
 
 ```
-📚 13 DOCUMENTOS TOTALES
-├── ⚡ Entrada Rápida (3 docs - 25 min)
-├── 🎯 Conceptuales (3 docs - 1h 5min) ← CRÍTICOS
-├── 🏗️ Diseño (2 docs - 1h 25min) ← ESENCIALES
-├── 🛠️ Implementación (3 docs - 1h 20min)
-└── ⚙️ Configuración (2 docs - Variable)
+🎯 Punto de Entrada (1)
+└─ INICIO_AQUI.md ⭐⭐⭐⭐⭐ NUEVO
+
+📖 Navegación (3)
+├─ INDEX.md (este archivo)
+├─ GUIA_LECTURA.md ⭐⭐⭐⭐⭐
+└─ QUICK_REFERENCE.md ⭐⭐⭐
+
+⚡ Entrada Rápida (2 - 20min)
+├─ RESUMEN_VISUAL.md (15 min) ⭐⭐⭐
+└─ RESUMEN_EJECUTIVO.md (5 min) ⭐⭐
+
+🎯 Conceptuales (4 - 1h 20min) ← CRÍTICOS
+├─ MODELO_CONCEPTUAL_REVISADO.md (20 min) ⭐⭐⭐
+├─ FLUJO_DATOS_Y_PERSISTENCIA.md (25 min) ⭐⭐⭐
+├─ ARQUITECTURA_MODULAR_v1.1.md (15 min) ⭐⭐⭐ NUEVO
+└─ INTEGRACION_CON_SISTEMA_ACTUAL.md (20 min) ⭐⭐⭐
+
+🏗️ Diseño (2 - 1h 25min) ← ESENCIALES
+├─ SISTEMA_MEMORIA_AVANZADO.md (45 min) ⭐⭐⭐
+└─ SISTEMA_PERSONALIDADES_JERARQUICAS.md (40 min) ⭐⭐⭐
+
+🛠️ Implementación (3 - 1h 20min)
+├─ ARQUITECTURA_TECNICA.md (35 min) ⭐⭐
+├─ EJEMPLOS_PERSONALIDADES_JSON.md (15 min) ⭐⭐
+└─ CASOS_DE_USO.md (30 min) ⭐
+
+⚙️ Configuración (2 - Variable)
+├─ CONFIGURACION_PROVIDERS.md ⭐⭐⭐ NUEVO
+└─ OPTIMIZACIONES_Y_CONFIGURACION.md ⭐⭐ NUEVO
+
+📋 Planificación (1 - 30min)
+└─ PLAN_IMPLEMENTACION.md (30 min) ⭐
+
+📝 Verificación (2 docs)
+├─ VERIFICACION_ALINEACION.md (informe técnico completo)
+└─ RESUMEN_VERIFICACION.md (resumen ejecutivo de verificación)
 ```
 
 ---
 
-## ⚡ ENTRADA RÁPIDA (3 documentos - 25 min)
+## ⚡ ENTRADA RÁPIDA
 
 ### 1. [RESUMEN_VISUAL.md](./RESUMEN_VISUAL.md) (15 min) ⭐⭐⭐
 
@@ -47,7 +81,7 @@ Esta guía te dice:
 - Performance real
 - Respuestas rápidas
 
-**Lee esto PRIMERO** para entender el modelo visualmente.
+**Empieza aquí para entender visualmente.**
 
 ---
 
@@ -55,12 +89,12 @@ Esta guía te dice:
 
 **FAQ - Respuestas rápidas**
 
-- 10 preguntas frecuentes con respuestas directas
-- Tabla de 3 capas (Template/Instance/Snapshot)
+- 10 preguntas frecuentes
+- Tabla de 3 capas
 - Configuraciones rápidas
 - Comandos útiles
 
-**Para buscar respuestas específicas rápido.**
+**Para buscar respuestas específicas.**
 
 ---
 
@@ -69,251 +103,168 @@ Esta guía te dice:
 **Resumen para stakeholders**
 
 - Propuesta de valor
-- Impacto esperado (métricas)
-- Inversión requerida ($185k, 5 meses)
-- Timeline
+- Impacto esperado
+- Inversión ($185k, 5 meses)
 - Riesgos
 
 **Para presentar a decision makers.**
 
 ---
 
-## 🎯 CONCEPTUALES (3 documentos - 1h 5min) ← CRÍTICOS
-
-**Estos explican el MODELO completo. Son ESENCIALES.**
+## 🎯 CONCEPTUALES (CRÍTICOS)
 
 ### 4. [MODELO_CONCEPTUAL_REVISADO.md](./MODELO_CONCEPTUAL_REVISADO.md) (20 min) ⭐⭐⭐
 
-**El modelo completo: Templates/Instances/Snapshots**
+**El modelo completo**
 
-- Reconciliación con propuesta de valor original
-- Template = JSON inmutable, compartible (estándar)
-- Instance = Estado en BBDD, evoluciona
-- Snapshot = JSON exportable, portable
+- Templates/Instances/Snapshots
+- Reconciliación con propuesta de valor
 - 3 tipos de JSON
 - Flujos completos
-
-**Fundamental para entender el diseño.**
 
 ---
 
 ### 5. [FLUJO_DATOS_Y_PERSISTENCIA.md](./FLUJO_DATOS_Y_PERSISTENCIA.md) (25 min) ⭐⭐⭐
 
-**Qué se guarda dónde y cómo**
+**Persistencia y performance**
 
-- JSON NUNCA se actualiza (inmutable)
-- Estados en BBDD (mutable)
-- Compilación dinámica (~5ms, rápida)
-- Background processing (async)
-- Performance real (benchmarks)
-- Qué pasa con BBDD actuales
-
-**Responde TODAS las dudas de persistencia.**
+- Qué se guarda dónde
+- JSON inmutable, BBDD mutable
+- Performance real (~5ms compilación)
+- Background async
 
 ---
 
-### 6. [INTEGRACION_CON_SISTEMA_ACTUAL.md](./INTEGRACION_CON_SISTEMA_ACTUAL.md) (20 min) ⭐⭐⭐
+### 6. [ARQUITECTURA_MODULAR_v1.1.md](./ARQUITECTURA_MODULAR_v1.1.md) (15 min) ⭐⭐⭐ **NUEVO**
 
-**Cómo v1.1 se integra con v1.0**
+**Distribución entre componentes**
 
-- TODO configurable en JSON (nada hardcoded)
-- Compilación dinámica vs estática
-- Schema JSON extendido
+- Qué cambia en `luminoracore/` (core)
+- Qué cambia en `luminoracore-cli/` (CLI)
+- Qué cambia en `luminoracore-sdk-python/` (SDK)
+- Orden de implementación
+- Dependencias
+
+**MUY IMPORTANTE: Los 3 componentes se afectan.**
+
+---
+
+### 7. [INTEGRACION_CON_SISTEMA_ACTUAL.md](./INTEGRACION_CON_SISTEMA_ACTUAL.md) (20 min) ⭐⭐⭐
+
+**Integración con v1.0**
+
+- TODO configurable en JSON
+- Nada hardcoded
 - Backward compatibility
-- Ejemplos paso a paso
-
-**Aclara cómo se configura todo en JSON.**
 
 ---
 
-## 🏗️ DISEÑO DE SISTEMAS (2 documentos - 1h 25min) ← ESENCIALES
+## 🏗️ DISEÑO DE SISTEMAS (ESENCIALES)
 
-**Estos explican los dos sistemas principales en detalle.**
-
-### 7. [SISTEMA_MEMORIA_AVANZADO.md](./SISTEMA_MEMORIA_AVANZADO.md) (45 min) ⭐⭐⭐
+### 8. [SISTEMA_MEMORIA_AVANZADO.md](./SISTEMA_MEMORIA_AVANZADO.md) (45 min) ⭐⭐⭐
 
 **Sistema de memoria completo**
 
-- Memoria episódica (momentos importantes)
-- Vector search (búsqueda semántica)
+- Memoria episódica
+- Vector search
 - Clasificación inteligente
-- Extracción automática de facts
+- Extracción de facts
 - Código de implementación
-
-**Para entender cómo funciona la memoria.**
 
 ---
 
-### 8. [SISTEMA_PERSONALIDADES_JERARQUICAS.md](./SISTEMA_PERSONALIDADES_JERARQUICAS.md) (40 min) ⭐⭐⭐
+### 9. [SISTEMA_PERSONALIDADES_JERARQUICAS.md](./SISTEMA_PERSONALIDADES_JERARQUICAS.md) (40 min) ⭐⭐⭐
 
-**Sistema de personalidades adaptativas**
+**Personalidades adaptativas**
 
 - Tree-based architecture
-- Niveles de relación (5 niveles)
-- Moods dinámicos (7+ moods)
+- Niveles de relación
+- Moods dinámicos
 - Adaptación contextual
-- Transiciones suaves
 - Código de implementación
 
-**Para entender cómo evolucionan las personalidades.**
-
 ---
 
-## 🛠️ IMPLEMENTACIÓN (3 documentos - 1h 20min)
+## 🛠️ IMPLEMENTACIÓN
 
-**Estos son para cuando vayas a CODEAR.**
+### 10. [ARQUITECTURA_TECNICA.md](./ARQUITECTURA_TECNICA.md) (35 min) ⭐⭐
 
-### 9. [ARQUITECTURA_TECNICA.md](./ARQUITECTURA_TECNICA.md) (35 min) ⭐⭐
+**Detalles técnicos**
 
-**Detalles técnicos de implementación**
-
-- Estructura de módulos Python
-- Esquemas de base de datos (SQL completo)
+- Estructura de módulos
+- DB schemas (SQL completo)
 - APIs del SDK
-- Diagrama de flujo
-- Integración con v1.0
-
-**Schemas SQL + Clases Python completas.**
+- Diagramas de flujo
 
 ---
 
-### 10. [EJEMPLOS_PERSONALIDADES_JSON.md](./EJEMPLOS_PERSONALIDADES_JSON.md) (15 min) ⭐⭐
+### 11. [EJEMPLOS_PERSONALIDADES_JSON.md](./EJEMPLOS_PERSONALIDADES_JSON.md) (15 min) ⭐⭐
 
-**Templates JSON completos v1.1**
+**Templates JSON v1.1**
 
 - Personalidad v1.0 (sin cambios)
 - Personalidad v1.1 completa
-- Solo moods
-- Solo niveles
-- Custom avanzada
-- Template generator
-
-**Templates listos para copiar y modificar.**
+- Solo moods / Solo niveles
+- Templates listos para copiar
 
 ---
 
-### 11. [CASOS_DE_USO.md](./CASOS_DE_USO.md) (30 min) ⭐
+### 12. [CASOS_DE_USO.md](./CASOS_DE_USO.md) (30 min) ⭐
 
-**5 casos de uso prácticos**
+**5 casos prácticos con código**
 
-1. Waifu Dating Coach (progresión romántica)
-2. Tutor Educativo (adaptación a nivel)
-3. E-commerce Assistant (recomendaciones)
-4. Compañero Salud Mental (patrones emocionales)
-5. Asistente Corporativo (memoria de clientes)
-
-**Ejemplos de código real en apps.**
+1. Waifu Dating Coach
+2. Tutor Educativo
+3. E-commerce Assistant
+4. Compañero Salud Mental
+5. Asistente Corporativo
 
 ---
 
-## ⚙️ CONFIGURACIÓN Y OPTIMIZACIÓN (2 documentos - Variable)
+## ⚙️ CONFIGURACIÓN
 
-**Estos son para optimizar costes y configurar providers.**
+### 13. [CONFIGURACION_PROVIDERS.md](./CONFIGURACION_PROVIDERS.md) ⭐⭐⭐ **NUEVO**
 
-### 12. [CONFIGURACION_PROVIDERS.md](./CONFIGURACION_PROVIDERS.md) ⭐⭐⭐ **NUEVO**
-
-**Sistema de providers abstraídos - TODO configurable**
+**Sistema de providers abstraídos**
 
 - Si usas DeepSeek → TODO usa DeepSeek
 - Si usas Claude → TODO usa Claude
-- Nada hardcoded a un provider
-- Interfaces abstractas (LLM, Embeddings, Storage, Vector)
-- Migrations para cada BBDD (PostgreSQL, SQLite, DynamoDB, MongoDB)
-- CLI wizard para setup paso a paso
-- Health checks automáticos
-- Auto-detección de dimensiones
+- NADA hardcoded
+- Interfaces abstractas
+- Migrations por cada BBDD
+- CLI wizard paso a paso
+- Health checks
 
-**CRÍTICO: Explica que TODO es configurable, nada hardcoded.**
-
----
-
-### 13. [OPTIMIZACIONES_Y_CONFIGURACION.md](./OPTIMIZACIONES_Y_CONFIGURACION.md) ⭐⭐ **NUEVO**
-
-**Cómo optimizar costes y performance**
-
-- Batch processing de embeddings (ahorro 80%)
-- Procesamiento selectivo (no procesar innecesario)
-- Tu propio endpoint DeepSeek (ahorro 30-58%)
-- Comparación de costes (cloud vs local vs híbrido)
-- Configuración completa recomendada
-- Performance optimizado
-
-**Para reducir costes y mejorar velocidad.**
+**CRÍTICO: Explica que TODO es configurable.**
 
 ---
 
-## 📋 PLANIFICACIÓN (1 documento - 30 min) ← OPCIONAL
+### 14. [OPTIMIZACIONES_Y_CONFIGURACION.md](./OPTIMIZACIONES_Y_CONFIGURACION.md) ⭐⭐ **NUEVO**
 
-### [PLAN_IMPLEMENTACION.md](./PLAN_IMPLEMENTACION.md) (30 min) ⭐
+**Optimizar costes y performance**
 
-**Roadmap de desarrollo completo**
+- Batch processing (ahorro 80%)
+- Tu propio DeepSeek local (ahorro 30-58%)
+- Procesamiento selectivo
+- Comparación cloud vs local
 
-- Timeline 5 meses (Nov 2025 - Mar 2026)
-- 5 fases detalladas
+---
+
+## 📋 PLANIFICACIÓN
+
+### 15. [PLAN_IMPLEMENTACION.md](./PLAN_IMPLEMENTACION.md) (30 min) ⭐
+
+**Roadmap 5 meses**
+
+- Timeline detallado
+- 5 fases
 - Tasks específicas
-- Estrategia de testing
-- Recursos necesarios
-- Presupuesto (~$185k)
-- Riesgos y mitigación
-
-**Solo si necesitas planificar la implementación.**
+- Testing strategy
+- Presupuesto ($185k)
 
 ---
 
-## 📊 RESUMEN POR PRIORIDAD
-
-### 🔥 DEBES LEER (8 docs - 3h 30min)
-
-**Mínimo para entender y empezar:**
-
-| # | Documento | Tiempo | Categoría |
-|---|-----------|--------|-----------|
-| 1 | GUIA_LECTURA.md | 5 min | 📖 Navegación |
-| 2 | RESUMEN_VISUAL.md | 15 min | ⚡ Entrada |
-| 3 | MODELO_CONCEPTUAL_REVISADO.md | 20 min | 🎯 Conceptual |
-| 4 | FLUJO_DATOS_Y_PERSISTENCIA.md | 25 min | 🎯 Conceptual |
-| 5 | INTEGRACION_CON_SISTEMA_ACTUAL.md | 20 min | 🎯 Conceptual |
-| 6 | SISTEMA_MEMORIA_AVANZADO.md | 45 min | 🏗️ Diseño |
-| 7 | SISTEMA_PERSONALIDADES_JERARQUICAS.md | 40 min | 🏗️ Diseño |
-| 8 | CONFIGURACION_PROVIDERS.md | Variable | ⚙️ Config |
-
-**Total: ~3h 30min** → Con esto puedes criticar y empezar
-
----
-
-### 📚 ÚTIL PARA CODEAR (3 docs - 1h 20min)
-
-**Cuando vayas a implementar:**
-
-| # | Documento | Tiempo | Para qué |
-|---|-----------|--------|----------|
-| 9 | ARQUITECTURA_TECNICA.md | 35 min | Clases, DB schemas, APIs |
-| 10 | EJEMPLOS_PERSONALIDADES_JSON.md | 15 min | Templates de referencia |
-| 11 | CASOS_DE_USO.md | 30 min | Ejemplos prácticos |
-
----
-
-### ⚡ COMPLEMENTARIOS (2 docs - Variable)
-
-**Opcional según necesidad:**
-
-| # | Documento | Cuándo Leer |
-|---|-----------|-------------|
-| 12 | OPTIMIZACIONES_Y_CONFIGURACION.md | Si te preocupan costes/performance |
-| 13 | QUICK_REFERENCE.md | Cuando tengas dudas puntuales |
-
----
-
-### 📋 SOLO SI PLANIFICAS (1 doc - 30 min)
-
-| # | Documento | Para qué |
-|---|-----------|----------|
-| 14 | PLAN_IMPLEMENTACION.md | Timeline, fases, presupuesto |
-| 15 | RESUMEN_EJECUTIVO.md | Presentar a stakeholders |
-
----
-
-## 🎯 RUTA RECOMENDADA
+## 🎯 RUTA DE LECTURA RECOMENDADA
 
 ### Plan de 1 Hora (Entender Modelo)
 
@@ -322,114 +273,54 @@ Esta guía te dice:
 2. MODELO_CONCEPTUAL_REVISADO.md (20 min)
 3. FLUJO_DATOS_Y_PERSISTENCIA.md (25 min)
 
-RESULTADO: Entiendes el 80% del diseño ✅
+RESULTADO: Entiendes el 80% ✅
 ```
 
 ---
 
-### Plan de 2.5 Horas (Comprensión Completa)
+### Plan de 3 Horas (Comprensión Completa)
 
 ```
-4. INTEGRACION_CON_SISTEMA_ACTUAL.md (20 min)
-5. SISTEMA_MEMORIA_AVANZADO.md (45 min)
-6. SISTEMA_PERSONALIDADES_JERARQUICAS.md (40 min)
+4. ARQUITECTURA_MODULAR_v1.1.md (15 min) ⭐ IMPORTANTE
+5. INTEGRACION_CON_SISTEMA_ACTUAL.md (20 min)
+6. SISTEMA_MEMORIA_AVANZADO.md (45 min)
+7. SISTEMA_PERSONALIDADES_JERARQUICAS.md (40 min)
 
-RESULTADO: Entiendes el 100% del diseño ✅
-```
-
----
-
-### Plan de 4 Horas (Listo para Codear)
-
-```
-7. CONFIGURACION_PROVIDERS.md (Variable)
-8. ARQUITECTURA_TECNICA.md (35 min)
-9. EJEMPLOS_PERSONALIDADES_JSON.md (15 min)
-
-RESULTADO: Puedes empezar a implementar ✅
+RESULTADO: Entiendes el 100% ✅
 ```
 
 ---
 
-## 📝 Changelog
+### Plan de 4.5 Horas (Listo para Implementar)
 
-### 2025-10-14 - Limpieza y Reorganización
+```
+8. CONFIGURACION_PROVIDERS.md (Variable)
+9. ARQUITECTURA_TECNICA.md (35 min)
+10. EJEMPLOS_PERSONALIDADES_JSON.md (15 min)
 
-**Eliminados (duplicados/innecesarios):**
+RESULTADO: Puedes empezar a codear ✅
+```
+
+---
+
+## 📊 Resumen por Prioridad
+
+| Prioridad | Documentos | Tiempo | Cuándo Leer |
+|-----------|-----------|--------|-------------|
+| **🔥 CRÍTICOS** | 7 docs | 2h 40min | Hoy + Mañana |
+| **📚 ÚTILES** | 4 docs | 1h 50min | Cuando codees |
+| **⚙️ CONFIGURACIÓN** | 2 docs | Variable | Antes de implementar |
+| **📋 OPCIONALES** | 2 docs | 35min | Si planificas |
+
+---
+
+## ✅ Documentos Eliminados (Limpieza)
+
 - ❌ README.md (duplicaba INDEX.md)
 - ❌ ALINEACION_DOCUMENTOS.md (verificación interna)
 - ❌ _DOCUMENTACION_COMPLETA.md (meta-índice redundante)
 
-**Agregados (nuevos docs):**
-- ✅ GUIA_LECTURA.md (plan de lectura)
-- ✅ CONFIGURACION_PROVIDERS.md (sistema de providers)
-- ✅ OPTIMIZACIONES_Y_CONFIGURACION.md (optimizaciones)
-
-**Resultado:** 13 documentos bien organizados (vs 16 antes)
-
----
-
-### 2025-10-14 - Creación Inicial
-
-- INDEX.md
-- SISTEMA_MEMORIA_AVANZADO.md
-- SISTEMA_PERSONALIDADES_JERARQUICAS.md
-- ARQUITECTURA_TECNICA.md
-- PLAN_IMPLEMENTACION.md
-- CASOS_DE_USO.md
-- MODELO_CONCEPTUAL_REVISADO.md
-- FLUJO_DATOS_Y_PERSISTENCIA.md
-- INTEGRACION_CON_SISTEMA_ACTUAL.md
-- EJEMPLOS_PERSONALIDADES_JSON.md
-- QUICK_REFERENCE.md
-- RESUMEN_VISUAL.md
-- RESUMEN_EJECUTIVO.md
-
----
-
-## ✅ Lista Completa de Documentos
-
-### Navegación
-1. **INDEX.md** (este archivo) - Índice maestro
-2. **GUIA_LECTURA.md** - Plan de lectura (qué leer y en qué orden)
-
-### Entrada Rápida  
-3. **RESUMEN_VISUAL.md** - Explicación visual (15 min)
-4. **QUICK_REFERENCE.md** - FAQ (5 min)
-5. **RESUMEN_EJECUTIVO.md** - Para stakeholders (5 min)
-
-### Conceptuales (Críticos)
-6. **MODELO_CONCEPTUAL_REVISADO.md** - Templates/Instances/Snapshots (20 min)
-7. **FLUJO_DATOS_Y_PERSISTENCIA.md** - Persistencia y performance (25 min)
-8. **INTEGRACION_CON_SISTEMA_ACTUAL.md** - Integración con v1.0 (20 min)
-
-### Diseño de Sistemas (Esenciales)
-9. **SISTEMA_MEMORIA_AVANZADO.md** - Memoria episódica, vector search (45 min)
-10. **SISTEMA_PERSONALIDADES_JERARQUICAS.md** - Niveles, moods, adaptación (40 min)
-
-### Implementación
-11. **ARQUITECTURA_TECNICA.md** - Clases, DB schemas, APIs (35 min)
-12. **EJEMPLOS_PERSONALIDADES_JSON.md** - Templates JSON completos (15 min)
-13. **CASOS_DE_USO.md** - 5 casos prácticos (30 min)
-
-### Configuración
-14. **CONFIGURACION_PROVIDERS.md** - Sistema de providers abstraídos (Variable)
-15. **OPTIMIZACIONES_Y_CONFIGURACION.md** - Optimizar costes y performance (Variable)
-
-### Planificación
-16. **PLAN_IMPLEMENTACION.md** - Roadmap 5 meses (30 min)
-
----
-
-## 🎯 Objetivo de v1.1
-
-**Convertir LuminoraCore en el framework más avanzado para personalidades AI con:**
-
-1. ✅ **Memoria Real** - Episódica + Semántica
-2. ✅ **Personalidades Adaptativas** - Niveles + Moods
-3. ✅ **Sistema de Snapshots** - Exportable/Importable
-4. ✅ **TODO Configurable** - Nada hardcoded
-5. ✅ **Backward Compatible** - v1.0 sigue funcionando
+**De 16 → 13 documentos** (más limpio y enfocado)
 
 ---
 
