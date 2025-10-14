@@ -1779,3 +1779,86 @@ If you have problems or questions:
 
 **Ready! Now you have everything you need to start using LuminoraCore in your projects.** 🚀
 
+---
+
+## 🎉 NEW in v1.1 - Memory & Relationships
+
+LuminoraCore v1.1 is now available with advanced memory and relationship features!
+
+### What's New?
+
+1. **Hierarchical Personality System** - Relationships that evolve
+2. **Affinity Management** - Track relationship points (0-100)
+3. **Fact Extraction** - Learn from conversations automatically
+4. **Episodic Memory** - Remember important moments
+5. **Memory Classification** - Organize by importance
+6. **Feature Flags** - Control feature activation
+7. **Database Migrations** - Structured schema management
+8. **CLI Tools** - New commands (migrate, memory, snapshot)
+
+### Quick Setup v1.1
+
+```bash
+# After installing v1.0 (steps above), setup v1.1:
+
+# 1. Run database migrations
+# Windows:
+.\scripts\setup-v1_1-database.ps1
+
+# Linux/Mac:
+./scripts/setup-v1_1-database.sh
+
+# 2. Verify v1.1 installation
+# Windows:
+.\scripts\verify-v1_1-installation.ps1
+
+# Linux/Mac:
+./scripts/test-v1_1-features.sh
+
+# 3. Test v1.1 features
+python examples/v1_1_quick_example.py
+```
+
+### v1.1 Documentation
+
+- **[Quick Start v1.1](mejoras_v1.1/QUICK_START_V1_1.md)** - 5-minute tutorial
+- **[v1.1 Features](mejoras_v1.1/V1_1_FEATURES_SUMMARY.md)** - Complete feature list
+- **[v1.1 API](luminoracore/docs/v1_1_features.md)** - API reference
+- **[SDK v1.1](luminoracore-sdk-python/docs/api_reference.md)** - SDK extensions
+
+### Backward Compatibility
+
+**100% backward compatible with v1.0:**
+- ✅ All v1.0 code works unchanged
+- ✅ v1.1 features are opt-in
+- ✅ No breaking changes
+- ✅ Existing JSON personalities work as-is
+
+### v1.1 Examples
+
+```python
+# Affinity tracking
+from luminoracore.core.relationship.affinity import AffinityManager, AffinityState
+
+manager = AffinityManager()
+state = AffinityState(user_id="user1", personality_name="alicia", affinity_points=0)
+state = manager.update_affinity_state(state, points_delta=5)
+print(f"Level: {state.current_level}, Points: {state.affinity_points}")
+```
+
+```python
+# Fact extraction
+from luminoracore.core.memory.fact_extractor import FactExtractor
+
+extractor = FactExtractor()
+facts = extractor.extract_sync(user_id="user1", message="I'm Diego, I'm 28")
+for fact in facts:
+    print(f"{fact.key}: {fact.value}")
+```
+
+**More examples:** See `examples/v1_1_*.py` files
+
+---
+
+**Updated:** October 2025 (v1.1 release)
+

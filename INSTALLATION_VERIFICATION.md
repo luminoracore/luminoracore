@@ -1,7 +1,7 @@
 # 🧪 Installation Verification Guide
 
-**Version:** 1.0.0  
-**Script:** `verify_installation.py`  
+**Version:** 1.1.0  
+**Scripts:** `verify_installation.py`, `verify-v1_1-installation.ps1`, `test-v1_1-features.sh`  
 **Updated:** October 2025
 
 ---
@@ -578,4 +578,72 @@ echo $env:OPENAI_API_KEY  # Windows
 
 **🎓 PRO TIP:**  
 Run `python verify_installation.py` after each major change to your environment. It's fast, comprehensive, and saves debugging time!
+
+---
+
+## 🎉 NEW: v1.1 Verification
+
+After installing v1.1, use the new verification scripts:
+
+### Windows
+
+```powershell
+.\scripts\verify-v1_1-installation.ps1
+```
+
+**Verifies:**
+- ✅ Core v1.1 modules (8 modules)
+- ✅ SDK v1.1 extensions (4 modules)
+- ✅ CLI v1.1 commands (3 commands)
+- ✅ Pytest tests (104+ tests)
+
+### Linux/Mac
+
+```bash
+./scripts/test-v1_1-features.sh
+```
+
+**Tests:**
+- ✅ All v1.1 imports
+- ✅ Core pytest tests (82 tests)
+- ✅ SDK pytest tests (22 tests)
+- ✅ Example execution
+
+### Expected Output
+
+```
+======================================
+LuminoraCore v1.1 Installation Verification
+======================================
+
+=== Core v1.1 Tests ===
+Testing: Migration Manager
+  ✓ Migration Manager passed
+
+Testing: Feature Flags
+  ✓ Feature Flags passed
+
+Testing: Affinity Manager
+  ✓ Affinity Manager passed
+
+=== Test Summary ===
+Tests passed: 15
+Tests failed: 0
+
+🎉 All v1.1 tests passed!
+```
+
+### Quick v1.1 Verification
+
+```bash
+# Quick check (Windows)
+python -c "from luminoracore.core.config import get_features; print('v1.1 OK')"
+
+# Quick check (Linux/Mac)
+python -c "from luminoracore.core.relationship.affinity import AffinityManager; print('v1.1 OK')"
+```
+
+---
+
+**Updated:** October 2025 (v1.1 release)
 

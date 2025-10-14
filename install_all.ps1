@@ -92,10 +92,13 @@ if ($success) {
     Write-Host "✅ ALL COMPONENTS INSTALLED SUCCESSFULLY" -ForegroundColor Green
     Write-Host ""
     Write-Host "Next steps:" -ForegroundColor Yellow
-    Write-Host "1. Run: python verify_installation.py" -ForegroundColor Gray
-    Write-Host "2. Configure API keys if needed" -ForegroundColor Gray
-    Write-Host "3. Test: luminoracore --help" -ForegroundColor Gray
-    Write-Host "4. Read: QUICK_START.md" -ForegroundColor Gray
+    Write-Host "1. Setup v1.1 database: .\scripts\setup-v1_1-database.ps1" -ForegroundColor Gray
+    Write-Host "2. Verify installation: python verify_installation.py" -ForegroundColor Gray
+    Write-Host "3. Verify v1.1: .\scripts\verify-v1_1-installation.ps1" -ForegroundColor Gray
+    Write-Host "4. Configure API keys if needed" -ForegroundColor Gray
+    Write-Host "5. Test: luminoracore --help" -ForegroundColor Gray
+    Write-Host "6. Test v1.1: python examples\v1_1_quick_example.py" -ForegroundColor Gray
+    Write-Host "7. Read: QUICK_START.md and mejoras_v1.1\QUICK_START_V1_1.md" -ForegroundColor Gray
 } else {
     Write-Host "❌ INSTALLATION FAILED" -ForegroundColor Red
     Write-Host ""
