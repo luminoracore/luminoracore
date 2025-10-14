@@ -366,6 +366,58 @@ This project is licensed under the MIT License - see the [LICENSE](luminoracore/
 
 ---
 
+## 📋 v1.1 Improvement Documentation
+
+**Comprehensive design documentation for upcoming v1.1 features** (Noviembre 2025 - Marzo 2026)
+
+### 🎯 Quick Access
+
+| Document | Type | Time | Priority |
+|----------|------|------|----------|
+| **[Quick Reference](mejoras_v1.1/QUICK_REFERENCE.md)** | FAQ | 5 min | ⭐⭐⭐ EMPEZAR AQUÍ |
+| **[Visual Summary](mejoras_v1.1/RESUMEN_VISUAL.md)** | Overview | 15 min | ⭐⭐⭐ |
+| **[Conceptual Model](mejoras_v1.1/MODELO_CONCEPTUAL_REVISADO.md)** | Core Design | 20 min | ⭐⭐⭐ |
+| **[Data Flow & Persistence](mejoras_v1.1/FLUJO_DATOS_Y_PERSISTENCIA.md)** | Technical | 25 min | ⭐⭐⭐ |
+| **[Integration with Current System](mejoras_v1.1/INTEGRACION_CON_SISTEMA_ACTUAL.md)** | Technical | 20 min | ⭐⭐ |
+| **[JSON Personality Examples](mejoras_v1.1/EJEMPLOS_PERSONALIDADES_JSON.md)** | Examples | 15 min | ⭐⭐ |
+
+### 📚 Complete Documentation Set (13 documents)
+
+**Index:** [mejoras_v1.1/INDEX.md](mejoras_v1.1/INDEX.md) - Master index with all documents  
+**Main Guide:** [mejoras_v1.1/README.md](mejoras_v1.1/README.md) - Complete guide to improvements
+
+### 🎯 Key Improvements Documented
+
+1. **🧠 Advanced Memory System**
+   - Episodic Memory (remember important moments)
+   - Semantic Search (vector embeddings)
+   - Automatic Fact Extraction
+   - Intelligent Classification
+
+2. **🌳 Hierarchical Personalities**
+   - Tree-based adaptive personalities
+   - Relationship Levels (Stranger → Friend → Soulmate)
+   - Dynamic Moods (7+ emotional states)
+   - Context-aware Adaptation
+
+3. **💾 Persistence Architecture**
+   - Templates (immutable JSON - the standard)
+   - Instances (mutable state in DB - runtime)
+   - Snapshots (exportable JSON - backups)
+
+### ⚠️ Important Clarifications
+
+- ✅ **Everything configurable in JSON** (no hardcoded values)
+- ✅ **Templates are immutable** (state in DB, not JSON)
+- ✅ **Dynamic compilation** (per message, but only ~5ms overhead)
+- ✅ **Backward compatible** (v1.0 personalities still work)
+- ✅ **Background processing** (heavy tasks don't block user)
+- ✅ **Your current DBs safe** (only adds new tables)
+
+**Total Documentation:** ~50,000 words | 13 documents | 4-5 hours reading time
+
+---
+
 ## 📞 Support
 
 - 📧 **Email**: contact@luminoracore.com

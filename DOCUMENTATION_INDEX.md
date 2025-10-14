@@ -324,11 +324,72 @@ luminoracore-sdk-python/examples/integrations/
 
 ---
 
+## 🚀 v1.1 Improvement Documentation (NEW)
+
+### Complete Design Documentation for v1.1 Features
+
+**Location:** [mejoras_v1.1/](mejoras_v1.1/)
+
+### ⚡ Quick Start (Choose One)
+
+| Document | Type | Time | When to Read |
+|----------|------|------|--------------|
+| **[Quick Reference](mejoras_v1.1/QUICK_REFERENCE.md)** ⭐⭐⭐ | FAQ | 5 min | Have quick questions |
+| **[Visual Summary](mejoras_v1.1/RESUMEN_VISUAL.md)** ⭐⭐⭐ | Overview | 15 min | Want visual explanation |
+| **[Full Index](mejoras_v1.1/INDEX.md)** | Master Index | 10 min | Need overview of all docs |
+
+### 📚 Core Concepts (Must Read)
+
+| Document | Content | Time | Priority |
+|----------|---------|------|----------|
+| **[Conceptual Model](mejoras_v1.1/MODELO_CONCEPTUAL_REVISADO.md)** | Templates vs Instances vs Snapshots | 20 min | 🔥 Critical |
+| **[Data Flow & Persistence](mejoras_v1.1/FLUJO_DATOS_Y_PERSISTENCIA.md)** | What persists where, performance | 25 min | 🔥 Critical |
+| **[Integration with Current System](mejoras_v1.1/INTEGRACION_CON_SISTEMA_ACTUAL.md)** | How v1.1 integrates with v1.0 | 20 min | 🔥 Critical |
+
+### 🎯 Systems Design
+
+| Document | Content | Time |
+|----------|---------|------|
+| **[Advanced Memory System](mejoras_v1.1/SISTEMA_MEMORIA_AVANZADO.md)** | Episodic memory, vector search, fact extraction | 45 min |
+| **[Hierarchical Personalities](mejoras_v1.1/SISTEMA_PERSONALIDADES_JERARQUICAS.md)** | Tree-based, moods, adaptation | 40 min |
+| **[Technical Architecture](mejoras_v1.1/ARQUITECTURA_TECNICA.md)** | Classes, DB schemas, APIs | 35 min |
+
+### 💼 Implementation
+
+| Document | Content | Time |
+|----------|---------|------|
+| **[Implementation Plan](mejoras_v1.1/PLAN_IMPLEMENTACION.md)** | 5-month roadmap, phases, tasks | 30 min |
+| **[Use Cases](mejoras_v1.1/CASOS_DE_USO.md)** | 5 complete use cases with code | 25 min |
+| **[JSON Examples](mejoras_v1.1/EJEMPLOS_PERSONALIDADES_JSON.md)** | Complete v1.1 JSON templates | 15 min |
+
+### 📊 Summary
+
+**Total:** 13 documents | ~50,000 words | 4-5 hours reading time
+
+**Key Features Documented:**
+- 🧠 Episodic Memory
+- 🔍 Semantic Search (vector embeddings)
+- 🌳 Hierarchical Personalities (5 relationship levels)
+- 🎭 Dynamic Moods (7+ emotional states)
+- 💕 Affinity System
+- 🤖 Automatic Fact Extraction
+- 📸 Snapshot System (export/import states)
+
+**Design Principles:**
+- ✅ Everything configurable in JSON (no hardcoded)
+- ✅ Templates immutable (state in DB)
+- ✅ Dynamic compilation (~5ms overhead)
+- ✅ Backward compatible (v1.0 works as-is)
+- ✅ Background processing (async)
+- ✅ Multi-backend support (SQLite, PostgreSQL, etc.)
+
+---
+
 ## 🔄 Updates
 
 This document is updated with each major change in the documentation structure.
 
-**Last updated:** 2025-10-05
+**Last updated:** 2025-10-14 (Added v1.1 improvement documentation)
 
 ---
 
@@ -345,6 +406,9 @@ This document is updated with each major change in the documentation structure.
 | **Use SDK** | `luminoracore-sdk-python/README.md` |
 | **See examples** | `*/examples/*.py` |
 | **Personality format** | `luminoracore/docs/personality_format.md` |
+| **v1.1 improvements (NEW)** | [mejoras_v1.1/QUICK_REFERENCE.md](mejoras_v1.1/QUICK_REFERENCE.md) ⭐ |
+| **v1.1 visual guide** | [mejoras_v1.1/RESUMEN_VISUAL.md](mejoras_v1.1/RESUMEN_VISUAL.md) |
+| **v1.1 full docs** | [mejoras_v1.1/INDEX.md](mejoras_v1.1/INDEX.md) |
 
 ---
 

@@ -35,6 +35,16 @@
 
 ## 🚀 v1.1.0 - Enhanced Memory & Intelligence (Q1 2026)
 
+**📋 COMPLETE DESIGN DOCUMENTATION AVAILABLE:**  
+→ **[mejoras_v1.1/](mejoras_v1.1/)** - 13 documentos completos con diseño, arquitectura e implementación
+
+**⚡ Quick Access:**
+- [Quick Reference](mejoras_v1.1/QUICK_REFERENCE.md) (5 min) - FAQ
+- [Visual Summary](mejoras_v1.1/RESUMEN_VISUAL.md) (15 min) - Overview
+- [Implementation Plan](mejoras_v1.1/PLAN_IMPLEMENTACION.md) (30 min) - 5-month roadmap
+
+---
+
 ### 🧠 Automatic Fact Extraction
 
 **Problem:** Currently, developers must manually call `store_memory()` for each fact.
