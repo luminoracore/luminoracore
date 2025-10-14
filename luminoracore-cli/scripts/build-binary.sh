@@ -12,7 +12,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}Building LuminoraCore CLI binary distribution...${NC}"
+echo -e "${BLUE}Building LuminoraCore CLI binary distribution (v1.0 + v1.1)...${NC}"
 
 # Check if we're in the right directory
 if [ ! -f "pyproject.toml" ] || [ ! -d "luminoracore_cli" ]; then
@@ -46,12 +46,18 @@ a = Analysis(
     hiddenimports=[
         'luminoracore_cli.config',
         'luminoracore_cli.commands',
+        'luminoracore_cli.commands.migrate',
+        'luminoracore_cli.commands.memory',
+        'luminoracore_cli.commands.snapshot',
         'luminoracore_cli.core',
         'luminoracore_cli.utils',
         'luminoracore_cli.server',
         'luminoracore_cli.templates',
         'luminoracore_cli.interactive',
         'luminoracore_cli.completion',
+        'luminoracore.storage.migrations.migration_manager',
+        'luminoracore.core.relationship',
+        'luminoracore.core.memory',
         'rich',
         'typer',
         'click',
