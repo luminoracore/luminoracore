@@ -6,6 +6,7 @@ Manages episodic memory, fact extraction, and semantic search.
 
 from .fact_extractor import Fact, FactCategory, FactExtractor
 from .episodic import Episode, EpisodeType, Sentiment, EpisodicMemoryManager
+from .classifier import ImportanceLevel, ClassificationResult, MemoryClassifier
 
 __all__ = [
     'Fact',
@@ -14,6 +15,9 @@ __all__ = [
     'Episode',
     'EpisodeType',
     'Sentiment',
-    'EpisodicMemoryManager'
+    'EpisodicMemoryManager',
+    'ImportanceLevel',
+    'ClassificationResult',
+    'MemoryClassifier'
 ]
 
