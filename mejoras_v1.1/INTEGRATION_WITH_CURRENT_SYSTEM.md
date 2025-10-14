@@ -4,6 +4,23 @@
 
 ---
 
+## 🏗️ ARCHITECTURAL DIVISION (v1.0 → v1.1)
+
+**CRITICAL:** Understand how components work together:
+
+| Component | v1.0 Responsibilities | v1.1 Additions |
+|-----------|----------------------|----------------|
+| **luminoracore (Core)** | ✅ Personality classes<br>✅ JSON schemas<br>✅ Compilers<br>✅ Validators | 🆕 Hierarchical config classes<br>🆕 Mood config classes<br>🆕 Memory classes<br>🆕 Relationship classes<br>🆕 v1.1 compiler |
+| **luminoracore-sdk** | ✅ LLM providers (10)<br>✅ Storage (SQLite, PostgreSQL)<br>✅ Session management<br>✅ Memory manager | 🆕 Extended storage (v1.1 tables)<br>🆕 Extended memory (semantic search)<br>🆕 New types (Episode, Fact, etc.) |
+| **luminoracore-cli** | ✅ 11 commands | 🆕 3 new commands (migrate, memory, snapshot) |
+
+**Integration strategy:**
+- Core defines personality structure (JSON → classes)
+- SDK provides infrastructure (providers, storage)
+- Core **USES** SDK providers when needed (fact extraction, etc.)
+
+---
+
 ## ❌ IMPORTANT CLARIFICATION
 
 **Code examples in previous documentation showed HARDCODED values, but this is INCORRECT.**

@@ -29,13 +29,13 @@
 6. ✅ Automatic Fact Extraction
 7. ✅ Conversational Analytics
 
-**Timeline:** 5 months (November 2025 - March 2026)
+**Timeline:** 10 weeks (~2.5 months)
 
 **Estimated Team:**
-- 2 Backend Developers
-- 1 ML/AI Engineer (for embeddings/NLP)
-- 1 QA Engineer
-- 1 DevOps Engineer (for vector store infrastructure)
+- 1-2 Backend Developers
+- 1 ML/AI Engineer (for embeddings/NLP, part-time)
+- 1 QA Engineer (part-time)
+- (DevOps can use existing infrastructure from SDK)
 
 ---
 
@@ -44,11 +44,17 @@
 **IMPORTANT:** v1.1 changes affect the **3 components** of the project.
 
 **See:** [MODULAR_ARCHITECTURE_v1.1.md](./MODULAR_ARCHITECTURE_v1.1.md) for complete details of:
-- What changes in `luminoracore/` (core) - ~25 new files, ~5000 LOC
-- What changes in `luminoracore-cli/` (CLI) - ~8 new files, ~2000 LOC
-- What changes in `luminoracore-sdk-python/` (SDK) - ~8 new files, ~1500 LOC
+- What changes in `luminoracore/` (core) - **13 new files, ~3,000 LOC** ✅
+- What changes in `luminoracore-cli/` (CLI) - **3 new files, ~600 LOC** ✅
+- What changes in `luminoracore-sdk-python/` (SDK) - **3 new files, ~1,500 LOC** ✅
+- **Total:** 19 new files, ~5,100 LOC
 - Implementation order (Core → CLI → SDK)
 - Dependencies between components
+
+**Key corrections:**
+- SDK providers/storage **ALREADY EXIST** (10 provider files) - we EXTEND, not create
+- CLI **ALREADY HAS** 11 commands - we ADD 3 more
+- Core creates NEW personality/memory classes only
 
 **This document shows the general PLAN. Consult MODULAR_ARCHITECTURE_v1.1.md for detailed distribution.**
 
@@ -57,16 +63,20 @@
 ## General Timeline
 
 ```
-November 2025        December 2025        January 2026         February 2026        March 2026
-─────────────────────────────────────────────────────────────────────────────────────────────
-│ PHASE 1            │ PHASE 2             │ PHASE 3            │ TESTING            │ RELEASE │
-│                    │                     │                    │                    │         │
-│ ┌────────────┐     │ ┌────────────┐      │ ┌────────────┐     │ ┌────────────┐     │ v1.1.0  │
-│ │ Episodic   │     │ │ Vector     │      │ │ Hierarchical│    │ │ Integration│     │         │
-│ │ Memory     │     │ │ Search     │      │ │ Personality│    │ │ Testing    │     │         │
-│ └────────────┘     │ └────────────┘      │ └────────────┘     │ └────────────┘     │         │
-└────────────────────┴─────────────────────┴────────────────────┴────────────────────┴─────────┘
-  Week 1-4             Week 5-8             Week 9-12            Week 13-16          Week 17-20
+Week 1-2             Week 3-5             Week 6-7             Week 8              Week 9-10
+─────────────────────────────────────────────────────────────────────────────────────────
+│ PHASE 1           │ PHASE 2            │ PHASE 3           │ PHASE 4          │ PHASE 5    │
+│ Core Foundation   │ Core Memory &      │ SDK Extensions    │ CLI Commands     │ Integration│
+│                   │ Personality        │                   │                  │ & Testing  │
+│ ┌──────────────┐  │ ┌──────────────┐   │ ┌──────────────┐  │ ┌─────────────┐  │ ┌─────────┐│
+│ │ Migration    │  │ │ Affinity     │   │ │ Extend       │  │ │ Migrate     │  │ │ E2E     ││
+│ │ Feature Flags│  │ │ Fact Extract │   │ │ Storage      │  │ │ Memory      │  │ │ Tests   ││
+│ │ Personality  │  │ │ Episodes     │   │ │ Memory Mgr   │  │ │ Snapshot    │  │ │ Docs    ││
+│ │ v1.1         │  │ │ Classifier   │   │ │ Client       │  │ │ Commands    │  │ │         ││
+│ └──────────────┘  │ └──────────────┘   │ └──────────────┘  │ └─────────────┘  │ └─────────┘│
+└───────────────────┴────────────────────┴───────────────────┴──────────────────┴────────────┘
+  Steps 1-3           Steps 4-7            Steps 8-11          Steps 12-14        Steps 15-18
+  ~800 LOC            ~1,500 LOC           ~1,500 LOC          ~600 LOC           ~700 LOC
 ```
 
 ---
@@ -111,22 +121,29 @@ November 2025        December 2025        January 2026         February 2026    
 
 | Role | FTE | Duration | Estimated Cost |
 |------|-----|----------|----------------|
-| Backend Developer 1 | 1.0 | 5 months | $50k |
-| Backend Developer 2 | 1.0 | 5 months | $50k |
-| ML/AI Engineer | 0.75 | 4 months | $45k |
-| QA Engineer | 0.5 | 3 months | $20k |
-| DevOps Engineer | 0.5 | 2 months | $15k |
-| **TOTAL** | | | **$180k** |
+| Backend Developer | 1.0 | 10 weeks | $25k |
+| ML/AI Engineer | 0.5 | 6 weeks | $15k |
+| QA Engineer | 0.25 | 4 weeks | $5k |
+| **TOTAL** | | | **$45k** |
+
+**Notes:**
+- Reduced team size because SDK infrastructure already exists
+- No DevOps needed (SDK has complete provider/storage system)
+- Shorter timeline (10 weeks vs 20 weeks) due to reusing SDK
 
 ### Infrastructure
 
 | Service | Use | Monthly Cost |
 |---------|-----|--------------|
-| PostgreSQL (RDS) | Database + pgvector | $150 |
-| Redis | Caching | $50 |
-| OpenAI API | Embeddings + LLM calls | $500 |
-| CI/CD (GitHub Actions) | Testing & deployment | $100 |
-| **TOTAL** | | **$800/month** |
+| PostgreSQL (or SQLite) | Database + pgvector | $0-150 |
+| DeepSeek API | Embeddings + LLM calls (cheaper) | $50-200 |
+| CI/CD (GitHub Actions) | Testing & deployment | $0 (free tier) |
+| **TOTAL** | | **$50-350/month** |
+
+**Notes:**
+- SQLite supported (no cost for development/small deployments)
+- DeepSeek is 90% cheaper than OpenAI
+- SDK already supports multiple providers (flexibility)
 
 ---
 
@@ -147,11 +164,12 @@ November 2025        December 2025        January 2026         February 2026    
 **Ready for Implementation:** ✅
 
 This plan provides:
-- ✅ Realistic 5-month timeline
-- ✅ Well-defined phases with specific tasks
-- ✅ Exhaustive testing strategy
+- ✅ Realistic 10-week timeline (corrected from 5 months)
+- ✅ Accurate LOC estimates based on actual codebase
+- ✅ Leverages existing SDK infrastructure (providers/storage)
+- ✅ Well-defined 18-step implementation
 - ✅ Risk mitigation plan
-- ✅ Clear budget and resources
+- ✅ Reduced budget ($45k vs $180k) due to SDK reuse
 
 ---
 

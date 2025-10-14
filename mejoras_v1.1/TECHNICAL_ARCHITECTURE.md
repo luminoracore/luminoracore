@@ -34,6 +34,23 @@ These values are **example defaults** that the code uses **ONLY IF the JSON does
 
 ## Architecture Overview
 
+### 🏗️ Component Responsibilities
+
+**CRITICAL:** Understand the division of responsibilities:
+
+| Component | What it HAS | What it DOES NOT have |
+|-----------|-------------|----------------------|
+| **luminoracore (Core)** | ✅ Personality classes<br>✅ Compilers<br>✅ Memory classes<br>✅ Relationship classes<br>✅ Validators<br>✅ Schemas | ❌ NO providers (in SDK)<br>❌ NO storage (in SDK)<br>❌ NO session management (in SDK)<br>❌ NO API calls |
+| **luminoracore-sdk** | ✅ LLM providers (10 already exist)<br>✅ Embedding providers<br>✅ Storage (SQLite, PostgreSQL)<br>✅ Session management<br>✅ Memory manager<br>✅ Client API | ❌ NO personality definitions<br>❌ NO compilers |
+| **luminoracore-cli** | ✅ Terminal commands (11 exist)<br>✅ Interactive wizards<br>✅ Configuration | ❌ NO business logic<br>❌ NO providers |
+
+**v1.1 Implementation Strategy:**
+- **Core:** CREATE new personality/memory classes
+- **SDK:** EXTEND existing storage/memory classes
+- **CLI:** ADD 3 new commands to existing 11
+
+---
+
 ### 💡 How It's Really Used (Complete Example)
 
 ```python
@@ -204,6 +221,79 @@ CREATE INDEX idx_session_moods_user_id ON session_moods(user_id);
 ---
 
 ## APIs and Interfaces
+
+### 🔌 Provider Architecture (SDK)
+
+**IMPORTANT:** Providers **ALREADY EXIST** in SDK. We do NOT create them.
+
+**Existing providers in SDK:**
+
+```
+luminoracore-sdk-python/luminoracore_sdk/providers/
+├── base.py                  # ✅ EXISTS v1.0
+├── anthropic.py             # ✅ EXISTS v1.0 (Claude)
+├── deepseek.py              # ✅ EXISTS v1.0
+├── google.py                # ✅ EXISTS v1.0 (Gemini)
+├── groq.py                  # ✅ EXISTS v1.0
+├── huggingface.py           # ✅ EXISTS v1.0
+├── mistral.py               # ✅ EXISTS v1.0
+├── ollama.py                # ✅ EXISTS v1.0
+├── openai.py                # ✅ EXISTS v1.0
+└── replicate.py             # ✅ EXISTS v1.0
+```
+
+**Usage example:**
+
+```python
+# Core uses SDK providers for LLM calls
+from luminoracore_sdk.providers import DeepSeekProvider
+
+# Fact extraction uses LLM provider
+provider = DeepSeekProvider(api_key=config.api_key)
+facts = await fact_extractor.extract_facts(
+    message=message,
+    llm_provider=provider  # ← Uses SDK provider
+)
+```
+
+**v1.1 does NOT create new providers.** ✅
+
+---
+
+### 🗄️ Storage Architecture (SDK)
+
+**IMPORTANT:** Storage **ALREADY EXISTS** in SDK. We do NOT create it.
+
+**Existing storage in SDK:**
+
+```
+luminoracore-sdk-python/luminoracore_sdk/session/
+├── storage.py               # ✅ EXISTS v1.0 (StorageProvider class)
+├── manager.py               # ✅ EXISTS v1.0 (Session management)
+├── memory.py                # ✅ EXISTS v1.0 (Memory manager)
+└── state.py                 # ✅ EXISTS v1.0 (State management)
+```
+
+**v1.1 EXTENDS storage.py:**
+
+```python
+# EXTEND existing StorageProvider class
+class StorageProvider:
+    # ✅ v1.0 methods (EXIST, no changes)
+    async def save_message(self, ...)
+    async def get_history(self, ...)
+    async def save_state(self, ...)
+    
+    # 🆕 NEW v1.1 methods (ADD, don't replace)
+    async def save_fact(self, ...)        # NEW
+    async def save_episode(self, ...)     # NEW
+    async def get_affinity(self, ...)     # NEW
+    async def update_affinity(self, ...)  # NEW
+```
+
+**v1.1 does NOT create new storage infrastructure.** ✅
+
+---
 
 ### Client API (Python SDK)
 
