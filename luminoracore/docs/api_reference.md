@@ -496,6 +496,117 @@ else:
         print(f"  - {error}")
 ```
 
-This API reference covers all the main components of LuminoraCore v1.0. For v1.1 features (memory, relationships, affinity), see [v1.1 Features Documentation](v1_1_features.md).
+## v1.1 Features - Memory & Relationships
+
+LuminoraCore v1.1 introduces advanced memory management and relationship tracking. This section provides a quick overview. For complete v1.1 API documentation, see [v1.1 Features Documentation](v1_1_features.md).
+
+### AffinityManager
+
+Track relationship points and levels:
+
+```python
+from luminoracore.core.affinity_manager import AffinityManager
+
+affinity_mgr = AffinityManager(storage)
+
+# Update affinity
+affinity_mgr.update_affinity(
+    session_id="user_123",
+    interaction_type="positive",
+    points=5
+)
+
+# Get current affinity
+affinity = affinity_mgr.get_affinity("user_123")
+print(f"Points: {affinity.points}, Level: {affinity.level}")
+```
+
+### FactExtractor
+
+Extract and store facts from conversations:
+
+```python
+from luminoracore.core.fact_extractor import FactExtractor
+
+fact_extractor = FactExtractor()
+
+# Extract facts
+facts = fact_extractor.extract_facts(
+    message="I love playing guitar on weekends",
+    session_id="user_123"
+)
+
+# Query facts
+facts = fact_extractor.get_facts(
+    session_id="user_123",
+    category="hobbies"
+)
+```
+
+### EpisodicMemoryManager
+
+Store and retrieve memorable moments:
+
+```python
+from luminoracore.core.episodic_memory import EpisodicMemoryManager
+
+memory_mgr = EpisodicMemoryManager(storage)
+
+# Create episode
+memory_mgr.create_episode(
+    session_id="user_123",
+    episode_type="achievement",
+    content="User completed first project",
+    importance=0.9
+)
+
+# Query episodes
+episodes = memory_mgr.get_episodes(
+    session_id="user_123",
+    episode_type="achievement",
+    min_importance=0.8
+)
+```
+
+### FeatureFlagManager
+
+Control v1.1 features dynamically:
+
+```python
+from luminoracore.core.feature_flags import FeatureFlagManager
+
+flag_mgr = FeatureFlagManager()
+
+# Check if feature is enabled
+if flag_mgr.is_enabled("affinity_system"):
+    # Use affinity system
+    pass
+
+# Configure features
+flag_mgr.load_config("config/features_production.json")
+```
+
+### MigrationManager
+
+Manage database schema migrations:
+
+```python
+from luminoracore.storage.migration_manager import MigrationManager
+
+migration_mgr = MigrationManager(storage)
+
+# Check status
+status = migration_mgr.get_status()
+
+# Apply migrations
+migration_mgr.migrate_up()
+
+# Rollback
+migration_mgr.migrate_down()
+```
+
+---
+
+This API reference covers all the main components of LuminoraCore v1.0 and introduces v1.1 features. For complete v1.1 documentation with detailed examples, see [v1.1 Features Documentation](v1_1_features.md).
 
 For more detailed information, see the [Getting Started Guide](getting_started.md) and [Personality Format Documentation](personality_format.md).

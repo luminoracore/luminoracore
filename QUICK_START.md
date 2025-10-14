@@ -308,17 +308,79 @@ from luminoracore import LuminoraCoreClient  # SDK
 
 ---
 
+## 🎉 What's New in v1.1 - Memory & Relationships
+
+LuminoraCore v1.1 adds powerful memory and relationship features! Here's how to get started:
+
+### 🚀 Quick v1.1 Setup
+
+```bash
+# 1. Setup v1.1 database
+.\scripts\setup-v1_1-database.ps1  # Windows
+./scripts/setup-v1_1-database.sh   # Linux/Mac
+
+# 2. Run v1.1 examples
+python examples/v1_1_affinity_demo.py
+python examples/v1_1_memory_demo.py
+python examples/v1_1_dynamic_personality_demo.py
+```
+
+### ✨ v1.1 Features
+
+- **🎭 Hierarchical Personalities** - Relationship levels that evolve (stranger → friend → soulmate)
+- **💝 Affinity Tracking** - Track relationship points (0-100)
+- **🧠 Fact Extraction** - Automatically learn from conversations (9 categories)
+- **📖 Episodic Memory** - Remember memorable moments (7 types)
+- **🏷️ Memory Classification** - Smart organization by importance
+- **🚩 Feature Flags** - Safe, gradual feature rollout
+- **🗄️ Database Migrations** - Structured schema management
+
+### 🔧 v1.1 CLI Commands
+
+```bash
+# Database migrations
+luminora-cli migrate --status
+luminora-cli migrate up
+
+# Memory management
+luminora-cli memory facts --session-id user_123
+luminora-cli memory episodes --session-id user_123
+
+# Snapshots
+luminora-cli snapshot create --session-id user_123 --output backup.json
+luminora-cli snapshot restore --input backup.json
+```
+
+### 📚 v1.1 Documentation
+
+- **[Quick Start v1.1](mejoras_v1.1/QUICK_START_V1_1.md)** - 5-minute tutorial
+- **[v1.1 Features Summary](mejoras_v1.1/V1_1_FEATURES_SUMMARY.md)** - Complete feature list
+- **[v1.1 API Guide](luminoracore/docs/v1_1_features.md)** - API reference
+- **[Technical Architecture](mejoras_v1.1/TECHNICAL_ARCHITECTURE.md)** - Database schema
+
+---
+
 ## ✨ Next Steps
 
+### For v1.0 (Getting Started)
 1. ✅ **Install**: `.\install_all.ps1` or `./install_all.sh`
 2. ✅ **Verify**: Run the 3 quick start scripts
 3. ✅ **Explore**: Read [INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md)
 4. ✅ **Practice**: Run examples in `luminoracore/examples/`
 5. ✅ **Create**: Make your first personality with `luminoracore create --interactive`
 
+### For v1.1 (Advanced Features)
+6. ✅ **Setup v1.1**: Run `./scripts/setup-v1_1-database.sh`
+7. ✅ **Try v1.1**: Run v1.1 examples
+8. ✅ **Learn v1.1**: Read [v1.1 Quick Start](mejoras_v1.1/QUICK_START_V1_1.md)
+9. ✅ **Explore Memory**: Test fact extraction and episodic memory
+10. ✅ **Track Affinity**: Implement relationship tracking
+
 ---
 
-**Need help?** Read the [Complete Guide](INSTALLATION_GUIDE.md) or check [ESTADO_ACTUAL_PROYECTO.md](ESTADO_ACTUAL_PROYECTO.md)
+**Need help?** Read the [Complete Guide](INSTALLATION_GUIDE.md) or check [DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)
 
 **Ready to start! 🚀**
+
+**v1.1 Production Ready:** 179 tests passing • 100% backward compatible
 

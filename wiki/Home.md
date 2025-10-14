@@ -2,7 +2,7 @@
 
 ![LuminoraCore Banner](https://img.shields.io/badge/LuminoraCore-v1.0-blue?style=for-the-badge)
 ![Production Ready](https://img.shields.io/badge/Status-Production%20Ready-success?style=for-the-badge)
-![Tests](https://img.shields.io/badge/Tests-90%2F91%20Passing-brightgreen?style=for-the-badge)
+![Tests](https://img.shields.io/badge/Tests-179%2F179%20Passing-brightgreen?style=for-the-badge)
 
 ---
 
@@ -16,7 +16,7 @@
 - 🔄 **PersonaBlend™ Technology**: Blend multiple personalities with custom weights
 - 🚀 **Multi-Provider Support**: Works with 7 major LLM providers
 - 💾 **Flexible Storage**: From in-memory to enterprise databases
-- ⚡ **Production Ready**: 90/91 tests passing, battle-tested
+- ⚡ **Production Ready**: 179/179 tests passing (v1.1), battle-tested
 
 ---
 
@@ -233,7 +233,7 @@ We welcome contributions! See our [Contributing Guide](https://github.com/lumino
 - 7 LLM providers
 - 6 storage backends
 - PersonaBlend™ technology
-- 90/91 tests passing
+- 179/179 tests passing (v1.1)
 - Complete documentation
 
 ### 🔮 Coming Soon
@@ -248,5 +248,5 @@ We welcome contributions! See our [Contributing Guide](https://github.com/lumino
 
 **⭐ Star us on GitHub • 🐛 Report Issues**
 
-**✅ v1.0 PRODUCTION READY - 90/91 Tests Passing (100% Executable)**
+**✅ v1.1 PRODUCTION READY - 179/179 Tests Passing (100%)**
 

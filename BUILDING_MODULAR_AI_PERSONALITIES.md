@@ -772,7 +772,7 @@ python integrations/fastapi_integration.py
 ### 🎯 Why Choose LuminoraCore?
 
 ✅ **Open Source** - MIT license, free forever  
-✅ **Production Ready** - 90/91 tests passing  
+✅ **Production Ready** - 179/179 tests passing (v1.1)  
 ✅ **Multi-Provider** - 7 LLM providers supported  
 ✅ **Flexible Storage** - 6 storage backend options  
 ✅ **Well-Documented** - Comprehensive guides and examples  

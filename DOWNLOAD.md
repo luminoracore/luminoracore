@@ -224,7 +224,7 @@ Installed components:
 - First stable release
 - 7 LLM providers
 - 6 storage backends
-- 90/91 tests passing
+- 179/179 tests passing (v1.1)
 - Complete documentation
 
 ---

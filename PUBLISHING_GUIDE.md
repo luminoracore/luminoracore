@@ -239,7 +239,7 @@ pytest tests/ -v
    - ✅ 7 LLM providers (OpenAI, Anthropic, DeepSeek, Mistral, Cohere, Google, Llama)
    - ✅ 6 storage backends (Memory, JSON, SQLite, Redis, PostgreSQL, MongoDB)
    - ✅ PersonaBlend™ technology
-   - ✅ 90/91 tests passing
+   - ✅ 179/179 tests passing (v1.1)
    
    ### Documentation
    - [Quick Start](QUICK_START.md)

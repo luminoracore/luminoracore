@@ -367,7 +367,7 @@ pytest tests/test_3_sdk.py -v          # SDK (37 tests)
 ### Q: Is it production-ready?
 
 **A: Yes.**
-- ✅ 90/91 tests passing (100% executable)
+- ✅ 179/179 tests passing (v1.1 production ready)
 - ✅ Comprehensive error handling
 - ✅ Type safety (Pydantic)
 - ✅ Async/await support

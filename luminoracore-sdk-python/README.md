@@ -3,15 +3,16 @@
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/luminoracore/sdk-python)
-[![Status](https://img.shields.io/badge/status-v1.0_ready-brightgreen.svg)](#)
-[![Tests](https://img.shields.io/badge/tests-37%2F37_passing-brightgreen.svg)](#)
+[![Status](https://img.shields.io/badge/status-v1.1_ready-brightgreen.svg)](#)
+[![Tests](https://img.shields.io/badge/tests-52%2F52_passing-brightgreen.svg)](#)
 
-**✅ OFFICIAL PYTHON SDK - v1.0 PRODUCTION READY**
+**✅ OFFICIAL PYTHON SDK - v1.1 PRODUCTION READY**
 
-**LuminoraCore SDK Python** is the official Python client for advanced AI personality management. Provides a complete toolkit for building AI applications with sophisticated personality systems, session management, and multi-provider LLM support.
+**LuminoraCore SDK Python** is the official Python client for advanced AI personality management. Provides a complete toolkit for building AI applications with sophisticated personality systems, advanced memory, affinity tracking, session management, and multi-provider LLM support.
 
 ## Key Features
 
+### Core Features (v1.0)
 - **✅ Advanced Personality Management**: Create, blend, and manage AI personalities with ease
 - **✅ Session Management**: Stateful conversations with persistent memory
 - **✅ Multi-Provider Support**: Integration with OpenAI, Anthropic, DeepSeek, Mistral, Cohere, Google, Llama
@@ -24,6 +25,16 @@
 - **✅ Robust Error Handling**: Automatic retries and fallbacks
 - **✅ Token Usage Tracking**: Real-time token monitoring and metrics
 
+### New in v1.1 - Memory & Relationships
+- **✅ Affinity Tracking**: Track relationship points (0-100) with automatic level progression
+- **✅ Fact Extraction**: Automatically learn from conversations with 9 fact categories
+- **✅ Episodic Memory**: Remember memorable moments with 7 episode types
+- **✅ Memory Classification**: Smart organization by importance and category
+- **✅ Hierarchical Personalities**: Dynamic personality adjustment based on relationship level
+- **✅ Feature Flags**: Safe, gradual feature rollout with JSON configuration
+- **✅ Session Snapshots**: Export/import complete session states
+- **✅ Advanced Querying**: Filter and search facts, episodes, and memories
+
 ## Installation
 
 ```bash
@@ -31,6 +42,8 @@ pip install -e luminoracore-sdk-python/
 ```
 
 ## Quick Start
+
+### Basic Usage (v1.0)
 
 ```python
 import asyncio
@@ -81,6 +94,59 @@ async def main():
     await client.cleanup()
 
 # Run the example
+asyncio.run(main())
+```
+
+### v1.1 Usage - Memory & Affinity
+
+```python
+import asyncio
+from luminoracore_sdk import LuminoraCoreClient
+
+async def main():
+    client = LuminoraCoreClient()
+    await client.initialize()
+    
+    session_id = await client.create_session(
+        personality_name="dr_luna",
+        provider_config=provider_config
+    )
+    
+    # Send message with automatic fact extraction
+    response = await client.send_message(
+        session_id=session_id,
+        message="I love playing guitar on weekends!",
+        extract_facts=True  # v1.1 feature
+    )
+    
+    # Query learned facts
+    facts = await client.get_facts(
+        session_id=session_id,
+        category="hobbies"
+    )
+    print(f"Learned facts: {facts}")
+    
+    # Check affinity level
+    affinity = await client.get_affinity(session_id)
+    print(f"Current affinity: {affinity.points}/100")
+    print(f"Relationship level: {affinity.level}")
+    
+    # Query episodic memories
+    episodes = await client.get_episodes(
+        session_id=session_id,
+        episode_type="achievement",
+        min_importance=0.8
+    )
+    
+    # Create snapshot
+    snapshot = await client.create_snapshot(session_id)
+    await client.export_snapshot(snapshot, "backup.json")
+    
+    # Restore from snapshot
+    new_session_id = await client.restore_snapshot("backup.json")
+    
+    await client.cleanup()
+
 asyncio.run(main())
 ```
 
@@ -203,11 +269,18 @@ memory_config = MemoryConfig(
 
 Check out the `examples/` directory for comprehensive examples:
 
+### v1.0 Examples
 - `basic_usage.py` - Basic usage examples
 - `simple_usage.py` - Simple usage examples
 - `personality_blending.py` - Personality blending examples
 - `integrations/fastapi_integration.py` - FastAPI integration
 - `integrations/streamlit_app.py` - Streamlit web app
+
+### v1.1 Examples
+- `v1_1_sdk_usage.py` - Complete v1.1 feature demonstration
+- `v1_1_affinity_tracking.py` - Affinity management examples
+- `v1_1_memory_system.py` - Fact extraction and episodic memory
+- `v1_1_snapshot_management.py` - Session snapshot examples
 
 ## Testing
 

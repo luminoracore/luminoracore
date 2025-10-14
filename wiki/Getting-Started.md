@@ -194,7 +194,7 @@ A:
 - Enterprise → `postgres`
 
 **Q: Is it production ready?**  
-A: Yes. 90/91 tests passing (100% executable), comprehensive documentation, and battle-tested.
+A: Yes. 179/179 tests passing (v1.1 production ready), comprehensive documentation, and battle-tested.
 
 ---
 
