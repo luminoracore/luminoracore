@@ -539,9 +539,110 @@ Once your personality is created:
 
 ---
 
+---
+
+## 🎉 NEW in v1.1: Hierarchical Personalities
+
+LuminoraCore v1.1 adds relationship levels to personalities!
+
+### What's New?
+
+You can now define how personality changes based on relationship level:
+
+```json
+{
+  "persona": {
+    "name": "Alicia",
+    "version": "1.1.0",
+    ...
+  },
+  
+  "advanced_parameters": {
+    "empathy": 0.9,
+    "formality": 0.5,
+    "humor": 0.6
+  },
+  
+  "hierarchical_config": {
+    "enabled": true,
+    "relationship_levels": [
+      {
+        "name": "stranger",
+        "affinity_range": [0, 20],
+        "description": "Initial interactions, more formal",
+        "modifiers": {
+          "advanced_parameters": {
+            "formality": 0.2,
+            "humor": -0.1
+          }
+        }
+      },
+      {
+        "name": "friend",
+        "affinity_range": [41, 60],
+        "description": "Comfortable relationship",
+        "modifiers": {
+          "advanced_parameters": {
+            "formality": -0.2,
+            "humor": 0.2
+          }
+        }
+      },
+      {
+        "name": "close_friend",
+        "affinity_range": [61, 80],
+        "description": "Very close relationship",
+        "modifiers": {
+          "advanced_parameters": {
+            "formality": -0.3,
+            "humor": 0.3
+          }
+        }
+      }
+    ]
+  }
+}
+```
+
+### How It Works
+
+1. **Base Parameters:** Define default values in `advanced_parameters`
+2. **Level Modifiers:** Each level adds/subtracts from base values
+3. **Dynamic Compilation:** Parameters adjust automatically based on affinity points
+4. **Backward Compatible:** Optional - personalities without it work as v1.0
+
+### Default Relationship Levels
+
+- `stranger` (0-20 points) - Formal, reserved
+- `acquaintance` (21-40 points) - Polite, cautious
+- `friend` (41-60 points) - Casual, comfortable
+- `close_friend` (61-80 points) - Playful, intimate
+- `soulmate` (81-100 points) - Deep connection
+
+### Usage
+
+```python
+from luminoracore.core.personality_v1_1 import PersonalityV11Extensions
+from luminoracore.core.compiler_v1_1 import DynamicPersonalityCompiler
+
+# Load personality with hierarchical config
+extensions = PersonalityV11Extensions.from_personality_dict(personality_dict)
+compiler = DynamicPersonalityCompiler(personality_dict, extensions)
+
+# Compile at different affinity levels
+compiled_stranger = compiler.compile(affinity_points=10)
+compiled_friend = compiler.compile(affinity_points=50)
+```
+
+**See:** [v1.1 Features Guide](mejoras_v1.1/V1_1_FEATURES_SUMMARY.md) for complete details.
+
+---
+
 **Questions?** Check the complete documentation or run:
 ```bash
 luminoracore --help
 luminoracore create --help
 ```
+
+**Updated:** October 2025 (v1.1 release)
 
