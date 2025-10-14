@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Installation Verification Script - LuminoraCore
-===============================================
+Installation Verification Script - LuminoraCore v1.0 + v1.1
+============================================================
 
 This script verifies:
   1. Active virtual environment
-  2. Base Engine (luminoracore)
-  3. CLI (luminoracore-cli)
-  4. SDK (luminoracore-sdk-python)
+  2. Base Engine (luminoracore) - v1.0 + v1.1
+  3. CLI (luminoracore-cli) - v1.0 + v1.1 commands
+  4. SDK (luminoracore-sdk-python) - v1.0 + v1.1 extensions
   5. Available providers (7 total)
   6. Optional dependencies
   7. Configured API Keys
+  8. v1.1 features availability
 
 IMPORTANT NOTE ABOUT API KEYS:
 -------------------------------
@@ -275,6 +276,42 @@ else:
 
 print()
 
+# Test 7: v1.1 Features
+print("7. v1.1 FEATURES")
+print("-" * 70)
+v11_features = []
+
+v11_modules = [
+    ("Migration Manager", "luminoracore.storage.migrations.migration_manager", "MigrationManager"),
+    ("Feature Flags", "luminoracore.core.config", "FeatureFlagManager"),
+    ("Affinity Manager", "luminoracore.core.relationship.affinity", "AffinityManager"),
+    ("Fact Extractor", "luminoracore.core.memory.fact_extractor", "FactExtractor"),
+]
+
+for name, module, cls in v11_modules:
+    try:
+        mod = __import__(module, fromlist=[cls])
+        getattr(mod, cls)
+        print(f"  ✅ {name}")
+        v11_features.append(True)
+    except (ImportError, AttributeError):
+        print(f"  ⚪ {name} (v1.1 not installed)")
+        v11_features.append(False)
+
+if all(v11_features):
+    print("\n✅ v1.1 features fully available!")
+    print("   Run: .\\scripts\\verify-v1_1-installation.ps1 for complete v1.1 verification")
+elif any(v11_features):
+    print("\n⚠️  v1.1 partially available")
+    print("   Some v1.1 features found, run database migration:")
+    print("   ./scripts/setup-v1_1-database.sh")
+else:
+    print("\n⚪ v1.1 features not detected (v1.0 only)")
+    print("   This is OK if you only need v1.0")
+    print("   To install v1.1: git pull and reinstall packages")
+
+print()
+
 # Final Summary
 print("=" * 70)
 print("SUMMARY")
@@ -302,14 +339,23 @@ if all(tests):
         print("   INSTALLATION_GUIDE.md (section 'API Key Configuration')")
         print()
     print("Next steps:")
-    print("  1. Read: QUICK_START.md")
-    if sdk_ok and api_keys_found > 0:
-        print("  2. Test: luminoracore test --provider deepseek")
-        print("  3. Run examples: python ejemplo_quick_start_sdk.py")
+    if all(v11_features):
+        print("  1. Read: QUICK_START.md and mejoras_v1.1/QUICK_START_V1_1.md")
+        print("  2. Setup v1.1: ./scripts/setup-v1_1-database.sh")
+        print("  3. Test v1.1: python examples/v1_1_quick_example.py")
+        if sdk_ok and api_keys_found > 0:
+            print("  4. Test SDK: python luminoracore-sdk-python/examples/v1_1_sdk_usage.py")
+        else:
+            print("  4. Configure API keys if needed")
     else:
-        print("  2. Configure your API keys")
-        print("  3. Test: luminoracore --help")
-        print("  4. Run available examples")
+        print("  1. Read: QUICK_START.md")
+        if sdk_ok and api_keys_found > 0:
+            print("  2. Test: luminoracore test --provider deepseek")
+            print("  3. Run examples: python ejemplo_quick_start_sdk.py")
+        else:
+            print("  2. Configure your API keys")
+            print("  3. Test: luminoracore --help")
+            print("  4. Run available examples")
 else:
     print("⚠️  SOME COMPONENTS MISSING")
     print()
