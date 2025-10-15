@@ -6,14 +6,30 @@
 
 ## 🚀 Getting Started (START HERE)
 
-### 1. [QUICK_START.md](QUICK_START.md) ⭐
-**First time? Start here.**
+### 1. [WHY_LUMINORACORE.md](WHY_LUMINORACORE.md) 🌟 NEW!
+**Why use LuminoraCore? (Non-technical explanation)**
+- Visual diagrams and comparisons
+- Real-world use cases with examples
+- Cost savings and ROI analysis
+- Before/After scenarios
+- Perfect for executives, managers, and decision-makers
+
+### 2. [5_MINUTE_QUICK_START.md](5_MINUTE_QUICK_START.md) ⚡ NEW!
+**Developer quick start - be running in 5 minutes!**
+- Super fast setup (30 seconds)
+- First bot in 2 minutes
+- Add memory in 2 more minutes
+- Working code examples
+- Perfect for developers who want to start immediately
+
+### 3. [QUICK_START.md](QUICK_START.md) ⭐
+**Complete quick start guide.**
 - Express installation in 1 command
 - Quick verification
 - Common use cases
 - Command summary
 
-### 2. [INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md) ⭐⭐
+### 4. [INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md) ⭐⭐
 **Complete step-by-step guide.**
 - Detailed installation of each component
 - Dependency explanation
@@ -21,7 +37,7 @@
 - Troubleshooting
 - API key configuration
 
-### 3. [CREATING_PERSONALITIES.md](CREATING_PERSONALITIES.md) ⭐⭐
+### 5. [CREATING_PERSONALITIES.md](CREATING_PERSONALITIES.md) ⭐⭐
 **Complete guide for creating AI personalities.**
 - JSON file location and structure
 - Detailed explanation of each section

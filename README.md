@@ -48,12 +48,17 @@ python verify_installation.py
 
 | Document | Time | Description |
 |----------|------|-------------|
-| **[QUICK_START.md](QUICK_START.md)** ⭐⭐⭐ | 5 min | Express installation and first steps |
-| **[INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md)** ⭐⭐⭐ | 30 min | Complete step-by-step guide with verifications |
+| **[WHY_LUMINORACORE.md](WHY_LUMINORACORE.md)** 🌟 NEW! | 10 min | Why use this? Visual explanations, ROI, use cases (for executives & decision-makers) |
+| **[5_MINUTE_QUICK_START.md](5_MINUTE_QUICK_START.md)** ⚡ NEW! | 5 min | Ultra-fast developer start - be running in 5 minutes! |
+| **[QUICK_START.md](QUICK_START.md)** ⭐⭐⭐ | 15 min | Complete quick start with all features |
+| **[INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md)** ⭐⭐⭐ | 30 min | Detailed step-by-step guide with verifications |
 | **[CREATING_PERSONALITIES.md](CREATING_PERSONALITIES.md)** ⭐⭐ | 15 min | How to create your own AI personalities |
 | **[CHEATSHEET.md](CHEATSHEET.md)** | 2 min | Quick reference cheatsheet |
 
-**Don't know where to start?** → Read [QUICK_START.md](QUICK_START.md) first.
+**🎯 Choose your path:**
+- **Evaluating?** → Read [WHY_LUMINORACORE.md](WHY_LUMINORACORE.md) to understand the value
+- **Developer?** → Jump to [5_MINUTE_QUICK_START.md](5_MINUTE_QUICK_START.md) to start coding
+- **First time?** → Read [QUICK_START.md](QUICK_START.md) for comprehensive guide
 
 **Want all the details?** → Read [INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md).
 
