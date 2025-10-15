@@ -1,6 +1,6 @@
 # 🎭 Complete Guide: Creating Personalities in LuminoraCore
 
-**Version:** 1.0.0  
+**Version:** 1.1.0  
 **Language:** English  
 **Updated:** October 2025
 
@@ -89,7 +89,7 @@ Defines who your personality is.
 {
   "persona": {
     "name": "Dr. Luna",                    // Unique name
-    "version": "1.0.0",                    // Semantic version (X.Y.Z)
+    "version": "1.1.0",                    // Semantic version (X.Y.Z)
     "description": "An enthusiastic scientist...",  // Brief description
     "author": "Your Name",                 // Who created it
     "tags": ["scientist", "educational"],  // Search tags
@@ -446,6 +446,7 @@ All located in: `luminoracore/luminoracore/personalities/`
 | File | Name | Type |
 |------|------|------|
 | `dr_luna.json` | Dr. Luna | Enthusiastic scientist |
+| `dr_luna_v1_1.json` | Dr. Luna v1.1 | v1.1 with memory & affinity |
 | `alex_digital.json` | Alex Digital | Gen Z digital native |
 | `captain_hook.json` | Captain Hook | Adventurous pirate |
 | `grandma_hope.json` | Grandma Hope | Caring grandmother |
@@ -634,7 +635,7 @@ compiled_stranger = compiler.compile(affinity_points=10)
 compiled_friend = compiler.compile(affinity_points=50)
 ```
 
-**See:** [v1.1 Features Guide](mejoras_v1.1/V1_1_FEATURES_SUMMARY.md) for complete details.
+**See:** [5_MINUTE_QUICK_START.md](5_MINUTE_QUICK_START.md) and [WHY_LUMINORACORE.md](WHY_LUMINORACORE.md) for complete v1.1 details.
 
 ---
 
@@ -644,5 +645,6 @@ luminoracore --help
 luminoracore create --help
 ```
 
-**Updated:** October 2025 (v1.1 release)
+**Updated:** October 2025 (v1.1 release)  
+**Status:** ✅ Production Ready
 

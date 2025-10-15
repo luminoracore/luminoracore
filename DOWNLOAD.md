@@ -18,6 +18,8 @@ pip install luminoracore-sdk
 
 **Works on:** Windows, Linux, macOS
 
+**Version:** v1.1.0 (Production Ready)
+
 ---
 
 ## 📦 Installation Options
@@ -53,15 +55,15 @@ pip install "luminoracore-sdk[all]"
 **Best for:** Offline installation, private networks, testing
 
 **Download wheels:**
-- [luminoracore-1.0.0-py3-none-any.whl](releases/luminoracore-1.0.0-py3-none-any.whl) (~2 MB)
-- [luminoracore_cli-1.0.0-py3-none-any.whl](releases/luminoracore_cli-1.0.0-py3-none-any.whl) (~500 KB)
-- [luminoracore_sdk-1.0.0-py3-none-any.whl](releases/luminoracore_sdk-1.0.0-py3-none-any.whl) (~3 MB)
+- [luminoracore-1.1.0-py3-none-any.whl](releases/luminoracore-1.1.0-py3-none-any.whl) (~2 MB)
+- [luminoracore_cli-1.1.0-py3-none-any.whl](releases/luminoracore_cli-1.1.0-py3-none-any.whl) (~500 KB)
+- [luminoracore_sdk-1.1.0-py3-none-any.whl](releases/luminoracore_sdk-1.1.0-py3-none-any.whl) (~3 MB)
 
 **Install:**
 ```bash
-pip install luminoracore-1.0.0-py3-none-any.whl
-pip install luminoracore_cli-1.0.0-py3-none-any.whl
-pip install luminoracore_sdk-1.0.0-py3-none-any.whl
+pip install luminoracore-1.1.0-py3-none-any.whl
+pip install luminoracore_cli-1.1.0-py3-none-any.whl
+pip install luminoracore_sdk-1.1.0-py3-none-any.whl
 ```
 
 **Advantages:**
@@ -105,15 +107,15 @@ pip install git+https://github.com/rulyaltamira/luminoracore.git#subdirectory=lu
 
 ```bash
 # Pull image
-docker pull ereace/luminoracore:v1.0.0
+docker pull ereace/luminoracore:v1.1.0
 
 # Run
-docker run -it ereace/luminoracore:v1.0.0 luminoracore --version
+docker run -it ereace/luminoracore:v1.1.0 luminoracore --version
 
 # Use in docker-compose
 services:
   luminoracore:
-    image: ereace/luminoracore:v1.0.0
+    image: ereace/luminoracore:v1.1.0
 ```
 
 **Advantages:**
@@ -186,6 +188,7 @@ Installed components:
 - Validation engine
 - Compilation for 7 LLM providers
 - PersonaBlend™ technology
+- **NEW v1.1:** Memory system, affinity tracking
 
 ### CLI Tool (luminoracore-cli)
 - `luminoracore validate` - Validate personalities
@@ -194,6 +197,7 @@ Installed components:
 - `luminoracore test` - Test with real APIs
 - `luminoracore blend` - Blend personalities
 - `luminoracore serve` - Development server
+- **NEW v1.1:** `migrate`, `memory`, `snapshot` commands
 
 ### SDK (luminoracore-sdk)
 - Session management
@@ -201,6 +205,7 @@ Installed components:
 - 7 LLM providers
 - 6 storage backends
 - Async/await API
+- **NEW v1.1:** Memory, affinity, episodic memory, feature flags
 
 ---
 
@@ -220,12 +225,16 @@ Installed components:
 
 ## 📊 Version History
 
-### v1.0.0 (Current - Production Ready)
-- First stable release
-- 7 LLM providers
-- 6 storage backends
-- 179/179 tests passing (v1.1)
+### v1.1.0 (Current - Production Ready)
+- Memory system with affinity tracking
+- Fact extraction and episodic memory
+- Hierarchical personalities (relationship levels)
+- Feature flags for safe rollout
+- Database migrations system
+- Docker production deployment
+- 179/179 tests passing
 - Complete documentation
+- 100% backward compatible with v1.0
 
 ---
 

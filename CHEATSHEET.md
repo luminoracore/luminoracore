@@ -24,15 +24,20 @@ cd luminoracore-sdk-python && pip install -e ".[openai]" && cd ..
 ## ✅ Verification
 
 ```bash
-python ejemplo_quick_start_core.py
-python ejemplo_quick_start_cli.py
-python ejemplo_quick_start_sdk.py
+# Complete verification (v1.0 + v1.1)
+python verify_installation.py
+
+# Quick examples
+python quick_start_core.py
+python quick_start_cli.py
+python quick_start_sdk.py
 ```
 
 ---
 
 ## 🧠 Base Engine (Python)
 
+### v1.0 Basic Usage
 ```python
 # Basic imports
 from luminoracore import (
@@ -59,6 +64,22 @@ print(compiled.prompt)
 # Blend
 blender = PersonalityBlender()
 blended = blender.blend([p1, p2], [0.6, 0.4])
+```
+
+### v1.1 Memory & Relationships
+```python
+# Memory system
+from luminoracore.core.relationship.affinity import AffinityManager
+from luminoracore.core.memory.fact_extractor import FactExtractor
+
+# Affinity tracking
+affinity = AffinityManager()
+state = affinity.create_state("user_123", "dr_luna")
+state = affinity.update_affinity_state(state, points_delta=5)
+
+# Fact extraction
+facts = FactExtractor()
+learned = facts.extract_sync("user_123", "I love playing guitar!")
 ```
 
 ---
@@ -172,10 +193,11 @@ export COHERE_API_KEY="..."
 |----------|---------------|------------------|
 | OpenAI | gpt-3.5-turbo, gpt-4 | `pip install -e ".[openai]"` |
 | Anthropic | claude-3-sonnet | `pip install -e ".[anthropic]"` |
+| DeepSeek | deepseek-chat | Included |
 | Cohere | command | `pip install -e ".[cohere]"` |
 | Google | gemini-pro | `pip install -e ".[google]"` |
 | Mistral | mistral-large | Included |
-| Llama | llama-2 | Included |
+| Llama | llama-2, llama-3 | Included |
 
 ---
 
@@ -188,6 +210,7 @@ export COHERE_API_KEY="..."
 | Blend personalities | **Core** or **CLI** |
 | Compile prompts in Python | **Core** |
 | Chatbot with real API | **SDK** |
+| Memory & relationships (v1.1) | **SDK** |
 | Web interface for testing | **CLI** `serve` |
 | Production app | **SDK** |
 
@@ -263,10 +286,11 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 ## 🔗 Quick Links
 
-- **Start:** [QUICK_START.md](QUICK_START.md)
+- **Why LuminoraCore:** [WHY_LUMINORACORE.md](WHY_LUMINORACORE.md) 🌟
+- **5-Minute Start:** [5_MINUTE_QUICK_START.md](5_MINUTE_QUICK_START.md) ⚡
 - **Complete Guide:** [INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md)
-- **Reference:** [CREATING_PERSONALITIES.md](CREATING_PERSONALITIES.md)
-- **Index:** [DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)
+- **Create Personalities:** [CREATING_PERSONALITIES.md](CREATING_PERSONALITIES.md)
+- **Documentation Index:** [DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)
 
 ---
 
@@ -279,7 +303,7 @@ luminoracore validate my_file.json
 
 ### Create chatbot
 ```python
-# See ejemplo_quick_start_sdk.py
+# See quick_start_sdk.py or examples/v1_1_complete_workflow.py
 ```
 
 ### Web server

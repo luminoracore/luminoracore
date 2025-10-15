@@ -1,73 +1,74 @@
 # Next Steps: Distribution & Publishing
 
-**Guía rápida de lo que falta hacer para distribución.**
+**Quick guide for v1.1 distribution and publishing.**
 
 ---
 
-## 📋 Estado Actual
+## 📋 Current Status
 
-✅ **Código listo para producción**
-- 90/91 tests pasando (100% ejecutables)
-- Documentación completa en inglés
-- 3 componentes funcionando correctamente
+✅ **Code ready for production**
+- 179/179 tests passing (100% executable)
+- Complete documentation in English
+- 3 components working correctly
+- All version numbers updated to 1.1.0
 
-✅ **Scripts de compilación creados**
-- `build_all_packages.ps1` / `.sh` - Compila paquetes
-- `install_from_local.ps1` - Prueba local
-- `publish_to_pypi.ps1` / `.sh` - Publica en PyPI
+✅ **Build scripts created**
+- `build_all_packages.ps1` / `.sh` - Build packages
+- `install_from_local.ps1` - Local testing
+- `publish_to_pypi.ps1` / `.sh` - Publish to PyPI
 
-✅ **Documentación de distribución creada**
-- `DOWNLOAD.md` - Opciones de descarga
-- `PUBLISHING_GUIDE.md` - Guía completa
-- `QUICK_REFERENCE_DISTRIBUTION.md` - Referencia rápida
+✅ **Distribution documentation created**
+- `DOWNLOAD.md` - Download options
+- `PUBLISHING_GUIDE.md` - Complete guide
+- `QUICK_REFERENCE_DISTRIBUTION.md` - Quick reference
 
 ---
 
-## 🎯 Cuando Vuelvas: 3 Opciones
+## 🎯 When You Return: 3 Options
 
-### OPCIÓN A: Usar en otro proyecto LOCAL (5 minutos)
+### OPTION A: Use in another LOCAL project (5 minutes)
 
 ```bash
-# 1. Compilar paquetes (solo una vez)
+# 1. Build packages (only once)
 .\build_all_packages.ps1
 
-# 2. En tu OTRO proyecto:
-pip install D:/Proyectos Ereace/LuminoraCoreBase/releases/luminoracore-1.0.0-py3-none-any.whl
-pip install D:/Proyectos Ereace/LuminoraCoreBase/releases/luminoracore_cli-1.0.0-py3-none-any.whl
-pip install D:/Proyectos Ereace/LuminoraCoreBase/releases/luminoracore_sdk-1.0.0-py3-none-any.whl
+# 2. In your OTHER project:
+pip install D:/Proyectos Ereace/LuminoraCoreBase/releases/luminoracore-1.1.0-py3-none-any.whl
+pip install D:/Proyectos Ereace/LuminoraCoreBase/releases/luminoracore_cli-1.1.0-py3-none-any.whl
+pip install D:/Proyectos Ereace/LuminoraCoreBase/releases/luminoracore_sdk-1.1.0-py3-none-any.whl
 
-# 3. Verificar
+# 3. Verify
 python -c "from luminoracore import Personality; print('✅ OK')"
 ```
 
-**✅ Listo para usar en tu proyecto!**
+**✅ Ready to use in your project!**
 
 ---
 
-### OPCIÓN B: Publicar en PyPI (15 minutos, una sola vez)
+### OPTION B: Publish to PyPI (15 minutes, once)
 
 ```bash
-# 1. Crear cuenta en PyPI (si no tienes)
+# 1. Create PyPI account (if you don't have one)
 # https://pypi.org/account/register/
 
-# 2. Crear API token
+# 2. Create API token
 # https://pypi.org/manage/account/token/
-# Guardar el token (empieza con pypi-)
+# Save the token (starts with pypi-)
 
-# 3. Compilar paquetes
+# 3. Build packages
 .\build_all_packages.ps1
 
-# 4. Probar localmente (opcional pero recomendado)
+# 4. Test locally (optional but recommended)
 .\install_from_local.ps1
 python verify_installation.py
 
-# 5. Publicar en PyPI
+# 5. Publish to PyPI
 .\publish_to_pypi.ps1
-# Usuario: __token__
-# Password: pypi-TU-TOKEN-AQUI
+# Username: __token__
+# Password: pypi-YOUR-TOKEN-HERE
 ```
 
-**Después de esto, CUALQUIER persona puede hacer:**
+**After this, ANYONE can do:**
 ```bash
 pip install luminoracore
 pip install luminoracore-cli
@@ -76,107 +77,150 @@ pip install luminoracore-sdk
 
 ---
 
-### OPCIÓN C: Instalar directo desde código (ya funciona ahora)
+### OPTION C: Install directly from source (already works now)
 
 ```bash
-# En tu OTRO proyecto:
-pip install D:/Proyectos Ereace/LuminoraCoreBase/luminoracore
-pip install D:/Proyectos Ereace/LuminoraCoreBase/luminoracore-cli
-pip install D:/Proyectos Ereace/LuminoraCoreBase/luminoracore-sdk-python
+# In your OTHER project:
+pip install -e D:/Proyectos Ereace/LuminoraCoreBase/luminoracore
+pip install -e D:/Proyectos Ereace/LuminoraCoreBase/luminoracore-cli
+pip install -e D:/Proyectos Ereace/LuminoraCoreBase/luminoracore-sdk-python
 ```
 
-**⚠️ Requiere tener el código fuente disponible**
+**⚠️ Requires source code to be available**
 
 ---
 
-## 🚀 Checklist para Publicación en PyPI
+## 🚀 Checklist for PyPI Publication
 
-Antes de ejecutar `.\publish_to_pypi.ps1`:
+Before running `.\publish_to_pypi.ps1`:
 
-- [ ] Todos los tests pasan: `pytest tests/ -v`
-- [ ] `verify_installation.py` muestra: `🎉 INSTALLATION COMPLETE AND CORRECT`
-- [ ] README.md actualizado
-- [ ] Versiones correctas en `setup.py` (1.0.0)
-- [ ] Sin API keys ni datos sensibles en código
-- [ ] `.gitignore` correcto (no sube `releases/`)
-- [ ] Cuenta PyPI creada
-- [ ] API token PyPI guardado
+- [ ] All tests pass: `pytest tests/ -v`
+- [ ] `verify_installation.py` shows: `🎉 INSTALLATION COMPLETE AND CORRECT`
+- [ ] README.md updated to v1.1
+- [ ] Correct versions in `pyproject.toml` (1.1.0)
+- [ ] No API keys or sensitive data in code
+- [ ] `.gitignore` correct (doesn't upload `releases/`)
+- [ ] PyPI account created
+- [ ] PyPI API token saved
+- [ ] All documentation in English
+- [ ] Docker support tested
 
-**Una vez publicado en PyPI, NO puedes sobrescribir la versión.**
-
----
-
-## 📊 Archivos de Distribución
-
-| Archivo | Descripción |
-|---------|-------------|
-| `build_all_packages.ps1` | Compila todo y crea .whl en `releases/` |
-| `build_all_packages.sh` | Versión Linux/Mac |
-| `install_from_local.ps1` | Prueba instalación desde wheels locales |
-| `publish_to_pypi.ps1` | Publica en PyPI (distribución mundial) |
-| `publish_to_pypi.sh` | Versión Linux/Mac |
-| `DOWNLOAD.md` | Página de descargas para usuarios |
-| `PUBLISHING_GUIDE.md` | Guía completa de publicación |
-| `QUICK_REFERENCE_DISTRIBUTION.md` | Referencia rápida |
+**Once published to PyPI, you CANNOT overwrite the version.**
 
 ---
 
-## 💡 Recomendación
+## 📊 Distribution Files
 
-### Para tu próximo proyecto que use LuminoraCore:
+| File | Description |
+|------|-------------|
+| `build_all_packages.ps1` | Builds everything and creates .whl in `releases/` |
+| `build_all_packages.sh` | Linux/Mac version |
+| `install_from_local.ps1` | Tests installation from local wheels |
+| `publish_to_pypi.ps1` | Publishes to PyPI (worldwide distribution) |
+| `publish_to_pypi.sh` | Linux/Mac version |
+| `DOWNLOAD.md` | Download page for users |
+| `PUBLISHING_GUIDE.md` | Complete publishing guide |
+| `QUICK_REFERENCE_DISTRIBUTION.md` | Quick reference |
 
-**AHORA (mientras desarrollas):**
+### New v1.1 Documentation:
+| File | Description |
+|------|-------------|
+| `5_MINUTE_QUICK_START.md` | Ultra-fast developer start |
+| `WHY_LUMINORACORE.md` | Business case with visual diagrams |
+| `luminoracore-sdk-python/DOCKER.md` | Complete Docker guide |
+| `luminoracore-sdk-python/ENV_VARIABLES.md` | All variables documented |
+
+---
+
+## 💡 Recommendation
+
+### For your next project using LuminoraCore:
+
+**NOW (while developing):**
 ```bash
-# Compilar una vez
+# Build once
 .\build_all_packages.ps1
 
-# Usar wheels en tu proyecto
+# Use wheels in your project
 pip install releases/luminoracore-*.whl
 pip install releases/luminoracore_cli-*.whl
 pip install releases/luminoracore_sdk-*.whl
 ```
 
-**DESPUÉS (cuando LuminoraCore esté maduro):**
+**LATER (when LuminoraCore is mature):**
 ```bash
-# Publicar en PyPI
+# Publish to PyPI
 .\publish_to_pypi.ps1
 
-# Usar en cualquier proyecto
+# Use in any project
 pip install luminoracore
+pip install luminoracore-cli
+pip install luminoracore-sdk
 ```
 
 ---
 
-## 📚 Documentación Relacionada
+## 📚 Related Documentation
 
-- [README.md](README.md) - Documentación principal
-- [DOWNLOAD.md](DOWNLOAD.md) - Opciones de instalación
-- [PUBLISHING_GUIDE.md](PUBLISHING_GUIDE.md) - Guía de publicación completa
-- [INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md) - Instalación detallada
+- [README.md](README.md) - Main documentation
+- [5_MINUTE_QUICK_START.md](5_MINUTE_QUICK_START.md) - Ultra-fast developer start
+- [WHY_LUMINORACORE.md](WHY_LUMINORACORE.md) - Business case and ROI
+- [DOWNLOAD.md](DOWNLOAD.md) - Installation options
+- [PUBLISHING_GUIDE.md](PUBLISHING_GUIDE.md) - Complete publishing guide
+- [INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md) - Detailed installation
 
 ---
 
-## 🎯 Comando para tu próximo proyecto
+## 🎯 Command for your next project
 
 ```bash
-# Si ya compilaste los paquetes:
-pip install D:/Proyectos Ereace/LuminoraCoreBase/releases/luminoracore-1.0.0-py3-none-any.whl
-pip install D:/Proyectos Ereace/LuminoraCoreBase/releases/luminoracore_cli-1.0.0-py3-none-any.whl
-pip install D:/Proyectos Ereace/LuminoraCoreBase/releases/luminoracore_sdk-1.0.0-py3-none-any.whl
+# If you already built the packages:
+pip install D:/Proyectos Ereace/LuminoraCoreBase/releases/luminoracore-1.1.0-py3-none-any.whl
+pip install D:/Proyectos Ereace/LuminoraCoreBase/releases/luminoracore_cli-1.1.0-py3-none-any.whl
+pip install D:/Proyectos Ereace/LuminoraCoreBase/releases/luminoracore_sdk-1.1.0-py3-none-any.whl
 
-# Si no los has compilado todavía:
+# If you haven't built them yet:
 cd D:/Proyectos Ereace/LuminoraCoreBase
 .\build_all_packages.ps1
-# (Luego usa el comando de arriba)
+# (Then use the command above)
 ```
 
 ---
 
 <div align="center">
 
-**Made with ❤️ by Ereace - Ruly Altamirano**
+**Made with ❤️ by LuminoraCore Team**
 
-**✅ Todo documentado y listo para cuando vuelvas**
+**✅ Everything documented and ready for v1.1**
 
 </div>
+
+---
+
+## 🆕 v1.1 New Features
+
+### What's New in v1.1:
+- ✅ **Memory System** - AI remembers conversations
+- ✅ **Affinity Tracking** - Relationship levels (stranger → soulmate)
+- ✅ **Fact Extraction** - Learns about users automatically
+- ✅ **Episodic Memory** - Stores memorable moments
+- ✅ **Feature Flags** - Turn features on/off safely
+- ✅ **Database Migrations** - Schema management
+- ✅ **Docker Support** - Production deployment
+- ✅ **Dynamic Personalities** - Adapts based on relationship
+
+### Quick Start:
+```bash
+# Read the new docs first
+cat 5_MINUTE_QUICK_START.md    # 5-minute developer start
+cat WHY_LUMINORACORE.md        # Business case and ROI
+
+# Then build and use
+.\build_all_packages.ps1
+pip install releases/luminoracore-1.1.0-py3-none-any.whl
+```
+
+**Version:** 1.1.0  
+**Status:** Production Ready  
+**Tests:** 179/179 passing
 
