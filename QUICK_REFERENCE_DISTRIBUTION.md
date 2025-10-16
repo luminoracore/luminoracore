@@ -1,142 +1,138 @@
 # Quick Reference: Distribution & Publishing
 
-## 🎯 Para usar LuminoraCore en otro proyecto LOCAL
+## 🎯 To use LuminoraCore in another LOCAL project
 
-### Opción 1: Desde wheels locales (SIN publicar en PyPI)
+### Option 1: From local wheels (WITHOUT publishing to PyPI)
 
 ```bash
-# 1. Compilar paquetes (solo una vez)
+# 1. Build packages (once only)
 .\build_all_packages.ps1
 
-# 2. En tu OTRO proyecto:
-pip install D:/Proyectos Ereace/LuminoraCoreBase/releases/luminoracore-1.0.0-py3-none-any.whl
-pip install D:/Proyectos Ereace/LuminoraCoreBase/releases/luminoracore_cli-1.0.0-py3-none-any.whl
-pip install D:/Proyectos Ereace/LuminoraCoreBase/releases/luminoracore_sdk-1.0.0-py3-none-any.whl
+# 2. Install from local wheels
+.\install_from_local.ps1
+
+# 3. Verify installation
+python verify_installation.py
 ```
 
-### Opción 2: Desde directorio local
+### Option 2: From source (development mode)
 
 ```bash
-# En tu OTRO proyecto:
-pip install D:/Proyectos Ereace/LuminoraCoreBase/luminoracore
-pip install D:/Proyectos Ereace/LuminoraCoreBase/luminoracore-cli
-pip install D:/Proyectos Ereace/LuminoraCoreBase/luminoracore-sdk-python
+# 1. Clone the repository
+git clone https://github.com/your-user/luminoracore.git
+cd luminoracore
+
+# 2. Install in development mode
+pip install -e luminoracore/
+pip install -e luminoracore-cli/
+pip install -e luminoracore-sdk-python/
+
+# 3. Verify installation
+python verify_installation.py
 ```
 
 ---
 
-## 🌐 Para publicar en PyPI (distribución mundial)
+## 🚀 To publish to PyPI (public distribution)
 
-### Paso 1: Crear cuenta en PyPI
-1. Ir a: https://pypi.org/account/register/
-2. Verificar email
-3. Crear API token: https://pypi.org/manage/account/token/
-4. Guardar token (empieza con `pypi-`)
-
-### Paso 2: Compilar y publicar
+### Step 1: Prepare for publishing
 
 ```bash
-# 1. Compilar paquetes
+# 1. Update version numbers (if needed)
+# Check: luminoracore/__init__.py, luminoracore-cli/__version__.py, etc.
+
+# 2. Build packages
 .\build_all_packages.ps1
 
-# 2. Probar localmente (opcional)
+# 3. Test locally
 .\install_from_local.ps1
 python verify_installation.py
-
-# 3. Publicar en PyPI
-.\publish_to_pypi.ps1
-# Usuario: __token__
-# Password: pypi-TU-TOKEN-AQUI
 ```
 
-### Paso 3: Listo
+### Step 2: Publish to PyPI
 
-Desde ese momento, CUALQUIER persona puede instalar:
 ```bash
+# 1. Publish all packages
+.\publish_to_pypi.ps1
+
+# 2. Verify on PyPI
+# Check: https://pypi.org/project/luminoracore/
+# Check: https://pypi.org/project/luminoracore-cli/
+# Check: https://pypi.org/project/luminoracore-sdk/
+```
+
+### Step 3: Test public installation
+
+```bash
+# 1. Create new virtual environment
+python -m venv test_public
+.\test_public\Scripts\activate
+
+# 2. Install from PyPI
 pip install luminoracore
 pip install luminoracore-cli
 pip install luminoracore-sdk
+
+# 3. Verify installation
+python verify_installation.py
 ```
 
 ---
 
-## 📁 Archivos y scripts disponibles
+## 📋 Distribution Checklist
 
-| Script | Propósito |
-|--------|-----------|
-| `build_all_packages.ps1` | Compila los 3 paquetes → crea .whl en `releases/` |
-| `install_from_local.ps1` | Instala desde wheels locales (para probar) |
-| `publish_to_pypi.ps1` | Publica en PyPI (distribución mundial) |
-| `install_all.ps1` | Instala desde código fuente (desarrollo) |
-| `verify_installation.py` | Verifica que todo esté instalado correctamente |
+### ✅ Before Publishing
+
+- [ ] All tests passing (179/179)
+- [ ] Version numbers updated to 1.1.0
+- [ ] Documentation in English
+- [ ] All examples working
+- [ ] Docker configuration updated
+- [ ] Environment variables documented
+
+### ✅ After Publishing
+
+- [ ] Packages available on PyPI
+- [ ] Installation from PyPI works
+- [ ] All components functional
+- [ ] Documentation accessible
+- [ ] Examples executable
 
 ---
 
-## 🔄 Workflow completo
+## 🎯 Quick Commands Summary
 
-```
-┌─────────────────────────────────────────┐
-│ 1. DESARROLLO                           │
-│    - Editar código                      │
-│    - Ejecutar tests: pytest tests/ -v   │
-│    - Verificar: verify_installation.py  │
-└──────────────┬──────────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────────┐
-│ 2. COMPILAR PAQUETES                    │
-│    .\build_all_packages.ps1             │
-│    → Genera .whl en releases/           │
-└──────────────┬──────────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────────┐
-│ 3. PROBAR LOCALMENTE                    │
-│    .\install_from_local.ps1             │
-│    python verify_installation.py        │
-└──────────────┬──────────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────────┐
-│ 4. PUBLICAR EN PyPI (opcional)          │
-│    .\publish_to_pypi.ps1                │
-│    → Disponible para TODO EL MUNDO      │
-└─────────────────────────────────────────┘
+```bash
+# Build everything
+.\build_all_packages.ps1
+
+# Install locally
+.\install_from_local.ps1
+
+# Publish to PyPI
+.\publish_to_pypi.ps1
+
+# Verify installation
+python verify_installation.py
+
+# Run examples
+python examples/basic_example.py
+python examples/advanced_example.py
 ```
 
 ---
 
-## ⚠️ Importante
+## 📞 Support
 
-### Antes de publicar en PyPI:
+If you encounter any issues:
 
-- ✅ Todos los tests pasan (`pytest tests/ -v`)
-- ✅ `verify_installation.py` muestra: `🎉 INSTALLATION COMPLETE AND CORRECT`
-- ✅ Documentación actualizada
-- ✅ README.md correcto
-- ✅ Versiones correctas en `setup.py`
-- ✅ Sin datos sensibles (API keys, passwords)
-
-### Versionado
-
-**No puedes sobrescribir versiones en PyPI.**
-
-Si ya publicaste `1.0.0`, la próxima debe ser `1.0.1`, `1.1.0`, o `2.0.0`.
-
-Actualizar versiones en:
-- `luminoracore/setup.py` → `version="1.0.1"`
-- `luminoracore-cli/luminoracore_cli/__version__.py` → `__version__ = "1.0.1"`
-- `luminoracore-sdk-python/luminoracore_sdk/__version__.py` → `__version__ = "1.0.1"`
+1. **Check documentation**: `DOCUMENTATION_INDEX.md`
+2. **Run verification**: `python verify_installation.py`
+3. **Check examples**: `examples/` directory
+4. **Review logs**: Check console output for errors
 
 ---
 
-## 📖 Guías completas
-
-- **[DOWNLOAD.md](DOWNLOAD.md)** - Opciones de descarga para usuarios
-- **[PUBLISHING_GUIDE.md](PUBLISHING_GUIDE.md)** - Guía completa de publicación
-- **[INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md)** - Instalación detallada
-
----
-
-**Cuando estés listo para publicar, ejecuta: `.\build_all_packages.ps1` y después `.\publish_to_pypi.ps1`**
-
+**Status**: ✅ Ready for distribution  
+**Version**: 1.1.0  
+**Last Updated**: October 2025
