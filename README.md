@@ -48,7 +48,8 @@ python verify_installation.py
 
 | Document | Time | Description |
 |----------|------|-------------|
-| **[WHY_LUMINORACORE.md](WHY_LUMINORACORE.md)** 🌟 NEW! | 10 min | Why use this? Visual explanations, ROI, use cases (for executives & decision-makers) |
+| **[CEO_BUSINESS_CASE.md](CEO_BUSINESS_CASE.md)** 🎯 NEW! | 8 min | Business case for CEOs - ROI, costs, competitive advantage |
+| **[WHY_LUMINORACORE.md](WHY_LUMINORACORE.md)** 🌟 | 10 min | Why use this? Visual explanations, ROI, use cases (for executives & decision-makers) |
 | **[5_MINUTE_QUICK_START.md](5_MINUTE_QUICK_START.md)** ⚡ NEW! | 5 min | Ultra-fast developer start - be running in 5 minutes! |
 | **[QUICK_START.md](QUICK_START.md)** ⭐⭐⭐ | 15 min | Complete quick start with all features |
 | **[INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md)** ⭐⭐⭐ | 30 min | Detailed step-by-step guide with verifications |
@@ -56,6 +57,7 @@ python verify_installation.py
 | **[CHEATSHEET.md](CHEATSHEET.md)** | 2 min | Quick reference cheatsheet |
 
 **🎯 Choose your path:**
+- **CEO/Founder?** → Read [CEO_BUSINESS_CASE.md](CEO_BUSINESS_CASE.md) for business case and ROI
 - **Evaluating?** → Read [WHY_LUMINORACORE.md](WHY_LUMINORACORE.md) to understand the value
 - **Developer?** → Jump to [5_MINUTE_QUICK_START.md](5_MINUTE_QUICK_START.md) to start coding
 - **First time?** → Read [QUICK_START.md](QUICK_START.md) for comprehensive guide
