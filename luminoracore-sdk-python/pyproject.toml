@@ -31,7 +31,7 @@ classifiers = [
     "Framework :: AsyncIO",
     "Typing :: Typed",
 ]
-requires-python = ">=3.8"-ñ
+requires-python = ">=3.8"
 dependencies = [
     # Use local core package during workspace development
     # "luminoracore>=1.0.0,<2.0.0",
