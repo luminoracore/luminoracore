@@ -31,7 +31,15 @@
 - Working code examples
 - Perfect for developers who want to start immediately
 
-### 4. [QUICK_START.md](QUICK_START.md) ⭐
+### 4. [COMPLETE_CLI_AND_CONFIGURATION_GUIDE.md](COMPLETE_CLI_AND_CONFIGURATION_GUIDE.md) 🔧 NEW!
+**Complete CLI commands and configuration guide.**
+- All CLI commands (v1.0 + v1.1 + future)
+- Sentiment analysis configuration
+- Personality enrichment JSON examples
+- Configuration examples
+- Perfect for developers and system administrators
+
+### 5. [QUICK_START.md](QUICK_START.md) ⭐
 **Complete quick start guide.**
 - Express installation in 1 command
 - Quick verification
