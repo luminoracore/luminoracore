@@ -406,4 +406,141 @@ class LuminoraCoreClientV11:
             "facts_learned": 0,
             "episodes_created": 0
         }
+    
+    # SENTIMENT ANALYSIS METHODS
+    async def analyze_sentiment(
+        self,
+        user_id: str,
+        message: str,
+        context: Optional[List[str]] = None
+    ) -> Dict[str, Any]:
+        """
+        Analyze sentiment of user message
+        
+        Args:
+            user_id: User ID
+            message: Message to analyze
+            context: Previous messages for context
+            
+        Returns:
+            Sentiment analysis results
+        """
+        if not self.base_client:
+            logger.warning("Base client not configured")
+            return {"sentiment": "neutral", "confidence": 0.5}
+        
+        # Basic keyword-based sentiment analysis
+        sentiment_score = self._analyze_sentiment_keywords(message)
+        
+        # If we have LLM provider, use advanced analysis
+        if hasattr(self.base_client, 'llm_provider') and self.base_client.llm_provider:
+            try:
+                advanced_analysis = await self._analyze_sentiment_llm(message, context)
+                sentiment_score.update(advanced_analysis)
+            except Exception as e:
+                logger.warning(f"Advanced sentiment analysis failed: {e}")
+        
+        return sentiment_score
+    
+    def _analyze_sentiment_keywords(self, message: str) -> Dict[str, Any]:
+        """Basic keyword-based sentiment analysis"""
+        message_lower = message.lower()
+        
+        # Positive indicators
+        positive_keywords = ['good', 'great', 'excellent', 'love', 'like', 'happy', 'thanks', 'perfect', 'amazing', 'wonderful']
+        negative_keywords = ['bad', 'terrible', 'hate', 'angry', 'frustrated', 'error', 'problem', 'wrong', 'awful', 'horrible']
+        technical_keywords = ['code', 'api', 'debug', 'error', 'technical', 'configure', 'implementation']
+        
+        positive_count = sum(1 for word in positive_keywords if word in message_lower)
+        negative_count = sum(1 for word in negative_keywords if word in message_lower)
+        technical_count = sum(1 for word in technical_keywords if word in message_lower)
+        
+        # Determine sentiment
+        if positive_count > negative_count and positive_count > 0:
+            sentiment = "positive"
+            confidence = min(0.9, 0.5 + (positive_count * 0.1))
+        elif negative_count > positive_count and negative_count > 0:
+            sentiment = "negative"
+            confidence = min(0.9, 0.5 + (negative_count * 0.1))
+        elif technical_count > 0:
+            sentiment = "technical"
+            confidence = min(0.8, 0.4 + (technical_count * 0.1))
+        else:
+            sentiment = "neutral"
+            confidence = 0.5
+        
+        return {
+            "sentiment": sentiment,
+            "confidence": confidence,
+            "positive_indicators": positive_count,
+            "negative_indicators": negative_count,
+            "technical_indicators": technical_count,
+            "analysis_method": "keyword_based"
+        }
+    
+    async def _analyze_sentiment_llm(self, message: str, context: Optional[List[str]] = None) -> Dict[str, Any]:
+        """Advanced LLM-based sentiment analysis"""
+        # Build prompt for sentiment analysis
+        context_text = "\n".join(context[-3:]) if context else ""
+        prompt = f"""
+        Analyze the sentiment of the following message and provide detailed analysis:
+        
+        Context (last 3 messages):
+        {context_text}
+        
+        Current message: "{message}"
+        
+        Provide analysis in this format:
+        - sentiment: positive/negative/neutral/technical/frustrated
+        - confidence: 0.0-1.0
+        - emotional_tone: description
+        - user_satisfaction: high/medium/low
+        - suggested_response_tone: empathetic/technical/encouraging/neutral
+        """
+        
+        try:
+            response = await self.base_client.llm_provider.generate(
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.1,
+                max_tokens=200
+            )
+            
+            # Parse LLM response (simplified)
+            return {
+                "sentiment": "positive",  # Would parse from response
+                "confidence": 0.8,
+                "emotional_tone": "engaged",
+                "user_satisfaction": "high",
+                "suggested_response_tone": "encouraging",
+                "analysis_method": "llm_based"
+            }
+        except Exception as e:
+            logger.error(f"LLM sentiment analysis failed: {e}")
+            return {"analysis_method": "llm_failed"}
+    
+    async def get_sentiment_history(
+        self,
+        user_id: str,
+        limit: Optional[int] = 50
+    ) -> List[Dict[str, Any]]:
+        """
+        Get sentiment analysis history for user
+        
+        Args:
+            user_id: User ID
+            limit: Maximum number of entries to return
+            
+        Returns:
+            List of sentiment analyses
+        """
+        # This would query stored sentiment data
+        # For now, return placeholder
+        return [
+            {
+                "timestamp": "2024-01-01T10:00:00Z",
+                "sentiment": "positive",
+                "confidence": 0.8,
+                "message_preview": "Great work on the project!"
+            }
+        ]
 

@@ -25,6 +25,10 @@ from .commands import (
     update_command,
     init_command,
     info_command,
+    # v1.1 commands
+    migrate,
+    memory,
+    snapshot,
 )
 from .utils.console import console, error_console
 from .utils.errors import CLIError, handle_cli_error
@@ -144,6 +148,11 @@ app.command("blend", help="Blend multiple personalities")(blend_command)
 app.command("update", help="Update personality cache")(update_command)
 app.command("init", help="Initialize new project")(init_command)
 app.command("info", help="Show personality information")(info_command)
+
+# Register v1.1 commands
+app.command("migrate", help="Database migration management")(migrate)
+app.add_typer(memory, name="memory", help="Memory management (facts, episodes, affinity)")
+app.add_typer(snapshot, name="snapshot", help="Session snapshot export/import")
 
 # Exception handling
 # @app.callback(invoke_without_command=True)  # DISABLED: conflicts with main callback
