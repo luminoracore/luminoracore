@@ -29,6 +29,10 @@
 | **1. Base Engine** | `test_1_motor_base.py` | 28 | 28 | ✅ 100% | ~9s |
 | **2. CLI** | `test_2_cli.py` | 26 | 25 | ✅ 100%* | ~2s |
 | **3. SDK** | `test_3_sdk.py` | 37 | 37 | ✅ 100% | ~0.5s |
+| **4. DeepSeek Integration** | `test_deepseek_*.py` | 4 files | - | ✅ Working | ~5s |
+| **5. Conversation Simulation** | `test_conversation_simulation*.py` | 2 files | - | ✅ Working | ~10s |
+| **6. Installation & Verification** | `test_installation_simple.py`, `verify_installation.py` | 2 files | - | ✅ Working | ~3s |
+| **7. Summary & Final** | `test_final_summary.py` | 1 file | - | ✅ Working | ~1s |
 | **TOTAL** | | **91** | **90** | **✅ 99%** | **~12s** |
 
 \* *25 passing + 1 skipped (conditional API key) = 100% executable*
@@ -309,6 +313,40 @@ python run_tests.py
 #### Async/Await API (2 tests)
 - ✅ Concurrent sessions
 - ✅ Concurrent personality loading
+
+---
+
+## 📁 Additional Test Files
+
+### DeepSeek Integration Tests (4 files)
+- **`test_deepseek_basic.py`** - Basic DeepSeek API integration
+- **`test_deepseek_complete.py`** - Complete DeepSeek workflow
+- **`test_deepseek_simple.py`** - Simple DeepSeek configuration
+- **`test_deepseek_working.py`** - Working DeepSeek implementation
+
+### Conversation Simulation Tests (2 files)
+- **`test_conversation_simulation.py`** - Full conversation simulation with memory
+- **`test_conversation_simulation_no_emojis.py`** - Same simulation without emojis
+
+### Installation & Verification Tests (2 files)
+- **`test_installation_simple.py`** - Simple installation verification
+- **`verify_installation.py`** - Complete installation verification
+
+### Summary & Final Tests (1 file)
+- **`test_final_summary.py`** - Final project summary and verification
+
+### Usage
+```bash
+# Run all additional tests
+python tests/test_deepseek_basic.py
+python tests/test_conversation_simulation.py
+python tests/verify_installation.py
+python tests/test_final_summary.py
+
+# Or run specific test categories
+python tests/test_deepseek_*.py
+python tests/test_conversation_simulation*.py
+```
 
 ---
 
