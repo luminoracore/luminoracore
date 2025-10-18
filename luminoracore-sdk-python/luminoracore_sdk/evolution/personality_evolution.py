@@ -162,15 +162,24 @@ class PersonalityEvolutionEngine:
             List of evolution history entries
         """
         try:
-            # Get evolution history from storage
-            evolution_key = f"evolution_history_{user_id}"
-            history_data = await self.storage.get_memory(session_id, evolution_key)
+            # Get evolution history from storage using get_facts
+            evolution_facts = await self.storage.get_facts(user_id, "evolution_history")
             
-            if not history_data:
+            if not evolution_facts:
                 return []
             
-            history = json.loads(history_data) if isinstance(history_data, str) else history_data
-            history = history.get('evolutions', [])
+            # Find the evolution history fact
+            history_fact = None
+            for fact in evolution_facts:
+                if fact.get("key") == f"evolution_history_{user_id}":
+                    history_fact = fact
+                    break
+            
+            if not history_fact:
+                return []
+            
+            history_data = history_fact.get("value", {})
+            history = history_data.get('evolutions', [])
             
             # Limit results
             if limit > 0:
@@ -198,10 +207,18 @@ class PersonalityEvolutionEngine:
             # Get personality from storage or default configuration
             personality_key = f"personality_{user_id}_{personality_name}"
             
-            # Try to get from memory first
-            personality_data = await self.storage.get_memory("global", personality_key)
+            # Try to get from memory first using get_facts
+            personality_facts = await self.storage.get_facts("global", "personality")
             
-            if personality_data:
+            # Find the personality fact
+            personality_fact = None
+            for fact in personality_facts:
+                if fact.get("key") == personality_key:
+                    personality_fact = fact
+                    break
+            
+            if personality_fact:
+                personality_data = personality_fact.get("value")
                 return json.loads(personality_data) if isinstance(personality_data, str) else personality_data
             
             # Return default personality if not found
@@ -447,11 +464,11 @@ class PersonalityEvolutionEngine:
         """Save evolved personality to storage"""
         try:
             personality_key = f"personality_{user_id}_{personality_name}"
-            await self.storage.save_memory(
-                "global",
-                user_id,
-                personality_key,
-                json.dumps(evolved_personality)
+            await self.storage.save_fact(
+                user_id="global",
+                category="personality",
+                key=personality_key,
+                value=evolved_personality
             )
             
             # Save evolution history
@@ -472,11 +489,19 @@ class PersonalityEvolutionEngine:
         try:
             history_key = f"evolution_history_{user_id}"
             
-            # Get existing history
-            existing_history = await self.storage.get_memory("global", history_key)
+            # Get existing history using get_facts
+            evolution_facts = await self.storage.get_facts("global", "evolution_history")
             history = {"evolutions": []}
             
-            if existing_history:
+            # Find existing history fact
+            existing_fact = None
+            for fact in evolution_facts:
+                if fact.get("key") == history_key:
+                    existing_fact = fact
+                    break
+            
+            if existing_fact:
+                existing_history = existing_fact.get("value", {})
                 history = json.loads(existing_history) if isinstance(existing_history, str) else existing_history
             
             # Add new evolution entry
@@ -500,12 +525,12 @@ class PersonalityEvolutionEngine:
             if len(history["evolutions"]) > 50:
                 history["evolutions"] = history["evolutions"][:50]
             
-            # Save updated history
-            await self.storage.save_memory(
-                "global",
-                user_id,
-                history_key,
-                json.dumps(history)
+            # Save updated history using save_fact
+            await self.storage.save_fact(
+                user_id="global",
+                category="evolution_history",
+                key=history_key,
+                value=history
             )
             
             return True
