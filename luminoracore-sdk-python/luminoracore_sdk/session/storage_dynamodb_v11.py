@@ -395,6 +395,33 @@ class DynamoDBStorageV11(StorageV11Extension):
             logger.error(f"Failed to get mood history: {e}")
             return []
     
+    async def get_mood(
+        self,
+        session_id: str
+    ) -> Optional[Dict[str, Any]]:
+        """Get current mood state"""
+        try:
+            response = self.table.query(
+                IndexName='SessionIndex',
+                KeyConditionExpression=Key('session_id').eq(session_id),
+                ScanIndexForward=False,
+                Limit=1
+            )
+            
+            items = response.get('Items', [])
+            if items:
+                item = items[0]
+                return {
+                    "current_mood": item.get('current_mood'),
+                    "mood_intensity": item.get('mood_intensity', 1.0),
+                    "created_at": item.get('created_at')
+                }
+            return None
+            
+        except Exception as e:
+            logger.error(f"Failed to get mood: {e}")
+            return None
+    
     # MEMORY METHODS
     async def save_memory(
         self,

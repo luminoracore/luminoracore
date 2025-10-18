@@ -6,7 +6,6 @@ Demonstrates relationship progression and level changes.
 
 import asyncio
 from luminoracore.core.relationship.affinity import AffinityManager, AffinityState
-from luminoracore.core.personality_v1_1 import PersonalityV11Extensions
 
 
 async def main():

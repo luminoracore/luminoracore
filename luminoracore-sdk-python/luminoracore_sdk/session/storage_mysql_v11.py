@@ -445,6 +445,40 @@ class MySQLStorageV11(StorageV11Extension):
             logger.error(f"Failed to get mood history: {e}")
             return []
     
+    async def get_mood(
+        self,
+        session_id: str
+    ) -> Optional[Dict[str, Any]]:
+        """Get current mood state"""
+        try:
+            conn = await self._get_connection()
+            try:
+                async with conn.cursor(aiomysql.DictCursor) as cursor:
+                    await cursor.execute("""
+                        SELECT current_mood, mood_intensity, created_at
+                        FROM user_mood 
+                        WHERE session_id = %s
+                        ORDER BY created_at DESC
+                        LIMIT 1
+                    """, (session_id,))
+                    
+                    row = await cursor.fetchone()
+                    if row:
+                        # Convert datetime objects to ISO format strings
+                        if row.get('created_at'):
+                            row['created_at'] = row['created_at'].isoformat()
+                        return {
+                            "current_mood": row["current_mood"],
+                            "mood_intensity": row["mood_intensity"],
+                            "created_at": row["created_at"]
+                        }
+                    return None
+            finally:
+                await self.pool.release(conn)
+        except Exception as e:
+            logger.error(f"Failed to get mood: {e}")
+            return None
+    
     # MEMORY METHODS
     async def save_memory(
         self,

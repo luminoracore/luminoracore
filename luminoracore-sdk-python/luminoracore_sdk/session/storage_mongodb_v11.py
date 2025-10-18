@@ -372,6 +372,37 @@ class MongoDBStorageV11(StorageV11Extension):
             logger.error(f"Failed to get mood history: {e}")
             return []
     
+    async def get_mood(
+        self,
+        session_id: str
+    ) -> Optional[Dict[str, Any]]:
+        """Get current mood state"""
+        try:
+            await self._ensure_initialized()
+            
+            mood_collection = self.database[self.MOOD_COLLECTION]
+            
+            result = await mood_collection.find_one(
+                {"session_id": session_id},
+                sort=[("created_at", -1)]
+            )
+            
+            if result:
+                # Convert ObjectId and datetime to serializable formats
+                result.pop('_id', None)
+                if result.get('created_at'):
+                    result['created_at'] = result['created_at'].isoformat()
+                return {
+                    "current_mood": result["current_mood"],
+                    "mood_intensity": result["mood_intensity"],
+                    "created_at": result["created_at"]
+                }
+            return None
+            
+        except Exception as e:
+            logger.error(f"Failed to get mood: {e}")
+            return None
+    
     # MEMORY METHODS
     async def save_memory(
         self,

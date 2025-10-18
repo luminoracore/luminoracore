@@ -410,6 +410,38 @@ class RedisStorageV11(StorageV11Extension):
             logger.error(f"Failed to get mood history: {e}")
             return []
     
+    async def get_mood(
+        self,
+        session_id: str
+    ) -> Optional[Dict[str, Any]]:
+        """Get current mood state"""
+        try:
+            await self._ensure_initialized()
+            
+            # Get latest mood for session
+            user_mood_key = f"{self.USER_PREFIX}*:moods"
+            mood_keys = await self.redis.keys(user_mood_key)
+            
+            if mood_keys:
+                # Get the most recent mood entry
+                latest_mood_key = await self.redis.zrevrange(mood_keys[0], 0, 0)
+                if latest_mood_key:
+                    data = await self.redis.get(latest_mood_key[0])
+                    if data:
+                        mood_data = self._deserialize_value(data)
+                        # Check if it's for the right session
+                        if session_id in latest_mood_key[0]:
+                            return {
+                                "current_mood": mood_data["current_mood"],
+                                "mood_intensity": mood_data["mood_intensity"],
+                                "created_at": mood_data["created_at"]
+                            }
+            return None
+            
+        except Exception as e:
+            logger.error(f"Failed to get mood: {e}")
+            return None
+    
     # MEMORY METHODS
     async def save_memory(
         self,

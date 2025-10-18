@@ -350,6 +350,33 @@ class SQLiteStorageV11(StorageV11Extension):
             logger.error(f"Failed to get mood history: {e}")
             return []
     
+    async def get_mood(
+        self,
+        session_id: str
+    ) -> Optional[Dict[str, Any]]:
+        """Get current mood state"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.execute("""
+                    SELECT current_mood, mood_intensity, created_at
+                    FROM user_mood 
+                    WHERE session_id = ?
+                    ORDER BY created_at DESC
+                    LIMIT 1
+                """, (session_id,))
+                
+                row = cursor.fetchone()
+                if row:
+                    return {
+                        "current_mood": row[0],
+                        "mood_intensity": row[1],
+                        "created_at": row[2]
+                    }
+                return None
+        except Exception as e:
+            logger.error(f"Failed to get mood: {e}")
+            return None
+    
     # MEMORY METHODS
     async def save_memory(
         self,

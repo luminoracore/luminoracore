@@ -311,6 +311,77 @@ python examples/v1_1_migrations_demo.py
 
 ---
 
+### 9. 🆕 Real Implementations Demo ⭐ (`v1_1_real_implementations_demo_simple.py`)
+
+**Features demonstrated:**
+- 🗄️  SQLite storage with REAL persistence
+- 🧠  Advanced sentiment analysis with LLM integration
+- 🔄  Real personality evolution engine
+- 📦  Complete session export with all data
+- 📊  Memory statistics and analytics
+- ✅  No more mock implementations!
+
+**Run:**
+```bash
+python examples/v1_1_real_implementations_demo_simple.py
+```
+
+**v1.1 Features covered:**
+- ✅ Real SQLite Storage Implementation
+- ✅ Real Sentiment Analysis with LLM
+- ✅ Real Personality Evolution Engine
+- ✅ Complete Session Export
+- ✅ Memory Statistics
+- ✅ Production-Ready Framework
+
+**Time:** ~15 seconds
+
+**💡 Demonstrates 100% complete framework with REAL implementations**
+
+---
+
+### 10. 🆕 Simplified Examples (SDK v1.1) ⭐
+
+#### Affinity Demo (`v1_1_affinity_demo_simple.py`)
+**Features demonstrated:**
+- 💝  Affinity point tracking
+- 📈  Level progression simulation
+- 🔄  Update affinity functionality
+- 📊  Get affinity state
+
+**Run:**
+```bash
+python examples/v1_1_affinity_demo_simple.py
+```
+
+#### Memory Demo (`v1_1_memory_demo_simple.py`)
+**Features demonstrated:**
+- 🧠  Fact management (save/get)
+- 📖  Episode management (save/get)
+- 📊  Memory statistics
+- 🔍  Search functionality
+
+**Run:**
+```bash
+python examples/v1_1_memory_demo_simple.py
+```
+
+#### Dynamic Personality Demo (`v1_1_dynamic_personality_demo_simple.py`)
+**Features demonstrated:**
+- 🎭  Personality evolution simulation
+- 💝  Affinity level progression
+- 🔄  Evolution analysis
+- 📦  Session management
+
+**Run:**
+```bash
+python examples/v1_1_dynamic_personality_demo_simple.py
+```
+
+**💡 All simplified examples work with SDK v1.1 and InMemoryStorageV11**
+
+---
+
 ## 📊 v1.1 Features Coverage
 
 | Feature | Main Example | Additional Examples |
@@ -325,6 +396,9 @@ python examples/v1_1_migrations_demo.py
 | **Database Migrations** | v1_1_migrations_demo.py ⭐ | v1_1_complete_workflow.py |
 | **Snapshot Export/Import** | v1_1_sdk_usage.py | v1_1_complete_workflow.py |
 | **Complete Integration** | v1_1_complete_workflow.py ⭐ | - |
+
+|| **Real Implementations** | v1_1_real_implementations_demo_simple.py ⭐ | - |
+|| **Simplified Examples** | v1_1_affinity_demo_simple.py, v1_1_memory_demo_simple.py, v1_1_dynamic_personality_demo_simple.py ⭐ | - |
 
 **✅ 100% of v1.1 features covered with examples**
 
@@ -360,6 +434,14 @@ python examples/v1_1_migrations_demo.py      # Migrations
 
 # 4. ⭐ Complete workflow (ALL integrated)
 python examples/v1_1_complete_workflow.py
+
+# 5. ⭐ Real implementations (100% functional)
+python examples/v1_1_real_implementations_demo_simple.py
+
+# 6. ⭐ Simplified examples (SDK v1.1)
+python examples/v1_1_affinity_demo_simple.py        # Affinity system
+python examples/v1_1_memory_demo_simple.py          # Memory system
+python examples/v1_1_dynamic_personality_demo_simple.py  # Personality evolution
 ```
 
 ### For SDK developers:
