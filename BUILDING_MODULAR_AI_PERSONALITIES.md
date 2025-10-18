@@ -1,6 +1,6 @@
-# How to Build Modular AI Personalities with LuminoraCore v1.0
+# How to Build Modular AI Personalities with LuminoraCore v1.1
 
-**Create, test, and deploy AI personalities as reusable modules — across chat, voice, and any LLM.**
+**Create, test, and deploy AI personalities as reusable modules — across chat, voice, and any LLM with advanced memory and relationship tracking.**
 
 ---
 
@@ -11,10 +11,11 @@
 3. [Architecture Overview](#3-architecture-overview)
 4. [Key Components & Their Roles](#4-key-components--their-roles)
 5. [Step-by-Step Example: VoIP Chatbot with Dynamic Personality](#5-step-by-step-example-voip-chatbot-with-dynamic-personality)
-6. [Blending & Simulation](#6-blending--simulation)
-7. [Deployment Notes & Best Practices](#7-deployment-notes--best-practices)
-8. [SEO / Performance Considerations](#8-seo--performance-considerations)
-9. [Next Steps & Call to Action](#9-next-steps--call-to-action)
+6. [Advanced v1.1 Features](#6-advanced-v11-features-memory-relationships--evolution)
+7. [Blending & Simulation](#7-blending--simulation)
+8. [Deployment Notes & Best Practices](#8-deployment-notes--best-practices)
+9. [SEO / Performance Considerations](#9-seo--performance-considerations)
+10. [Next Steps & Call to Action](#10-next-steps--call-to-action)
 
 ---
 
@@ -42,9 +43,9 @@ The rise of large language models (LLMs) like GPT, Claude, DeepSeek, and Mistral
 
 ## 2. What is LuminoraCore
 
-**LuminoraCore** is an open-source framework designed to let developers define personality profiles in JSON, compile them into optimized prompts, validate them, blend them, and simulate conversational responses. It supports **7 LLM backends** (DeepSeek, OpenAI, Anthropic, Mistral, Cohere, Google Gemini, Llama) via a unified API.
+**LuminoraCore v1.1** is an open-source framework designed to let developers define personality profiles in JSON, compile them into optimized prompts, validate them, blend them, and simulate conversational responses. It supports **7 LLM backends** (DeepSeek, OpenAI, Anthropic, Mistral, Cohere, Google Gemini, Llama) via a unified API, with **advanced memory systems, relationship tracking, and personality evolution**.
 
-### Core Building Blocks
+### Core Building Blocks (v1.1)
 
 ```
 ┌─────────────────────────────────────────────────┐
@@ -57,14 +58,26 @@ The rise of large language models (LLMs) like GPT, Claude, DeepSeek, and Mistral
 │ 3. Validator                                    │
 │    Ensure personality conforms to schema        │
 ├─────────────────────────────────────────────────┤
-│ 4. Simulator                                    │
+│ 4. Memory System (v1.1)                        │
+│    Store facts, episodes, user relationships    │
+├─────────────────────────────────────────────────┤
+│ 5. Affinity Manager (v1.1)                     │
+│    Track relationship evolution (0-100 points)  │
+├─────────────────────────────────────────────────┤
+│ 6. Feature Flags (v1.1)                        │
+│    Dynamic feature control and configuration    │
+├─────────────────────────────────────────────────┤
+│ 7. Database Migrations (v1.1)                  │
+│    Schema management and version control        │
+├─────────────────────────────────────────────────┤
+│ 8. Simulator                                    │
 │    Test conversation responses                  │
 ├─────────────────────────────────────────────────┤
-│ 5. Blender (PersonaBlend™)                      │
+│ 9. Blender (PersonaBlend™)                      │
 │    Mix multiple personalities dynamically       │
 ├─────────────────────────────────────────────────┤
-│ 6. Listing / Catalog APIs                       │
-│    Manage existing personalities                │
+│ 10. Listing / Catalog APIs                      │
+│     Manage existing personalities               │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -89,13 +102,18 @@ LLM (DeepSeek, OpenAI, Anthropic, etc.)
 Response to User
 ```
 
-### Key Benefits
+### Key Benefits (v1.1)
 
 ✅ **Provider-agnostic**: Switch between OpenAI, DeepSeek, Anthropic without rewriting prompts  
 ✅ **Version-controlled**: Store personality JSONs in Git for full audit trail  
 ✅ **Testable**: Validate and simulate before deployment  
 ✅ **Reusable**: Define once, use across web, mobile, voice, email  
-✅ **Blendable**: Create hybrid personalities on-the-fly
+✅ **Blendable**: Create hybrid personalities on-the-fly  
+✅ **Memory-enabled**: AI remembers users across conversations  
+✅ **Relationship-aware**: Personalities evolve based on user interactions  
+✅ **Feature-flagged**: Dynamic feature control for safe deployments  
+✅ **Migration-ready**: Database schema management with version control  
+✅ **Storage-flexible**: Support for SQLite, DynamoDB, PostgreSQL, MySQL, MongoDB, Redis
 
 ---
 
@@ -109,11 +127,13 @@ Response to User
 | **Validator** | `{ persona_json }` | `{ is_valid, errors[] }` | Ensure personality conforms to schema before use |
 | **Blender** | `{ personas[], weights[] }` | `blended_persona_json` | Create hybrid personalities (e.g., 70% professional + 30% friendly) |
 
-### SDK Methods (Python)
+### SDK Methods (Python v1.1)
 
 ```python
 from luminoracore import Personality, PersonalityCompiler, LLMProvider
-from luminoracore_sdk import LuminoraCoreClient
+from luminoracore_sdk import LuminoraCoreClientV11
+from luminoracore_sdk.types.provider import ProviderConfig
+from luminoracore_sdk.types.session import StorageConfig
 
 # Load and validate
 personality = Personality("customer_support.json")
@@ -123,22 +143,37 @@ compiler = PersonalityCompiler()
 result = compiler.compile(personality, LLMProvider.DEEPSEEK)
 # → Returns optimized prompt for DeepSeek
 
-# Use with SDK for real conversations
-client = LuminoraCoreClient()
+# Use with SDK v1.1 for real conversations with memory
+client = LuminoraCoreClientV11(
+    storage_config=StorageConfig(storage_type="dynamodb")  # or sqlite, postgresql, etc.
+)
 await client.initialize()
+
+# Configure provider (DeepSeek: ~$0.14/1M tokens)
+provider = ProviderConfig(
+    name="deepseek",
+    api_key=os.getenv("DEEPSEEK_API_KEY"),
+    model="deepseek-chat"
+)
 
 session_id = await client.create_session(
     personality_name="customer_support",
-    provider_config=provider_config
+    provider_config=provider
 )
 
+# Send message with automatic memory storage
 response = await client.send_message(
     session_id=session_id,
     message="I need help with my order"
 )
+
+# Access memory features
+facts = await client.get_facts(session_id)
+episodes = await client.get_episodes(session_id)
+affinity = await client.get_affinity(session_id)
 ```
 
-### CLI Commands
+### CLI Commands (v1.1)
 
 ```bash
 # Validate personality
@@ -155,6 +190,25 @@ luminoracore blend \
   "support.json:0.7" \
   "friendly.json:0.3" \
   --output support_friendly.json
+
+# Memory and relationship management (v1.1)
+luminoracore memory list --session-id user_123
+luminoracore memory export --session-id user_123 --format json
+luminoracore affinity get --session-id user_123
+
+# Database migrations (v1.1)
+luminoracore migrate status
+luminoracore migrate up
+luminoracore migrate rollback
+
+# Feature flags (v1.1)
+luminoracore features list
+luminoracore features enable memory_system
+luminoracore features disable semantic_search
+
+# Snapshots (v1.1)
+luminoracore snapshot export --session-id user_123
+luminoracore snapshot import backup_20241201.json
 ```
 
 ---
@@ -328,7 +382,7 @@ import asyncio
 import os
 import re
 from dataclasses import dataclass
-from luminoracore_sdk import LuminoraCoreClient
+from luminoracore_sdk import LuminoraCoreClientV11
 from luminoracore_sdk.types.provider import ProviderConfig
 from luminoracore_sdk.types.session import StorageConfig
 
@@ -383,7 +437,7 @@ class VoiceBot:
     async def init(self):
         """Initialize LuminoraCore client."""
         # Initialize with memory storage (supports Redis, PostgreSQL, etc.)
-        self.client = LuminoraCoreClient(
+        self.client = LuminoraCoreClientV11(
             storage_config=StorageConfig(storage_type="memory")
         )
         await self.client.initialize()
@@ -461,20 +515,90 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-**What makes this powerful:**
+**What makes this powerful (v1.1):**
 
 ✅ **~150 lines** of clean, production-ready code  
 ✅ **Personalities as modules** - define once, use everywhere  
 ✅ **Dynamic switching** - seamless transitions mid-conversation  
 ✅ **Provider-agnostic** - works with DeepSeek, OpenAI, Anthropic, etc.  
+✅ **Memory-enabled** - AI remembers users across conversations  
+✅ **Relationship-aware** - Personalities evolve based on user interactions  
+✅ **Feature-flagged** - Dynamic feature control for safe deployments  
+✅ **Migration-ready** - Database schema management with version control  
+✅ **Storage-flexible** - Supports SQLite, DynamoDB, PostgreSQL, MySQL, MongoDB, Redis  
 ✅ **Testable** - easy to unit test sentiment detection and personality logic  
-✅ **Scalable** - supports Redis, PostgreSQL for production deployments
+✅ **Scalable** - production-ready with advanced storage backends
 
 **Full example:** See [`voice_bot_dynamic_personality.py`](luminoracore-sdk-python/examples/voice_bot_dynamic_personality.py) in the repository for the complete, production-ready implementation using the official LuminoraCore personality format.
 
 ---
 
-## 6. Blending & Simulation
+## 6. Advanced v1.1 Features: Memory, Relationships & Evolution
+
+### Memory System - AI That Remembers
+
+```python
+# Automatic fact extraction from conversations
+facts = await client.get_facts(session_id)
+# Returns: [{"key": "user_name", "value": "Sarah", "confidence": 0.95}, ...]
+
+# Episodic memory for important moments
+episodes = await client.get_episodes(session_id)
+# Returns: [{"timestamp": "2024-12-01", "event": "completed_marathon", "importance": 0.9}, ...]
+
+# Semantic search across memories
+results = await client.semantic_search(session_id, "user's favorite foods")
+# Returns relevant facts and episodes about food preferences
+```
+
+### Relationship Evolution - From Stranger to Soulmate
+
+```python
+# Track relationship progression (0-100 points)
+affinity = await client.get_affinity(session_id)
+# Returns: {"points": 78, "level": "close_friend", "progress": 0.78}
+
+# Personality automatically adapts based on relationship level:
+# 0-20:   Stranger (formal, professional)
+# 21-40:  Acquaintance (friendly, helpful)
+# 41-60:  Friend (casual, enthusiastic)
+# 61-80:  Close friend (warm, personal)
+# 81-100: Soulmate (intimate, deep connection)
+```
+
+### Feature Flags - Dynamic Control
+
+```python
+from luminoracore.core.config.feature_flags import FeatureFlagManager
+
+# Enable/disable features dynamically
+manager = FeatureFlagManager()
+manager.enable_feature("memory_system")
+manager.disable_feature("semantic_search")
+
+# Check if feature is enabled
+if manager.is_enabled("memory_system"):
+    # Use memory features
+    facts = await client.get_facts(session_id)
+```
+
+### Database Migrations - Schema Management
+
+```python
+from luminoracore.storage.migrations import MigrationManager
+
+# Run migrations
+manager = MigrationManager()
+await manager.migrate()
+
+# Check migration status
+status = await manager.get_current_version()
+pending = await manager.get_pending_migrations()
+```
+
+---
+
+## 7. Blending & Simulation
 
 ### PersonaBlend™: Create Hybrid Personalities
 
@@ -716,7 +840,7 @@ provider_config = ProviderConfig(
 
 ---
 
-## 9. Next Steps & Call to Action
+## 10. Next Steps & Call to Action
 
 ### 🚀 Get Started Today
 
@@ -774,7 +898,11 @@ python integrations/fastapi_integration.py
 ✅ **Open Source** - MIT license, free forever  
 ✅ **Production Ready** - 179/179 tests passing (v1.1)  
 ✅ **Multi-Provider** - 7 LLM providers supported  
-✅ **Flexible Storage** - 6 storage backend options  
+✅ **Flexible Storage** - 6 storage backend options (SQLite, DynamoDB, PostgreSQL, MySQL, MongoDB, Redis)  
+✅ **Memory System** - Advanced fact extraction, episodic memory, semantic search  
+✅ **Relationship Tracking** - Dynamic personality evolution based on user interactions  
+✅ **Feature Flags** - Dynamic feature control for safe deployments  
+✅ **Database Migrations** - Schema management with version control  
 ✅ **Well-Documented** - Comprehensive guides and examples  
 ✅ **Active Development** - Regular updates and improvements
 
@@ -809,7 +937,7 @@ python integrations/fastapi_integration.py
 
 [⭐ Star on GitHub](https://github.com/luminoracore/luminoracore) • [📖 Documentation](https://github.com/luminoracore/luminoracore/wiki) • [📧 Contact](mailto:contact@luminoracore.com)
 
-**LuminoraCore v1.0 - Production Ready**
+**LuminoraCore v1.1 - Production Ready with Advanced Memory & Relationships**
 
 </div>
 

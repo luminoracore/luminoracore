@@ -4,11 +4,11 @@
 
 ---
 
-## 🎭 **PERSONALIDAD ENRIQUECIDA (JSON GENERADO)**
+## 🎭 **ENRICHED PERSONALITY (GENERATED JSON)**
 
-### **📍 ¿Dónde se genera el JSON de personalidad enriquecida?**
+### **📍 Where is the enriched personality JSON generated?**
 
-El JSON de personalidad enriquecida se genera en **`conversation_export.json`** en la sección `final_personality`:
+The enriched personality JSON is generated in **`conversation_export.json`** in the `final_personality` section:
 
 ```json
 {
@@ -29,7 +29,7 @@ El JSON de personalidad enriquecida se genera en **`conversation_export.json`** 
 }
 ```
 
-### **🔄 Evolución de Personalidad (3 Recalculaciones):**
+### **🔄 Personality Evolution (3 Recalculations):**
 
 ```json
 {
@@ -38,8 +38,8 @@ El JSON de personalidad enriquecida se genera en **`conversation_export.json`** 
       "message_count": 3,
       "affinity": 19,
       "relationship_level": "acquaintance",
-      "personality_before": { /* personalidad inicial */ },
-      "personality_after": { /* personalidad después del mensaje 3 */ },
+      "personality_before": { /* initial personality */ },
+      "personality_after": { /* personality after message 3 */ },
       "changes": {
         "professionalism": 0.019,
         "efficiency": 0.038,
@@ -48,34 +48,34 @@ El JSON de personalidad enriquecida se genera en **`conversation_export.json`** 
         "patience": 0.019
       }
     }
-    // ... más recalculaciones
+    // ... more recalculations
   ]
 }
 ```
 
-### **📁 Archivos Generados en la Simulación:**
+### **📁 Files Generated in Simulation:**
 
-1. **`conversation_export.json`** - JSON completo con:
-   - `session_info`: Información de la sesión
-   - `conversation`: Los 10 mensajes completos
-   - `personality_evolution`: 3 recalculaciones de personalidad
-   - `memory_classification`: Hechos y episodios clasificados
-   - `final_personality`: Personalidad final enriquecida
+1. **`conversation_export.json`** - Complete JSON with:
+   - `session_info`: Session information
+   - `conversation`: The 10 complete messages
+   - `personality_evolution`: 3 personality recalculations
+   - `memory_classification`: Classified facts and episodes
+   - `final_personality`: Final enriched personality
 
-2. **`conversation_memory.db`** - Base de datos SQLite con:
-   - Tabla `sessions`: Información de sesiones
-   - Tabla `conversations`: Mensajes y contexto
-   - Tabla `personality_evolution`: Evolución de personalidad
-   - Tabla `memory_facts`: Hechos clasificados
-   - Tabla `memory_episodes`: Episodios memorables
+2. **`conversation_memory.db`** - SQLite database with:
+   - `sessions` table: Session information
+   - `conversations` table: Messages and context
+   - `personality_evolution` table: Personality evolution
+   - `memory_facts` table: Classified facts
+   - `memory_episodes` table: Memorable episodes
 
 ---
 
-## 📊 **ANÁLISIS SENTIMENTAL Y CONFIGURACIÓN**
+## 📊 **SENTIMENT ANALYSIS AND CONFIGURATION**
 
-### **⚙️ ¿Dónde se configura cuándo hacer análisis sentimental?**
+### **⚙️ Where is sentiment analysis frequency configured?**
 
-En el archivo de configuración de personalidad:
+In the personality configuration file:
 
 ```json
 {
@@ -84,20 +84,20 @@ En el archivo de configuración de personalidad:
     "episodic_memory": 0.8,
     "preference_learning": 0.9,
     "goal_tracking": 0.8,
-    "recalculation_frequency": 3,  // ← AQUÍ: Cada 3 mensajes
-    "sentiment_analysis_frequency": 5  // ← AQUÍ: Cada 5 mensajes
+    "recalculation_frequency": 3,  // ← HERE: Every 3 messages
+    "sentiment_analysis_frequency": 5  // ← HERE: Every 5 messages
   }
 }
 ```
 
-### **🧠 Configuración Completa de Análisis Sentimental:**
+### **🧠 Complete Sentiment Analysis Configuration:**
 
 ```json
 {
   "sentiment_config": {
     "enabled": true,
-    "frequency": 5,  // Cada 5 mensajes
-    "provider": "deepseek",  // o "openai", "anthropic", etc.
+    "frequency": 5,  // Every 5 messages
+    "provider": "deepseek",  // or "openai", "anthropic", etc.
     "analysis_types": [
       "emotional_tone",
       "user_satisfaction", 
@@ -119,7 +119,7 @@ En el archivo de configuración de personalidad:
 }
 ```
 
-### **📈 Ejemplo de Análisis Sentimental:**
+### **📈 Sentiment Analysis Example:**
 
 ```json
 {
@@ -127,7 +127,7 @@ En el archivo de configuración de personalidad:
     "message_count": 5,
     "timestamp": "2025-10-16T22:47:39.064316",
     "analysis": {
-      "overall_sentiment": 0.8,  // Positivo
+      "overall_sentiment": 0.8,  // Positive
       "emotional_tone": "enthusiastic",
       "user_satisfaction": 0.85,
       "relationship_health": "improving",
@@ -146,93 +146,93 @@ En el archivo de configuración de personalidad:
 }
 ```
 
-### **🔧 Comando CLI para Análisis Sentimental:**
+### **🔧 CLI Command for Sentiment Analysis:**
 
 ```bash
-# Analizar sentimientos de una sesión (futuro comando)
-luminoracore sentiment analyze user_123        # Analizar sentimientos
-luminoracore sentiment history user_123        # Historial de sentimientos
-luminoracore sentiment dashboard user_123      # Dashboard de sentimientos
+# Analyze session sentiment (future command)
+luminoracore sentiment analyze user_123        # Analyze sentiment
+luminoracore sentiment history user_123        # Sentiment history
+luminoracore sentiment dashboard user_123      # Sentiment dashboard
 ```
 
 ---
 
-## 🖥️ **COMANDOS CLI COMPLETOS**
+## 🖥️ **COMPLETE CLI COMMANDS**
 
-### **📋 Lista de Comandos CLI v1.1 (REAL):**
+### **📋 CLI Commands List v1.1 (REAL):**
 
 ```bash
-# COMANDOS BÁSICOS v1.0 (11 comandos)
-luminoracore validate <personality_file>     # Validar personalidad
-luminoracore compile <personality_file>      # Compilar personalidad  
-luminoracore blend <file1> <file2>           # Mezclar personalidades
-luminoracore test <personality_file>         # Probar personalidad
-luminoracore create <template>               # Crear nueva personalidad
-luminoracore list                            # Listar personalidades
-luminoracore serve                           # Servidor web
-luminoracore update <personality_file>       # Actualizar personalidad
-luminoracore init <project_name>             # Inicializar proyecto
-luminoracore info <personality_file>         # Información de personalidad
+# BASIC COMMANDS v1.0 (11 commands)
+luminoracore validate <personality_file>     # Validate personality
+luminoracore compile <personality_file>      # Compile personality  
+luminoracore blend <file1> <file2>           # Blend personalities
+luminoracore test <personality_file>         # Test personality
+luminoracore create <template>               # Create new personality
+luminoracore list                            # List personalities
+luminoracore serve                           # Web server
+luminoracore update <personality_file>       # Update personality
+luminoracore init <project_name>             # Initialize project
+luminoracore info <personality_file>         # Personality information
 
-# COMANDOS NUEVOS v1.1 (3 comandos)
-luminoracore migrate [db_path]               # Migrar base de datos
-luminoracore memory facts <session_id>       # Gestionar hechos de memoria
-luminoracore memory episodes <session_id>    # Gestionar episodios
-luminoracore memory search <session_id>      # Buscar en memoria
-luminoracore snapshot <session_id>           # Exportar snapshot
+# NEW COMMANDS v1.1 (3 commands)
+luminoracore migrate [db_path]               # Migrate database
+luminoracore memory facts <session_id>       # Manage memory facts
+luminoracore memory episodes <session_id>    # Manage episodes
+luminoracore memory search <session_id>      # Search memory
+luminoracore snapshot <session_id>           # Export snapshot
 ```
 
-### **📖 Guía de Uso de Comandos CLI:**
+### **📖 CLI Commands Usage Guide:**
 
-#### **🔧 Comandos Básicos:**
+#### **🔧 Basic Commands:**
 
 ```bash
-# 1. Validar personalidad
+# 1. Validate personality
 luminoracore validate luminoracore/luminoracore/personalities/dr_luna.json
 
-# 2. Compilar personalidad para OpenAI
+# 2. Compile personality for OpenAI
 luminoracore compile luminoracore/luminoracore/personalities/dr_luna.json --provider openai
 
-# 3. Mezclar dos personalidades
+# 3. Blend two personalities
 luminoracore blend dr_luna.json victoria_sterling.json --output mixed_personality.json
 
-# 4. Probar personalidad
+# 4. Test personality
 luminoracore test dr_luna.json --provider deepseek --api-key $DEEPSEEK_API_KEY
 
-# 5. Analizar personalidad
+# 5. Analyze personality
 luminoracore analyze dr_luna.json --detailed
 ```
 
-#### **🆕 Comandos v1.1:**
+#### **🆕 v1.1 Commands:**
 
 ```bash
-# 1. Migrar base de datos a v1.1
-luminoracore migrate                          # Migrar con configuración por defecto
-luminoracore migrate custom.db                # Migrar base de datos específica
-luminoracore migrate --dry-run                # Ver qué se haría sin aplicar
-luminoracore migrate --status                 # Ver estado de migraciones
-luminoracore migrate --history                # Ver historial de migraciones
+# 1. Migrate database to v1.1
+luminoracore migrate                          # Migrate with default configuration
+luminoracore migrate custom.db                # Migrate specific database
+luminoracore migrate --dry-run                # See what would be done without applying
+luminoracore migrate --status                 # See migration status
+luminoracore migrate --history                # See migration history
 
-# 2. Gestionar memoria de sesión
-luminoracore memory facts user_123            # Listar hechos de la sesión
-luminoracore memory facts user_123 --category personal_info  # Filtrar por categoría
-luminoracore memory facts user_123 --format json            # Formato JSON
-luminoracore memory episodes user_123         # Listar episodios memorables
-luminoracore memory search user_123 "Carlos"  # Buscar en memoria
+# 2. Manage session memory
+luminoracore memory facts user_123            # List session facts
+luminoracore memory facts user_123 --category personal_info  # Filter by category
+luminoracore memory facts user_123 --format json            # JSON format
+luminoracore memory episodes user_123         # List memorable episodes
+luminoracore memory search user_123 "Carlos"  # Search in memory
 
-# 3. Exportar snapshot completo
-luminoracore snapshot user_123                # Exportar snapshot de sesión
-luminoracore snapshot user_123 --format json  # Formato JSON
-luminoracore snapshot user_123 --format sqlite # Formato SQLite
+# 3. Export complete snapshot
+luminoracore snapshot user_123                # Export session snapshot
+luminoracore snapshot user_123 --format json  # JSON format
+luminoracore snapshot user_123 --format sqlite # SQLite format
 ```
 
-### **📚 Ayuda de Comandos:**
+### **📚 Command Help:**
 
 ```bash
-# Ayuda general
+# General help
 luminoracore --help
 
-# Ayuda específica de comando
+# Specific command help
 luminoracore validate --help
 luminoracore migrate --help
 luminoracore memory --help
@@ -241,15 +241,15 @@ luminoracore snapshot --help
 
 ---
 
-## ⚙️ **CONFIGURACIÓN AVANZADA**
+## ⚙️ **ADVANCED CONFIGURATION**
 
-### **🎯 Configuración de Frecuencias:**
+### **🎯 Frequency Configuration:**
 
 ```json
 {
   "luminora_config": {
     "personality_recalculation": {
-      "frequency": 3,  // Cada 3 mensajes
+      "frequency": 3,  // Every 3 messages
       "triggers": [
         "message_count",
         "affinity_change",
@@ -257,7 +257,7 @@ luminoracore snapshot --help
       ]
     },
     "sentiment_analysis": {
-      "frequency": 5,  // Cada 5 mensajes
+      "frequency": 5,  // Every 5 messages
       "triggers": [
         "message_count",
         "negative_sentiment_detected",
@@ -265,7 +265,7 @@ luminoracore snapshot --help
       ]
     },
     "memory_consolidation": {
-      "frequency": 10,  // Cada 10 mensajes
+      "frequency": 10,  // Every 10 messages
       "triggers": [
         "message_count",
         "memory_size_threshold",
@@ -276,20 +276,20 @@ luminoracore snapshot --help
 }
 ```
 
-### **🔧 Variables de Entorno:**
+### **🔧 Environment Variables:**
 
 ```bash
-# Configuración de frecuencias
+# Frequency configuration
 export LUMINORA_RECALCULATION_FREQUENCY=3
 export LUMINORA_SENTIMENT_FREQUENCY=5
 export LUMINORA_MEMORY_CONSOLIDATION_FREQUENCY=10
 
-# Configuración de análisis sentimental
+# Sentiment analysis configuration
 export LUMINORA_SENTIMENT_PROVIDER=deepseek
 export LUMINORA_SENTIMENT_MODEL=deepseek-chat
 export LUMINORA_SENTIMENT_ENABLED=true
 
-# Configuración de memoria
+# Memory configuration
 export LUMINORA_MEMORY_RETENTION_DAYS=30
 export LUMINORA_MEMORY_MAX_FACTS=1000
 export LUMINORA_MEMORY_MAX_EPISODES=500
@@ -297,47 +297,47 @@ export LUMINORA_MEMORY_MAX_EPISODES=500
 
 ---
 
-## 🚀 **COMANDOS FUTUROS (v1.2+)**
+## 🚀 **FUTURE COMMANDS (v1.2+)**
 
-### **📋 Comandos Planificados (v1.2+):**
+### **📋 Planned Commands (v1.2+):**
 
 ```bash
-# Análisis avanzado
-luminoracore sentiment analyze <session_id>      # Analizar sentimientos
-luminoracore sentiment history <session_id>      # Historial de sentimientos
-luminoracore analytics dashboard <session_id>    # Dashboard analítico
-luminoracore insights generate <session_id>      # Generar insights automáticos
+# Advanced analysis
+luminoracore sentiment analyze <session_id>      # Analyze sentiment
+luminoracore sentiment history <session_id>      # Sentiment history
+luminoracore analytics dashboard <session_id>    # Analytics dashboard
+luminoracore insights generate <session_id>      # Generate automatic insights
 
-# Gestión de datos
-luminoracore backup all-sessions                 # Backup completo
-luminoracore restore from-backup <file>          # Restaurar backup
-luminoracore sync cloud <provider>               # Sincronizar con cloud
-luminoracore export all-formats <session_id>     # Exportar todos los formatos
+# Data management
+luminoracore backup all-sessions                 # Complete backup
+luminoracore restore from-backup <file>          # Restore backup
+luminoracore sync cloud <provider>               # Sync with cloud
+luminoracore export all-formats <session_id>     # Export all formats
 
-# Desarrollo
-luminoracore dev create-personality              # Crear personalidad interactivo
-luminoracore dev test-scenarios                  # Probar escenarios
-luminoracore dev benchmark                       # Benchmark de rendimiento
-luminoracore dev validate-performance           # Validar rendimiento
+# Development
+luminoracore dev create-personality              # Interactive personality creation
+luminoracore dev test-scenarios                  # Test scenarios
+luminoracore dev benchmark                       # Performance benchmark
+luminoracore dev validate-performance           # Validate performance
 
-# Integración
-luminoracore integrate webhook <url>             # Configurar webhooks
-luminoracore integrate api generate-keys         # Generar API keys
-luminoracore integrate monitoring setup          # Configurar monitoreo
-luminoracore integrate discord setup             # Configurar Discord bot
-luminoracore integrate telegram setup            # Configurar Telegram bot
+# Integration
+luminoracore integrate webhook <url>             # Configure webhooks
+luminoracore integrate api generate-keys         # Generate API keys
+luminoracore integrate monitoring setup          # Configure monitoring
+luminoracore integrate discord setup             # Configure Discord bot
+luminoracore integrate telegram setup            # Configure Telegram bot
 
-# Análisis de calidad
-luminoracore quality check <personality_file>    # Verificar calidad
-luminoracore quality optimize <personality_file> # Optimizar personalidad
-luminoracore quality compare <file1> <file2>     # Comparar personalidades
+# Quality analysis
+luminoracore quality check <personality_file>    # Verify quality
+luminoracore quality optimize <personality_file> # Optimize personality
+luminoracore quality compare <file1> <file2>     # Compare personalities
 ```
 
 ---
 
-## 📊 **EJEMPLO COMPLETO DE USO**
+## 📊 **COMPLETE USAGE EXAMPLE**
 
-### **🔧 Configuración Completa:**
+### **🔧 Complete Configuration:**
 
 ```python
 # config.py
@@ -361,9 +361,9 @@ PERSONALITY_CONFIG = {
         }
     },
     "memory_preferences": {
-        "recalculation_frequency": 3,      # Cada 3 mensajes
-        "sentiment_analysis_frequency": 5,  # Cada 5 mensajes
-        "memory_consolidation_frequency": 10 # Cada 10 mensajes
+        "recalculation_frequency": 3,      # Every 3 messages
+        "sentiment_analysis_frequency": 5,  # Every 5 messages
+        "memory_consolidation_frequency": 10 # Every 10 messages
     },
     "sentiment_config": {
         "enabled": True,
@@ -378,62 +378,62 @@ PERSONALITY_CONFIG = {
 }
 ```
 
-### **🖥️ Uso de Comandos CLI:**
+### **🖥️ CLI Commands Usage:**
 
 ```bash
-# 1. Validar configuración
+# 1. Validate configuration
 luminoracore validate victoria_sterling.json
 
-# 2. Migrar a v1.1
+# 2. Migrate to v1.1
 luminoracore migrate --to-v1.1 --input victoria_sterling.json
 
-# 3. Probar con DeepSeek
+# 3. Test with DeepSeek
 luminoracore test victoria_sterling_v1_1.json --provider deepseek
 
-# 4. Gestionar memoria
+# 4. Manage memory
 luminoracore memory --session user_123 --action list
 
-# 5. Exportar snapshot
+# 5. Export snapshot
 luminoracore snapshot --export user_123 --format json
 ```
 
 ---
 
-## 🎯 **RESUMEN COMPLETO DE RESPUESTAS**
+## 🎯 **COMPLETE SUMMARY OF ANSWERS**
 
-### **📄 JSON de Personalidad Enriquecida:**
-✅ **Generado en**: `conversation_export.json` → sección `final_personality`
-✅ **Contiene**: Evolución completa de personalidad con 3 recalculaciones
-✅ **Incluye**: Hechos, episodios, afinidad y cambios de personalidad
+### **📄 Enriched Personality JSON:**
+✅ **Generated in**: `conversation_export.json` → `final_personality` section
+✅ **Contains**: Complete personality evolution with 3 recalculations
+✅ **Includes**: Facts, episodes, affinity and personality changes
 
-### **📊 Análisis Sentimental:**
-✅ **Configurado en**: `memory_preferences.sentiment_analysis_frequency: 5`
-✅ **Se ejecuta**: Cada 5 mensajes (configurable)
-✅ **Proveedores**: DeepSeek, OpenAI, Anthropic (configurable)
-✅ **Comandos**: `luminoracore sentiment analyze <session_id>` (futuro)
+### **📊 Sentiment Analysis:**
+✅ **Configured in**: `memory_preferences.sentiment_analysis_frequency: 5`
+✅ **Executes**: Every 5 messages (configurable)
+✅ **Providers**: DeepSeek, OpenAI, Anthropic (configurable)
+✅ **Commands**: `luminoracore sentiment analyze <session_id>` (future)
 
-### **🖥️ Comandos CLI:**
-✅ **Comandos v1.0**: 10 comandos básicos (validate, compile, blend, test, create, list, serve, update, init, info)
-✅ **Comandos v1.1**: 4 comandos nuevos (migrate, memory facts, memory episodes, memory search, snapshot)
-✅ **Comandos futuros**: 15+ comandos planificados para v1.2+
+### **🖥️ CLI Commands:**
+✅ **v1.0 Commands**: 10 basic commands (validate, compile, blend, test, create, list, serve, update, init, info)
+✅ **v1.1 Commands**: 4 new commands (migrate, memory facts, memory episodes, memory search, snapshot)
+✅ **Future Commands**: 15+ planned commands for v1.2+
 
-### **⚙️ Configuración:**
-✅ **Frecuencias**: Configurables en JSON y variables de entorno
-✅ **Proveedores**: DeepSeek, OpenAI, Anthropic, etc.
-✅ **Personalizable**: Cada aspecto es configurable
-✅ **Base de datos**: SQLite, PostgreSQL, Redis, MongoDB
+### **⚙️ Configuration:**
+✅ **Frequencies**: Configurable in JSON and environment variables
+✅ **Providers**: DeepSeek, OpenAI, Anthropic, etc.
+✅ **Customizable**: Every aspect is configurable
+✅ **Database**: SQLite, PostgreSQL, Redis, MongoDB
 
-### **📁 Archivos Generados:**
-✅ **JSON**: `conversation_export.json` con toda la información
-✅ **SQLite**: `conversation_memory.db` con estructura de tablas
-✅ **Logs**: Información detallada de cada proceso
+### **📁 Generated Files:**
+✅ **JSON**: `conversation_export.json` with all information
+✅ **SQLite**: `conversation_memory.db` with table structure
+✅ **Logs**: Detailed information of each process
 
-### **🔄 Proceso de Recalculación:**
-✅ **Frecuencia**: Cada 3 mensajes (configurable)
-✅ **Triggers**: Cambios de afinidad, nivel de relación, nuevos hechos
-✅ **Algoritmo**: Linear mapping + smooth transition
-✅ **Export**: JSON, prompt, system prompt para LLMs
+### **🔄 Recalculation Process:**
+✅ **Frequency**: Every 3 messages (configurable)
+✅ **Triggers**: Affinity changes, relationship level, new facts
+✅ **Algorithm**: Linear mapping + smooth transition
+✅ **Export**: JSON, prompt, system prompt for LLMs
 
 ---
 
-**🎊 ¡LuminoraCore v1.1 tiene todo lo que necesitas para personalidades inteligentes, análisis sentimental y gestión avanzada de memoria!**
+**🎊 LuminoraCore v1.1 has everything you need for intelligent personalities, sentiment analysis and advanced memory management!**
