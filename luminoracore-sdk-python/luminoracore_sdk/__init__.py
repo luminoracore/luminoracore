@@ -3,11 +3,14 @@
 from importlib.metadata import version, PackageNotFoundError
 
 from .client import LuminoraCoreClient
+from .client_v1_1 import LuminoraCoreClientV11
 from .session import (
     PersonalitySession,
     ConversationManager,
     SessionConfig,
     MemoryConfig,
+    StorageV11Extension,
+    InMemoryStorageV11,
 )
 from .providers import (
     ProviderFactory,
@@ -44,11 +47,14 @@ except PackageNotFoundError:
 __all__ = [
     # Main client
     "LuminoraCoreClient",
+    "LuminoraCoreClientV11",
     # Session management
     "PersonalitySession",
     "ConversationManager",
     "SessionConfig",
     "MemoryConfig",
+    "StorageV11Extension",
+    "InMemoryStorageV11",
     # Providers
     "ProviderFactory",
     "OpenAIProvider",

@@ -22,7 +22,12 @@
 
 ### **1. LuminoraCoreClientV11**
 ```python
+# Option 1: Direct import (recommended)
+from luminoracore_sdk import LuminoraCoreClientV11, InMemoryStorageV11
+
+# Option 2: Module import
 from luminoracore_sdk.client_v1_1 import LuminoraCoreClientV11
+from luminoracore_sdk.session.storage_v1_1 import InMemoryStorageV11
 
 # Initialization
 client_v11 = LuminoraCoreClientV11(base_client, storage_v11=storage)
@@ -97,9 +102,12 @@ await storage.get_mood(...)       # ✅ Implemented
 
 ### **1. Correct Configuration**
 ```python
-from luminoracore_sdk.client_v1_1 import LuminoraCoreClientV11
-from luminoracore_sdk.session.storage_v1_1 import InMemoryStorageV11
-from luminoracore_sdk.session.memory_v1_1 import MemoryManagerV11
+# ✅ RECOMMENDED: Direct import from main module
+from luminoracore_sdk import LuminoraCoreClient, LuminoraCoreClientV11, InMemoryStorageV11
+
+# Alternative: Module-specific imports
+# from luminoracore_sdk.client_v1_1 import LuminoraCoreClientV11
+# from luminoracore_sdk.session.storage_v1_1 import InMemoryStorageV11
 
 # Configure storage
 storage = InMemoryStorageV11()  # For development
