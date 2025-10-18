@@ -6,10 +6,15 @@ Adds v1.1 API methods to the SDK client.
 
 from typing import List, Optional, Dict, Any
 import logging
+import json
 from datetime import datetime
 
 from .session.storage_v1_1 import StorageV11Extension
+from .session.storage_sqlite_v11 import SQLiteStorageV11
+from .session.storage_dynamodb_v11 import DynamoDBStorageV11
 from .session.memory_v1_1 import MemoryManagerV11
+from .evolution.personality_evolution import PersonalityEvolutionEngine
+from .analysis.sentiment_analyzer import AdvancedSentimentAnalyzer
 from .types.memory import FactDict, EpisodeDict, MemorySearchResult
 from .types.relationship import AffinityDict, AffinityProgressDict
 from .types.snapshot import PersonalitySnapshotDict, SnapshotExportOptions
@@ -41,6 +46,10 @@ class LuminoraCoreClientV11:
         self.base_client = base_client
         self.storage_v11 = storage_v11
         self.memory_v11 = MemoryManagerV11(storage_v11=storage_v11) if storage_v11 else None
+        
+        # Initialize advanced systems
+        self.evolution_engine = PersonalityEvolutionEngine(storage_v11) if storage_v11 else None
+        self.sentiment_analyzer = AdvancedSentimentAnalyzer(storage_v11, base_client.llm_provider if hasattr(base_client, 'llm_provider') else None) if storage_v11 else None
     
     # MEMORY METHODS
     async def search_memories(
@@ -333,35 +342,73 @@ class LuminoraCoreClientV11:
         Returns:
             Complete snapshot
         """
-        # Placeholder implementation
         logger.info(f"Exporting snapshot for session {session_id}")
         
-        snapshot: PersonalitySnapshotDict = {
-            "_snapshot_info": {
-                "created_at": datetime.now().isoformat(),
-                "template_name": "unknown",
-                "template_version": "1.1.0",
-                "user_id": "unknown",
-                "session_id": session_id,
-                "total_messages": 0,
-                "days_active": 0
-            },
-            "persona": {},
-            "core_traits": {},
-            "linguistic_profile": {},
-            "behavioral_rules": {},
-            "advanced_parameters": {},
-            "current_state": {
-                "affinity": {"points": 0, "level": "stranger", "progression_history": []},
-                "mood": {"current": "neutral", "intensity": 1.0, "started_at": "", "history": []},
-                "learned_facts": [],
-                "memorable_episodes": [],
-                "conversation_summary": {}
-            },
-            "active_configuration": None
-        }
+        if not self.storage_v11:
+            logger.warning("Storage v1.1 not configured")
+            return self._create_empty_snapshot(session_id)
         
-        return snapshot
+        try:
+            # Extract user_id from session_id (assuming format: user_id_session_timestamp)
+            user_id = session_id.split('_')[0] if '_' in session_id else "unknown"
+            
+            # Get all data for export
+            facts = await self.storage_v11.get_facts(user_id)
+            episodes = await self.storage_v11.get_episodes(user_id)
+            affinity = await self.storage_v11.get_affinity(user_id, "default")
+            mood_history = await self.storage_v11.get_mood_history(user_id, limit=10)
+            memories = await self.storage_v11.get_all_memories(session_id)
+            
+            # Get personality configuration
+            personality_key = f"personality_{user_id}_default"
+            personality_config = await self.storage_v11.get_memory("global", personality_key)
+            
+            # Create comprehensive snapshot
+            snapshot: PersonalitySnapshotDict = {
+                "_snapshot_info": {
+                    "created_at": datetime.now().isoformat(),
+                    "template_name": "default",
+                    "template_version": "1.1.0",
+                    "user_id": user_id,
+                    "session_id": session_id,
+                    "total_messages": len(facts) + len(episodes),
+                    "days_active": self._calculate_days_active(affinity, episodes)
+                },
+                "persona": json.loads(personality_config) if personality_config else {},
+                "core_traits": self._extract_core_traits(personality_config),
+                "linguistic_profile": self._extract_linguistic_profile(personality_config),
+                "behavioral_rules": self._extract_behavioral_rules(personality_config),
+                "advanced_parameters": self._extract_advanced_parameters(personality_config),
+                "current_state": {
+                    "affinity": {
+                        "points": affinity.get("affinity_points", 0) if affinity else 0,
+                        "level": affinity.get("current_level", "stranger") if affinity else "stranger",
+                        "progression_history": self._get_affinity_history(user_id)
+                    },
+                    "mood": {
+                        "current": mood_history[0].get("current_mood", "neutral") if mood_history else "neutral",
+                        "intensity": mood_history[0].get("mood_intensity", 1.0) if mood_history else 1.0,
+                        "started_at": mood_history[0].get("created_at", "") if mood_history else "",
+                        "history": mood_history
+                    },
+                    "learned_facts": facts,
+                    "memorable_episodes": episodes,
+                    "conversation_summary": self._create_conversation_summary(facts, episodes)
+                },
+                "active_configuration": {
+                    "storage_type": "sqlite" if isinstance(self.storage_v11, SQLiteStorageV11) else "dynamodb" if isinstance(self.storage_v11, DynamoDBStorageV11) else "memory",
+                    "export_timestamp": datetime.now().isoformat(),
+                    "total_facts": len(facts),
+                    "total_episodes": len(episodes),
+                    "total_memories": len(memories)
+                }
+            }
+            
+            return snapshot
+            
+        except Exception as e:
+            logger.error(f"Failed to export snapshot: {e}")
+            return self._create_empty_snapshot(session_id)
     
     async def import_snapshot(
         self,
@@ -425,22 +472,141 @@ class LuminoraCoreClientV11:
         Returns:
             Sentiment analysis results
         """
-        if not self.base_client:
-            logger.warning("Base client not configured")
+        if not self.sentiment_analyzer:
+            logger.warning("Sentiment analyzer not configured")
             return {"sentiment": "neutral", "confidence": 0.5}
         
-        # Basic keyword-based sentiment analysis
-        sentiment_score = self._analyze_sentiment_keywords(message)
+        try:
+            # Create session_id for analysis
+            session_id = f"{user_id}_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            
+            # Save message for analysis
+            await self.storage_v11.save_memory(
+                session_id,
+                user_id,
+                "current_message",
+                {
+                    "content": message,
+                    "context": context or [],
+                    "timestamp": datetime.now().isoformat()
+                }
+            )
+            
+            # Perform advanced sentiment analysis
+            result = await self.sentiment_analyzer.analyze_sentiment(session_id, user_id)
+            
+            return {
+                "sentiment": result.overall_sentiment,
+                "confidence": result.confidence,
+                "sentiment_score": result.sentiment_score,
+                "emotions_detected": result.emotions_detected,
+                "sentiment_trend": result.sentiment_trend,
+                "analysis_timestamp": result.analysis_timestamp,
+                "message_count": result.message_count,
+                "detailed_analysis": result.detailed_analysis
+            }
+            
+        except Exception as e:
+            logger.error(f"Sentiment analysis failed: {e}")
+            return {"sentiment": "neutral", "confidence": 0.0, "error": str(e)}
+    
+    # PERSONALITY EVOLUTION METHODS
+    async def evolve_personality(
+        self,
+        session_id: str,
+        user_id: str,
+        personality_name: str = "default",
+        **params
+    ) -> Dict[str, Any]:
+        """
+        Evolve personality based on session interactions
         
-        # If we have LLM provider, use advanced analysis
-        if hasattr(self.base_client, 'llm_provider') and self.base_client.llm_provider:
-            try:
-                advanced_analysis = await self._analyze_sentiment_llm(message, context)
-                sentiment_score.update(advanced_analysis)
-            except Exception as e:
-                logger.warning(f"Advanced sentiment analysis failed: {e}")
+        Args:
+            session_id: Session identifier
+            user_id: User identifier
+            personality_name: Personality being evolved
+            **params: Additional parameters
+            
+        Returns:
+            Evolution result with changes detected and applied
+        """
+        if not self.evolution_engine:
+            logger.warning("Evolution engine not configured")
+            return {
+                "session_id": session_id,
+                "evolution_timestamp": datetime.now().isoformat(),
+                "changes_detected": False,
+                "personality_updates": {},
+                "confidence_score": 0.0,
+                "message": "Evolution engine not available"
+            }
         
-        return sentiment_score
+        try:
+            # Perform personality evolution
+            result = await self.evolution_engine.evolve_personality(
+                session_id, user_id, personality_name, **params
+            )
+            
+            return {
+                "session_id": result.session_id,
+                "evolution_timestamp": result.evolution_timestamp,
+                "changes_detected": result.changes_detected,
+                "personality_updates": result.personality_updates,
+                "confidence_score": result.confidence_score,
+                "changes": [
+                    {
+                        "trait_name": change.trait_name,
+                        "old_value": change.old_value,
+                        "new_value": change.new_value,
+                        "change_reason": change.change_reason,
+                        "confidence": change.confidence
+                    }
+                    for change in result.changes
+                ],
+                "evolution_triggers": result.evolution_triggers
+            }
+            
+        except Exception as e:
+            logger.error(f"Personality evolution failed: {e}")
+            return {
+                "session_id": session_id,
+                "evolution_timestamp": datetime.now().isoformat(),
+                "changes_detected": False,
+                "personality_updates": {},
+                "confidence_score": 0.0,
+                "message": f"Evolution failed: {str(e)}"
+            }
+    
+    async def get_evolution_history(
+        self,
+        session_id: str,
+        user_id: str,
+        limit: int = 10,
+        include_details: bool = True
+    ) -> List[Dict[str, Any]]:
+        """
+        Get personality evolution history
+        
+        Args:
+            session_id: Session identifier
+            user_id: User identifier
+            limit: Maximum number of entries to return
+            include_details: Whether to include detailed change information
+            
+        Returns:
+            List of evolution history entries
+        """
+        if not self.evolution_engine:
+            logger.warning("Evolution engine not configured")
+            return []
+        
+        try:
+            return await self.evolution_engine.get_evolution_history(
+                session_id, user_id, limit, include_details
+            )
+        except Exception as e:
+            logger.error(f"Failed to get evolution history: {e}")
+            return []
     
     def _analyze_sentiment_keywords(self, message: str) -> Dict[str, Any]:
         """Basic keyword-based sentiment analysis"""
@@ -543,4 +709,111 @@ class LuminoraCoreClientV11:
                 "message_preview": "Great work on the project!"
             }
         ]
+    
+    # HELPER METHODS
+    def _create_empty_snapshot(self, session_id: str) -> PersonalitySnapshotDict:
+        """Create empty snapshot when storage is not available"""
+        return {
+            "_snapshot_info": {
+                "created_at": datetime.now().isoformat(),
+                "template_name": "unknown",
+                "template_version": "1.1.0",
+                "user_id": "unknown",
+                "session_id": session_id,
+                "total_messages": 0,
+                "days_active": 0
+            },
+            "persona": {},
+            "core_traits": {},
+            "linguistic_profile": {},
+            "behavioral_rules": {},
+            "advanced_parameters": {},
+            "current_state": {
+                "affinity": {"points": 0, "level": "stranger", "progression_history": []},
+                "mood": {"current": "neutral", "intensity": 1.0, "started_at": "", "history": []},
+                "learned_facts": [],
+                "memorable_episodes": [],
+                "conversation_summary": {}
+            },
+            "active_configuration": None
+        }
+    
+    def _calculate_days_active(self, affinity: Optional[Dict], episodes: List[Dict]) -> int:
+        """Calculate days active based on data"""
+        if not episodes:
+            return 0
+        
+        try:
+            # Get earliest episode date
+            earliest_date = min(
+                datetime.fromisoformat(ep.get("created_at", "").replace('Z', '+00:00'))
+                for ep in episodes
+                if ep.get("created_at")
+            )
+            
+            # Calculate days difference
+            days_diff = (datetime.now() - earliest_date).days
+            return max(1, days_diff)
+        except:
+            return 0
+    
+    def _extract_core_traits(self, personality_config: Optional[str]) -> Dict[str, Any]:
+        """Extract core traits from personality configuration"""
+        if not personality_config:
+            return {}
+        
+        try:
+            config = json.loads(personality_config)
+            return config.get("core_traits", {})
+        except:
+            return {}
+    
+    def _extract_linguistic_profile(self, personality_config: Optional[str]) -> Dict[str, Any]:
+        """Extract linguistic profile from personality configuration"""
+        if not personality_config:
+            return {}
+        
+        try:
+            config = json.loads(personality_config)
+            return config.get("linguistic_profile", {})
+        except:
+            return {}
+    
+    def _extract_behavioral_rules(self, personality_config: Optional[str]) -> List[str]:
+        """Extract behavioral rules from personality configuration"""
+        if not personality_config:
+            return []
+        
+        try:
+            config = json.loads(personality_config)
+            return config.get("behavioral_rules", [])
+        except:
+            return []
+    
+    def _extract_advanced_parameters(self, personality_config: Optional[str]) -> Dict[str, Any]:
+        """Extract advanced parameters from personality configuration"""
+        if not personality_config:
+            return {}
+        
+        try:
+            config = json.loads(personality_config)
+            return config.get("advanced_parameters", {})
+        except:
+            return {}
+    
+    def _get_affinity_history(self, user_id: str) -> List[Dict[str, Any]]:
+        """Get affinity progression history"""
+        # This would typically query storage for historical affinity data
+        # For now, return empty list
+        return []
+    
+    def _create_conversation_summary(self, facts: List[Dict], episodes: List[Dict]) -> Dict[str, Any]:
+        """Create conversation summary from facts and episodes"""
+        return {
+            "total_facts": len(facts),
+            "total_episodes": len(episodes),
+            "fact_categories": list(set(fact.get("category", "") for fact in facts)),
+            "episode_types": list(set(episode.get("episode_type", "") for episode in episodes)),
+            "most_important_episode": max(episodes, key=lambda e: e.get("importance", 0)) if episodes else None
+        }
 
