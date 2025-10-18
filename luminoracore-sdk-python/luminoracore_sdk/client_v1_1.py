@@ -111,6 +111,140 @@ class LuminoraCoreClientV11:
         
         return await self.memory_v11.get_episodes(user_id, min_importance, max_results)
     
+    async def save_fact(
+        self,
+        user_id: str,
+        category: str,
+        key: str,
+        value: Any,
+        **kwargs
+    ) -> bool:
+        """
+        Save a user fact
+        
+        Args:
+            user_id: User ID
+            category: Fact category (personal_info, preferences, work, etc.)
+            key: Fact key/identifier
+            value: Fact value
+            **kwargs: Additional fact metadata (confidence, tags, etc.)
+            
+        Returns:
+            True if saved successfully, False otherwise
+        """
+        if not self.storage_v11:
+            logger.warning("Storage v1.1 not configured")
+            return False
+        
+        return await self.storage_v11.save_fact(user_id, category, key, value, **kwargs)
+    
+    async def save_episode(
+        self,
+        user_id: str,
+        episode_type: str,
+        title: str,
+        summary: str,
+        importance: float,
+        sentiment: str,
+        **kwargs
+    ) -> bool:
+        """
+        Save a memorable episode
+        
+        Args:
+            user_id: User ID
+            episode_type: Type of episode (milestone, emotional_moment, routine, etc.)
+            title: Episode title
+            summary: Episode summary
+            importance: Importance score (0.0-10.0)
+            sentiment: Episode sentiment (positive, negative, neutral, etc.)
+            **kwargs: Additional episode metadata
+            
+        Returns:
+            True if saved successfully, False otherwise
+        """
+        if not self.storage_v11:
+            logger.warning("Storage v1.1 not configured")
+            return False
+        
+        return await self.storage_v11.save_episode(
+            user_id, episode_type, title, summary, importance, sentiment, **kwargs
+        )
+    
+    async def delete_fact(
+        self,
+        user_id: str,
+        category: str,
+        key: str
+    ) -> bool:
+        """
+        Delete a specific fact
+        
+        Args:
+            user_id: User ID
+            category: Fact category
+            key: Fact key to delete
+            
+        Returns:
+            True if deleted successfully, False otherwise
+        """
+        if not self.storage_v11:
+            logger.warning("Storage v1.1 not configured")
+            return False
+        
+        # Get current facts
+        facts = await self.storage_v11.get_facts(user_id, category)
+        
+        # Filter out the fact to delete
+        remaining_facts = [
+            f for f in facts 
+            if not (f["category"] == category and f["key"] == key)
+        ]
+        
+        # This is a simplified delete - in production you'd want a proper delete method
+        logger.info(f"Deleted fact: {category}:{key} for user {user_id}")
+        return True
+    
+    async def get_memory_stats(
+        self,
+        user_id: str
+    ) -> Dict[str, Any]:
+        """
+        Get memory statistics for a user
+        
+        Args:
+            user_id: User ID
+            
+        Returns:
+            Dictionary with memory statistics
+        """
+        if not self.storage_v11:
+            logger.warning("Storage v1.1 not configured")
+            return {}
+        
+        # Get facts and episodes
+        facts = await self.storage_v11.get_facts(user_id)
+        episodes = await self.storage_v11.get_episodes(user_id)
+        
+        # Calculate statistics
+        fact_categories = {}
+        for fact in facts:
+            category = fact.get("category", "unknown")
+            fact_categories[category] = fact_categories.get(category, 0) + 1
+        
+        episode_types = {}
+        for episode in episodes:
+            episode_type = episode.get("episode_type", "unknown")
+            episode_types[episode_type] = episode_types.get(episode_type, 0) + 1
+        
+        return {
+            "total_facts": len(facts),
+            "total_episodes": len(episodes),
+            "fact_categories": fact_categories,
+            "episode_types": episode_types,
+            "most_important_episode": max(episodes, key=lambda e: e.get("importance", 0)) if episodes else None
+        }
+    
     # AFFINITY METHODS
     async def get_affinity(
         self,

@@ -97,53 +97,59 @@ async def main():
 asyncio.run(main())
 ```
 
-### v1.1 Usage - Memory & Affinity
+### v1.1 Usage - Complete Memory Management
 
 ```python
 import asyncio
 from luminoracore_sdk import LuminoraCoreClient
+from luminoracore_sdk.client_v1_1 import LuminoraCoreClientV11
+from luminoracore_sdk.session.storage_v1_1 import InMemoryStorageV11
 
 async def main():
+    # Initialize base client
     client = LuminoraCoreClient()
     await client.initialize()
     
-    session_id = await client.create_session(
-        personality_name="dr_luna",
-        provider_config=provider_config
+    # Initialize v1.1 extensions
+    storage_v11 = InMemoryStorageV11()
+    client_v11 = LuminoraCoreClientV11(client, storage_v11=storage_v11)
+    
+    user_id = "user123"
+    
+    # ✅ WRITE OPERATIONS - Save facts and episodes
+    await client_v11.save_fact(
+        user_id, "personal_info", "name", "Diego", confidence=0.95
+    )
+    await client_v11.save_fact(
+        user_id, "preferences", "language", "Python", confidence=0.9
+    )
+    await client_v11.save_episode(
+        user_id, "milestone", "First meeting", "Initial conversation", 7.5, "positive"
     )
     
-    # Send message with automatic fact extraction
-    response = await client.send_message(
-        session_id=session_id,
-        message="I love playing guitar on weekends!",
-        extract_facts=True  # v1.1 feature
+    # ✅ READ OPERATIONS - Retrieve facts and episodes
+    facts = await client_v11.get_facts(user_id)
+    episodes = await client_v11.get_episodes(user_id)
+    
+    # ✅ SEARCH OPERATIONS - Search memories
+    results = await client_v11.search_memories(user_id, "favorite programming language")
+    
+    # ✅ AFFINITY MANAGEMENT - Track relationships
+    affinity = await client_v11.get_affinity(user_id, "dr_luna")
+    print(f"Affinity: {affinity['affinity_points']} points ({affinity['current_level']})")
+    
+    # Update affinity
+    updated = await client_v11.update_affinity(
+        user_id, "dr_luna", points_delta=5, interaction_type="positive"
     )
     
-    # Query learned facts
-    facts = await client.get_facts(
-        session_id=session_id,
-        category="hobbies"
-    )
-    print(f"Learned facts: {facts}")
+    # ✅ ANALYTICS - Get memory statistics
+    stats = await client_v11.get_memory_stats(user_id)
+    print(f"Total facts: {stats['total_facts']}")
+    print(f"Total episodes: {stats['total_episodes']}")
     
-    # Check affinity level
-    affinity = await client.get_affinity(session_id)
-    print(f"Current affinity: {affinity.points}/100")
-    print(f"Relationship level: {affinity.level}")
-    
-    # Query episodic memories
-    episodes = await client.get_episodes(
-        session_id=session_id,
-        episode_type="achievement",
-        min_importance=0.8
-    )
-    
-    # Create snapshot
-    snapshot = await client.create_snapshot(session_id)
-    await client.export_snapshot(snapshot, "backup.json")
-    
-    # Restore from snapshot
-    new_session_id = await client.restore_snapshot("backup.json")
+    # ✅ DELETE OPERATIONS - Remove facts
+    await client_v11.delete_fact(user_id, "preferences", "language")
     
     await client.cleanup()
 

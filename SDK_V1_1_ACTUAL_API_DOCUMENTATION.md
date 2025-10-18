@@ -1,52 +1,60 @@
-# 📚 Documentación Real del SDK v1.1 - API Actual
+# 📚 Real SDK v1.1 Documentation - Current API
 
-**Documentación exacta de lo que tiene el SDK v1.1 - Sin asumir métodos que no existen**
-
----
-
-## 🎯 **PROBLEMA IDENTIFICADO**
-
-**❌ Lo que estaba mal:**
-- Asumí métodos como `add_fact()`, `store_fact()` que NO existen
-- Inventé parámetros como `category`, `limit` que NO acepta
-- No verifiqué la API real del SDK v1.1
-
-**✅ Lo que SÍ existe:**
-- `MemoryManagerV11` con métodos limitados
-- `StorageV11Extension` con métodos abstractos
-- `LuminoraCoreClientV11` con métodos específicos
+**Exact documentation of what the SDK v1.1 has - Without assuming methods that don't exist**
 
 ---
 
-## 🔍 **API REAL DEL SDK V1.1**
+## 🎯 **IDENTIFIED PROBLEM**
+
+**❌ What was wrong:**
+- Assumed methods like `add_fact()`, `store_fact()` that DON'T exist
+- Invented parameters like `category`, `limit` that are NOT accepted
+- Didn't verify the real SDK v1.1 API
+
+**✅ What DOES exist:**
+- `MemoryManagerV11` with limited methods
+- `StorageV11Extension` with abstract methods
+- `LuminoraCoreClientV11` with specific methods
+
+---
+
+## 🔍 **REAL SDK V1.1 API**
 
 ### **1. LuminoraCoreClientV11**
 ```python
 from luminoracore_sdk.client_v1_1 import LuminoraCoreClientV11
 
-# Inicialización
+# Initialization
 client_v11 = LuminoraCoreClientV11(base_client, storage_v11=storage)
 
-# MÉTODOS DISPONIBLES:
+# AVAILABLE METHODS:
+
+# ✅ READ METHODS:
 await client_v11.search_memories(user_id, query, top_k=10)
 await client_v11.get_facts(user_id, options=None)
 await client_v11.get_episodes(user_id, min_importance=None, max_results=None)
 await client_v11.get_affinity(user_id, personality_name)
 await client_v11.get_relationship_level(user_id, personality_name)
 await client_v11.export_personality_snapshot(user_id, personality_name, options=None)
+
+# ✅ WRITE METHODS (NEW):
+await client_v11.save_fact(user_id, category, key, value, **kwargs)
+await client_v11.save_episode(user_id, episode_type, title, summary, importance, sentiment, **kwargs)
+await client_v11.delete_fact(user_id, category, key)
+await client_v11.get_memory_stats(user_id)
 ```
 
 ### **2. MemoryManagerV11**
 ```python
 from luminoracore_sdk.session.memory_v1_1 import MemoryManagerV11
 
-# Inicialización
+# Initialization
 memory_manager = MemoryManagerV11(storage_v11=storage)
 
-# MÉTODOS DISPONIBLES:
+# AVAILABLE METHODS:
 await memory_manager.get_facts(user_id, options=None)
 await memory_manager.get_episodes(user_id, min_importance=None, max_results=None)
-await memory_manager.get_episode_by_id(episode_id)  # ⚠️ No implementado
+await memory_manager.get_episode_by_id(episode_id)  # ⚠️ Not implemented
 await memory_manager.semantic_search(user_id, query, top_k=10, filters=None)
 ```
 
@@ -54,7 +62,7 @@ await memory_manager.semantic_search(user_id, query, top_k=10, filters=None)
 ```python
 from luminoracore_sdk.session.storage_v1_1 import StorageV11Extension
 
-# MÉTODOS ABSTRACTOS (deben implementarse):
+# ABSTRACT METHODS (must be implemented):
 await storage.save_affinity(user_id, personality_name, affinity_points, current_level)
 await storage.get_affinity(user_id, personality_name)
 await storage.save_fact(user_id, category, key, value)
@@ -69,42 +77,42 @@ await storage.get_mood(session_id)
 ```python
 from luminoracore_sdk.session.storage_v1_1 import InMemoryStorageV11
 
-# Implementación en memoria (para testing)
+# In-memory implementation (for testing)
 storage = InMemoryStorageV11()
 
-# MÉTODOS IMPLEMENTADOS:
-await storage.save_affinity(...)  # ✅ Implementado
-await storage.get_affinity(...)   # ✅ Implementado
-await storage.save_fact(...)      # ✅ Implementado
-await storage.get_facts(...)      # ✅ Implementado
-await storage.save_episode(...)   # ✅ Implementado
-await storage.get_episodes(...)   # ✅ Implementado
-await storage.save_mood(...)      # ✅ Implementado
-await storage.get_mood(...)       # ✅ Implementado
+# IMPLEMENTED METHODS:
+await storage.save_affinity(...)  # ✅ Implemented
+await storage.get_affinity(...)   # ✅ Implemented
+await storage.save_fact(...)      # ✅ Implemented
+await storage.get_facts(...)      # ✅ Implemented
+await storage.save_episode(...)   # ✅ Implemented
+await storage.get_episodes(...)   # ✅ Implemented
+await storage.save_mood(...)      # ✅ Implemented
+await storage.get_mood(...)       # ✅ Implemented
 ```
 
 ---
 
-## 🔧 **IMPLEMENTACIÓN CORRECTA PARA BACKEND**
+## 🔧 **CORRECT IMPLEMENTATION FOR BACKEND**
 
-### **1. Configuración Correcta**
+### **1. Correct Configuration**
 ```python
 from luminoracore_sdk.client_v1_1 import LuminoraCoreClientV11
 from luminoracore_sdk.session.storage_v1_1 import InMemoryStorageV11
 from luminoracore_sdk.session.memory_v1_1 import MemoryManagerV11
 
-# Configurar storage
-storage = InMemoryStorageV11()  # Para desarrollo
-# storage = DynamoDBStorageV11(...)  # Para producción
+# Configure storage
+storage = InMemoryStorageV11()  # For development
+# storage = DynamoDBStorageV11(...)  # For production
 
-# Configurar cliente v1.1
-base_client = LuminoraCoreClient()  # Cliente base v1.0
+# Configure v1.1 client
+base_client = LuminoraCoreClient()  # Base client v1.0
 client_v11 = LuminoraCoreClientV11(base_client, storage_v11=storage)
 ```
 
-### **2. Endpoints Correctos**
+### **2. Correct Endpoints**
 ```python
-# ✅ CORRECTO: Usar métodos que SÍ existen
+# ✅ CORRECT: Use methods that DO exist
 @app.route('/api/v1/memory/session/<session_id>/facts', methods=['GET'])
 async def get_memory_facts(session_id):
     facts = await client_v11.get_facts(session_id)
@@ -123,33 +131,33 @@ async def search_memory(session_id):
     return jsonify({"results": results})
 ```
 
-### **3. ❌ INCORRECTO: Métodos que NO existen**
+### **3. ❌ INCORRECT: Methods that DON'T exist**
 ```python
-# ❌ ESTO NO EXISTE:
-await memory_manager.add_fact(session_id, fact_data)  # ❌ No existe
-await memory_manager.store_fact(session_id, content, category)  # ❌ No existe
-await client_v11.save_fact(session_id, fact)  # ❌ No existe
+# ❌ THIS DOES NOT EXIST:
+await memory_manager.add_fact(session_id, fact_data)  # ❌ Does not exist
+await memory_manager.store_fact(session_id, content, category)  # ❌ Does not exist
+await client_v11.save_fact(session_id, fact)  # ❌ Does not exist
 
-# ❌ ESTOS PARÁMETROS NO EXISTEN:
-await memory_manager.get_facts(session_id, category="personal_info")  # ❌ No acepta category
-await memory_manager.get_facts(session_id, limit=10)  # ❌ No acepta limit
+# ❌ THESE PARAMETERS DO NOT EXIST:
+await memory_manager.get_facts(session_id, category="personal_info")  # ❌ Does not accept category
+await memory_manager.get_facts(session_id, limit=10)  # ❌ Does not accept limit
 ```
 
 ---
 
-## 🎯 **ESTRATEGIA CORRECTA**
+## 🎯 **CORRECT STRATEGY**
 
-### **Opción 1: Usar Solo Lectura (Recomendado para Demo)**
+### **Option 1: Use Only Reading (Recommended for Demo)**
 ```python
-# Solo usar métodos de lectura que SÍ existen
+# Only use read methods that DO exist
 async def handle_memory_readonly(session_id):
-    # Leer hechos existentes
+    # Read existing facts
     facts = await client_v11.get_facts(session_id)
     
-    # Leer episodios existentes
+    # Read existing episodes
     episodes = await client_v11.get_episodes(session_id)
     
-    # Buscar en memoria
+    # Search in memory
     search_results = await client_v11.search_memories(session_id, "query")
     
     return {
@@ -159,93 +167,264 @@ async def handle_memory_readonly(session_id):
     }
 ```
 
-### **Opción 2: Implementar Storage Personalizado**
+### **Option 2: Implement Custom Storage**
 ```python
 class CustomStorageV11(StorageV11Extension):
-    """Implementación personalizada para el backend"""
+    """Custom implementation for the backend"""
     
     async def save_fact(self, user_id: str, category: str, key: str, value: Any, **kwargs) -> bool:
-        # Implementar guardado en DynamoDB/SQLite
+        # Implement saving to DynamoDB/SQLite
         pass
     
     async def get_facts(self, user_id: str, category: Optional[str] = None) -> List[Dict[str, Any]]:
-        # Implementar lectura desde DynamoDB/SQLite
+        # Implement reading from DynamoDB/SQLite
         pass
     
-    # ... implementar todos los métodos abstractos
+    # ... implement all abstract methods
 ```
 
-### **Opción 3: Simular Escritura (Para Demo)**
+### **Option 3: Simulate Writing (For Demo)**
 ```python
-# Simular escritura usando el cliente base v1.0
+# Simulate writing using the base v1.0 client
 async def simulate_fact_storage(session_id, fact_data):
-    # Usar el cliente base para simular almacenamiento
-    # Esto es solo para demostración
+    # Use the base client to simulate storage
+    # This is only for demonstration
     pass
 ```
 
 ---
 
-## 📋 **ENDPOINTS REALES QUE SE PUEDEN IMPLEMENTAR**
+## 📋 **REAL ENDPOINTS THAT CAN BE IMPLEMENTED**
 
-### **Endpoints de Lectura (✅ Funcionan)**
+### **Read Endpoints (✅ Work)**
 ```bash
-GET /api/v1/memory/session/{id}/facts           # Leer hechos
-GET /api/v1/memory/session/{id}/episodes        # Leer episodios
-POST /api/v1/memory/session/{id}/search         # Buscar en memoria
-GET /api/v1/affinity/session/{id}               # Leer afinidad
-GET /api/v1/relationship/session/{id}           # Leer nivel de relación
-GET /api/v1/session/{id}/export                 # Exportar snapshot
+GET /api/v1/memory/session/{id}/facts           # Read facts
+GET /api/v1/memory/session/{id}/episodes        # Read episodes
+POST /api/v1/memory/session/{id}/search         # Search in memory
+GET /api/v1/affinity/session/{id}               # Read affinity
+GET /api/v1/relationship/session/{id}           # Read relationship level
+GET /api/v1/session/{id}/export                 # Export snapshot
 ```
 
-### **Endpoints de Escritura (⚠️ Requieren implementación)**
+### **Write Endpoints (⚠️ Require implementation)**
 ```bash
-POST /api/v1/memory/session/{id}/facts          # Guardar hecho (implementar)
-POST /api/v1/memory/session/{id}/episodes       # Guardar episodio (implementar)
-POST /api/v1/affinity/session/{id}              # Guardar afinidad (implementar)
+POST /api/v1/memory/session/{id}/facts          # Save fact (implement)
+POST /api/v1/memory/session/{id}/episodes       # Save episode (implement)
+POST /api/v1/affinity/session/{id}              # Save affinity (implement)
 ```
 
 ---
 
-## 🚀 **RECOMENDACIÓN PARA CURSOR AI**
+## 🚀 **RECOMMENDATION FOR CURSOR AI**
 
-### **Fase 1: Implementar Solo Lectura**
-1. Usar `InMemoryStorageV11` para desarrollo
-2. Implementar endpoints de lectura que SÍ existen
-3. Probar que funciona correctamente
+### **Phase 1: Implement Only Reading**
+1. Use `InMemoryStorageV11` for development
+2. Implement read endpoints that DO exist
+3. Test that it works correctly
 
-### **Fase 2: Implementar Escritura**
-1. Crear `CustomStorageV11` que extienda `StorageV11Extension`
-2. Implementar métodos abstractos para DynamoDB/SQLite
-3. Agregar endpoints de escritura
+### **Phase 2: Implement Writing**
+1. Create `CustomStorageV11` that extends `StorageV11Extension`
+2. Implement abstract methods for DynamoDB/SQLite
+3. Add write endpoints
 
-### **Fase 3: Integración Completa**
-1. Conectar con base de datos real
-2. Implementar persistencia completa
-3. Probar flujo completo
-
----
-
-## ✅ **RESUMEN DE LO QUE SÍ EXISTE**
-
-### **✅ Clases Disponibles:**
-- `LuminoraCoreClientV11` - Cliente v1.1
-- `MemoryManagerV11` - Gestión de memoria
-- `StorageV11Extension` - Interfaz de almacenamiento
-- `InMemoryStorageV11` - Implementación en memoria
-
-### **✅ Métodos de Lectura:**
-- `get_facts()` - Leer hechos
-- `get_episodes()` - Leer episodios
-- `search_memories()` - Buscar en memoria
-- `get_affinity()` - Leer afinidad
-- `export_personality_snapshot()` - Exportar snapshot
-
-### **⚠️ Métodos de Escritura (Abstractos):**
-- `save_fact()` - Guardar hecho (implementar)
-- `save_episode()` - Guardar episodio (implementar)
-- `save_affinity()` - Guardar afinidad (implementar)
+### **Phase 3: Complete Integration**
+1. Connect with real database
+2. Implement complete persistence
+3. Test complete workflow
 
 ---
 
-**🎊 ¡Ahora Cursor AI sabe exactamente qué métodos existen y cuáles debe implementar!**
+## ✅ **SUMMARY OF WHAT DOES EXIST**
+
+### **✅ Available Classes:**
+- `LuminoraCoreClientV11` - v1.1 Client
+- `MemoryManagerV11` - Memory management
+- `StorageV11Extension` - Storage interface
+- `InMemoryStorageV11` - In-memory implementation
+
+### **✅ Read Methods:**
+- `get_facts()` - Read facts
+- `get_episodes()` - Read episodes
+- `search_memories()` - Search in memory
+- `get_affinity()` - Read affinity
+- `export_personality_snapshot()` - Export snapshot
+
+### **⚠️ Write Methods (Abstract):**
+- `save_fact()` - Save fact (implement)
+- `save_episode()` - Save episode (implement)
+- `save_affinity()` - Save affinity (implement)
+
+---
+
+## 💾 **Storage System - Complete Guide**
+
+### **Storage Types Available:**
+
+#### **1. Memory Storage (Default)**
+```python
+# In RAM - Lost when app closes
+storage_config = StorageConfig(storage_type="memory")
+```
+
+**✅ Advantages:**
+- Zero setup required
+- Very fast
+- Perfect for testing and demos
+
+**❌ Disadvantages:**
+- Data lost when app closes
+- Not persistent
+- Not suitable for production
+
+#### **2. JSON File Storage**
+```python
+# Persistent file on disk
+storage_config = StorageConfig(
+    storage_type="json",
+    connection_string="./sessions/conversations.json"  # File path
+)
+```
+
+**✅ Advantages:**
+- Persistent (saved on disk)
+- No database server required
+- Portable (can move the file)
+- Human-readable format
+- Easy backups
+
+**❌ Disadvantages:**
+- Slow with many sessions (>1000)
+- Not suitable for concurrent access
+- No complex queries
+
+**📍 Where JSON files are saved:**
+- **Default location**: `./sessions/conversations.json` (relative to your app)
+- **Custom location**: You specify the path in `connection_string`
+- **Directory**: Automatically created if it doesn't exist
+
+**Example for API Demo:**
+```python
+# For a demo API, save in a specific folder
+storage_config = StorageConfig(
+    storage_type="json",
+    connection_string="./demo_data/user_sessions.json"
+)
+# This creates: ./demo_data/user_sessions.json
+```
+
+#### **3. SQLite Storage**
+```python
+# Local database file
+storage_config = StorageConfig(
+    storage_type="sqlite",
+    connection_string="./data/luminoracore.db"
+)
+```
+
+**✅ Advantages:**
+- Persistent database file
+- Perfect for mobile apps
+- Fast SQL queries
+- No server required
+
+**❌ Disadvantages:**
+- Not suitable for high concurrency
+- No horizontal scaling
+
+#### **4. Redis Storage**
+```python
+# Redis server
+storage_config = StorageConfig(
+    storage_type="redis",
+    connection_string="redis://localhost:6379"
+)
+```
+
+**✅ Advantages:**
+- Very fast (in-memory)
+- Perfect for web applications
+- Supports concurrent access
+- Automatic TTL
+
+**❌ Disadvantages:**
+- Requires Redis server
+- More complex setup
+
+#### **5. PostgreSQL/MongoDB Storage**
+```python
+# Production databases
+storage_config = StorageConfig(
+    storage_type="postgres",  # or "mongodb"
+    connection_string="postgresql://user:pass@localhost:5432/db"
+)
+```
+
+### **Storage Decision Guide:**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    STORAGE DECISION TREE                   │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Need persistence?                                          │
+│  ├─ No → Use MEMORY (default)                              │
+│  └─ Yes → What type of application?                        │
+│       ├─ Demo/Testing → Use JSON FILE                      │
+│       ├─ Mobile App → Use SQLITE                           │
+│       ├─ Desktop App → Use JSON or SQLITE                  │
+│       ├─ Web App (single server) → Use SQLITE or REDIS     │
+│       ├─ Web App (multiple servers) → Use REDIS            │
+│       └─ Enterprise → Use POSTGRESQL or MONGODB            │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### **For API Demo Implementation:**
+
+#### **Recommended Setup for Demo API:**
+```python
+# Option 1: JSON File (Simple)
+storage_config = StorageConfig(
+    storage_type="json",
+    connection_string="./demo_sessions.json"
+)
+
+# Option 2: SQLite (Better for demos)
+storage_config = StorageConfig(
+    storage_type="sqlite",
+    connection_string="./demo_data/luminoracore_demo.db"
+)
+```
+
+#### **File Structure for Demo:**
+```
+your_api_project/
+├── demo_data/
+│   ├── luminoracore_demo.db     # SQLite database
+│   └── user_sessions.json       # JSON sessions
+├── src/
+│   └── api.py                   # Your API code
+└── requirements.txt
+```
+
+### **Storage v1.1 Integration:**
+
+The v1.1 memory system works with ALL storage types:
+
+```python
+# Initialize with your chosen storage
+storage_config = StorageConfig(storage_type="json", connection_string="./sessions.json")
+client = LuminoraCoreClient(storage_config=storage_config)
+
+# Initialize v1.1 extensions
+storage_v11 = InMemoryStorageV11()  # For v1.1 features
+client_v11 = LuminoraCoreClientV11(client, storage_v11=storage_v11)
+
+# Now you have:
+# - v1.0 sessions stored in your chosen backend (JSON/SQLite/etc.)
+# - v1.1 memory features (facts, episodes, affinity) in memory
+```
+
+---
+
+**🎊 Now Cursor AI knows exactly which methods exist and which ones it must implement!**
