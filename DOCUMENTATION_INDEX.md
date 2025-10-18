@@ -21,6 +21,16 @@
 **Audience**: Developers who need fast reference
 **Content**: CLI commands, Python code examples, troubleshooting
 
+### [DEMO_PROJECT_INTEGRATION_GUIDE.md](DEMO_PROJECT_INTEGRATION_GUIDE.md) - ⭐ Demo Project Guide
+**Purpose**: Complete guide for integrating LuminoraCore into demo projects
+**Audience**: Developers building demos, prototypes, or showcases
+**Content**: Installation, feature showcase, storage options, troubleshooting
+
+### [SERVERLESS_LAMBDA_DYNAMODB_DEEPSEEK_GUIDE.md](SERVERLESS_LAMBDA_DYNAMODB_DEEPSEEK_GUIDE.md) - ⭐ Serverless Deployment Guide
+**Purpose**: Complete guide for deploying LuminoraCore in serverless architecture
+**Audience**: Developers building production serverless applications
+**Content**: Lambda setup, DynamoDB design, DeepSeek integration, deployment, monitoring
+
 ---
 
 ## 🎯 Business & Strategy

@@ -6,7 +6,7 @@ Demonstrates complete database migration management for v1.1.
 
 import asyncio
 from datetime import datetime
-from luminoracore.storage.migration_manager import MigrationManager, Migration
+from luminoracore.storage.migrations import MigrationManager, MigrationError
 
 
 class MockStorage:

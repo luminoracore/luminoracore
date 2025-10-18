@@ -13,7 +13,7 @@ def main():
     """Complete Feature Flags demonstration."""
     
     print("=" * 80)
-    print("🚩 LuminoraCore v1.1 - Feature Flags Deep Dive")
+    print("LuminoraCore v1.1 - Feature Flags Deep Dive")
     print("=" * 80)
     
     # ========================================

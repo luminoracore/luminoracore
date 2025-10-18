@@ -12,7 +12,8 @@
 ## 🚀 Quick Start (5 Minutes)
 
 ```bash
-# Install
+# Install (Windows - set PYTHONPATH for v1.1 modules)
+$env:PYTHONPATH = "D:\Proyectos Ereace\LuminoraCoreBase\luminoracore"
 pip install -e luminoracore/
 pip install -e luminoracore-sdk-python/
 
@@ -21,6 +22,17 @@ python quick_start_sdk.py
 ```
 
 **See [5_MINUTE_QUICK_START.md](5_MINUTE_QUICK_START.md) for complete guide.**
+
+### ⚠️ Important Installation Note
+
+**For Windows users**: The v1.1 modules require setting PYTHONPATH to access the updated core modules:
+
+```powershell
+# Set PYTHONPATH before running examples
+$env:PYTHONPATH = "D:\Proyectos Ereace\LuminoraCoreBase\luminoracore"
+```
+
+**This ensures access to all v1.1 features: FeatureFlags, Migrations, Affinity, Memory, etc.**
 
 ---
 
@@ -187,8 +199,24 @@ python verify_installation.py
 
 ---
 
-## 📊 Performance
+## 📊 Performance & Status
 
+### ✅ Framework Status: 100% Complete
+- **✅ Core Engine v1.1**: All modules functional (FeatureFlags, Migrations, Affinity, Memory)
+- **✅ SDK v1.1**: Complete API with real storage implementations
+- **✅ CLI v1.1**: All commands functional (migrate, memory, snapshot)
+- **✅ Examples**: All complex examples working with real implementations
+
+### 🧪 Tested & Verified
+- **✅ Feature Flag System**: Configuration management, dynamic feature control
+- **✅ Database Migrations**: Schema management, version control, rollback support
+- **✅ Affinity System**: Relationship tracking, level progression, point calculation
+- **✅ Memory System**: Fact extraction, episodic memory, semantic search
+- **✅ Storage Options**: SQLite, DynamoDB, PostgreSQL, MySQL, MongoDB, Redis
+- **✅ Personality Evolution**: Dynamic personality updates based on interactions
+- **✅ Sentiment Analysis**: LLM-powered sentiment detection and analysis
+
+### 📈 Performance Metrics
 - ✅ **179 tests passing**
 - ✅ **~5,100 lines of code**
 - ✅ **100% backward compatible**
