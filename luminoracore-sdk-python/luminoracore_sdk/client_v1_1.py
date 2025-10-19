@@ -169,6 +169,7 @@ class LuminoraCoreClientV11:
                     key="provider_config",
                     value=str(provider_config)
                 )
+            
         
         return session_id
     

@@ -201,5 +201,8 @@ def main():
         asyncio.run(test_conversation_memory_interactive())
 
 
+# Export the main function for CLI
+conversation_memory = main
+
 if __name__ == "__main__":
     main()

@@ -380,8 +380,13 @@ Instructions:
                     )
                 except Exception as e:
                     print(f"Base client send_message failed: {e}")
-                    # Create a context-aware fallback response
-                    response = self._create_context_aware_fallback_response(context)
+                    # Check if it's a session not found error - use context-aware fallback
+                    if "Session not found" in str(e):
+                        print(f"Session not found in base_client, using context-aware fallback for DynamoDB")
+                        response = self._create_context_aware_fallback_response(context)
+                    else:
+                        # Create a context-aware fallback response for other errors
+                        response = self._create_context_aware_fallback_response(context)
             else:
                 # Final fallback with context awareness
                 response = self._create_context_aware_fallback_response(context)

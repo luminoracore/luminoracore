@@ -10,10 +10,23 @@ from botocore.exceptions import ClientError
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timedelta
 import logging
+from decimal import Decimal
 
 from .storage_v1_1 import StorageV11Extension
 
 logger = logging.getLogger(__name__)
+
+
+def _convert_floats_to_decimal(obj):
+    """Convert float values to Decimal for DynamoDB compatibility"""
+    if isinstance(obj, float):
+        return Decimal(str(obj))
+    elif isinstance(obj, dict):
+        return {k: _convert_floats_to_decimal(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [_convert_floats_to_decimal(item) for item in obj]
+    else:
+        return obj
 
 
 class DynamoDBStorageV11(StorageV11Extension):
@@ -76,6 +89,32 @@ class DynamoDBStorageV11(StorageV11Extension):
                     {
                         'AttributeName': 'SK',
                         'AttributeType': 'S'
+                    },
+                    {
+                        'AttributeName': 'GSI1PK',
+                        'AttributeType': 'S'
+                    },
+                    {
+                        'AttributeName': 'GSI1SK',
+                        'AttributeType': 'S'
+                    }
+                ],
+                GlobalSecondaryIndexes=[
+                    {
+                        'IndexName': 'GSI1',
+                        'KeySchema': [
+                            {
+                                'AttributeName': 'GSI1PK',
+                                'KeyType': 'HASH'
+                            },
+                            {
+                                'AttributeName': 'GSI1SK',
+                                'KeyType': 'RANGE'
+                            }
+                        ],
+                        'Projection': {
+                            'ProjectionType': 'ALL'
+                        }
                     }
                 ],
                 BillingMode='PAY_PER_REQUEST'
@@ -136,6 +175,9 @@ class DynamoDBStorageV11(StorageV11Extension):
                 'updated_at': datetime.now().isoformat(),
                 'TTL': int((datetime.now() + timedelta(days=365)).timestamp())
             }
+            
+            # Convert floats to Decimal for DynamoDB compatibility
+            item = _convert_floats_to_decimal(item)
             
             self.table.put_item(Item=item)
             return True
@@ -203,6 +245,9 @@ class DynamoDBStorageV11(StorageV11Extension):
                 'TTL': int((datetime.now() + timedelta(days=365)).timestamp())
             }
             
+            # Convert floats to Decimal for DynamoDB compatibility
+            item = _convert_floats_to_decimal(item)
+            
             self.table.put_item(Item=item)
             return True
             
@@ -240,18 +285,28 @@ class DynamoDBStorageV11(StorageV11Extension):
             facts = []
             for item in response.get('Items', []):
                 try:
-                    value = json.loads(item['value']) if item['value'].startswith(('{', '[', '"')) else item['value']
-                except:
-                    value = item['value']
-                
-                facts.append({
-                    "category": item['category'],
-                    "key": item['key'],
-                    "value": value,
-                    "confidence": item.get('confidence', 1.0),
-                    "created_at": item.get('created_at'),
-                    "updated_at": item.get('updated_at')
-                })
+                    # Check if this is a fact item (has SK = 'FACT')
+                    if item.get('SK') != 'FACT':
+                        continue
+                    
+                    value = item.get('value', '')
+                    if isinstance(value, str) and value.startswith(('{', '[', '"')):
+                        try:
+                            value = json.loads(value)
+                        except:
+                            pass  # Keep as string if JSON parsing fails
+                    
+                    facts.append({
+                        "category": item.get('category', ''),
+                        "key": item.get('key', ''),
+                        "value": value,
+                        "confidence": item.get('confidence', 1.0),
+                        "created_at": item.get('created_at'),
+                        "updated_at": item.get('updated_at')
+                    })
+                except Exception as e:
+                    logger.warning(f"Skipping invalid fact item: {e}")
+                    continue
             
             return facts
             

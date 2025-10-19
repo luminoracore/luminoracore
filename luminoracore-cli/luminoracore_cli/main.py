@@ -154,7 +154,7 @@ app.command("info", help="Show personality information")(info_command)
 app.command("migrate", help="Database migration management")(migrate)
 app.add_typer(memory, name="memory", help="Memory management (facts, episodes, affinity)")
 app.add_typer(snapshot, name="snapshot", help="Session snapshot export/import")
-app.command("conversation-memory", help="Test conversation memory integration - CRITICAL FIX")(conversation_memory.main)
+app.command("conversation-memory", help="Test conversation memory integration - CRITICAL FIX")(conversation_memory)
 
 # Exception handling
 # @app.callback(invoke_without_command=True)  # DISABLED: conflicts with main callback
