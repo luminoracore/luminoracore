@@ -80,6 +80,15 @@ class ConversationMemoryManager:
             # Step 3: Get user affinity/relationship level
             affinity = await self.client.get_affinity(session_id, personality_name)
             
+            # Handle case where affinity is None (new user)
+            if affinity is None:
+                affinity = {
+                    "current_level": "stranger",
+                    "affinity_points": 0,
+                    "total_interactions": 0,
+                    "positive_interactions": 0
+                }
+            
             # Step 4: Build complete context for LLM
             context = await self._build_llm_context(
                 session_id=session_id,
@@ -137,8 +146,8 @@ class ConversationMemoryManager:
                 "response": response["content"],
                 "personality_name": personality_name,
                 "facts_learned": len(new_facts),
-                "affinity_level": affinity["level"],
-                "affinity_points": affinity["points"],
+                "affinity_level": affinity["current_level"],
+                "affinity_points": affinity["affinity_points"],
                 "conversation_length": len(conversation_history) + 1,
                 "context_used": True,
                 "new_facts": new_facts,
@@ -157,7 +166,7 @@ class ConversationMemoryManager:
         """Get conversation history for the session"""
         try:
             # Try to get from conversation history storage
-            history_data = await self.client.storage.get_facts(
+            history_data = await self.client.storage_v11.get_facts(
                 user_id=session_id, 
                 category="conversation_history"
             )
@@ -206,7 +215,7 @@ class ConversationMemoryManager:
         
         # 1. Personality and relationship context
         context_parts.append(f"Personality: {personality_name}")
-        context_parts.append(f"Relationship Level: {affinity['level']} ({affinity['points']}/100 points)")
+        context_parts.append(f"Relationship Level: {affinity['current_level']} ({affinity['affinity_points']}/100 points)")
         
         # 2. User facts context
         if user_facts:
@@ -226,13 +235,13 @@ class ConversationMemoryManager:
             context_parts.append(history_context)
         
         # 4. Personality-specific instructions based on relationship level
-        if affinity['level'] == 'stranger':
+        if affinity['current_level'] == 'stranger':
             context_parts.append("Instructions: Be professional and formal. Ask questions to learn about the user.")
-        elif affinity['level'] == 'acquaintance':
+        elif affinity['current_level'] == 'acquaintance':
             context_parts.append("Instructions: Be friendly and polite. Reference what you know about the user.")
-        elif affinity['level'] == 'friend':
+        elif affinity['current_level'] == 'friend':
             context_parts.append("Instructions: Be casual and friendly. Reference previous conversations and shared experiences.")
-        elif affinity['level'] == 'close_friend':
+        elif affinity['current_level'] == 'close_friend':
             context_parts.append("Instructions: Be personal and warm. Show deep understanding of the user and their preferences.")
         
         # 5. Current message context
@@ -258,41 +267,42 @@ class ConversationMemoryManager:
         """Generate response using LLM with full context"""
         
         # Use the client's LLM generation with full context
-        if hasattr(self.client, 'generate_with_context'):
-            # If the client has a context-aware generation method
-            response = await self.client.generate_with_context(
-                context=context.context_string,
-                personality_name=context.personality_name,
-                provider_config=provider_config
-            )
-        else:
-            # Fallback: Use the context string as a prompt
+        # Note: We'll use the base_client for actual LLM generation
+        if hasattr(self.client, 'base_client') and self.client.base_client:
+            # Use the context string as a prompt
             prompt = f"""
 {context.context_string}
 
 Based on the above context, generate an appropriate response to the current user message.
 Remember to:
 - Use the personality traits for {context.personality_name}
-- Reference the relationship level ({context.affinity['level']})
+- Reference the relationship level ({context.affinity['current_level']})
 - Use known facts about the user
 - Reference previous conversation if relevant
 - Be natural and conversational
 
 Response:"""
             
-            # Use basic message sending with the context as prompt
-            response = await self.client.send_message(
+            # Use base_client's send_message method
+            response = await self.client.base_client.send_message(
                 session_id=context.session_id,
                 message=prompt,
+                personality_name=context.personality_name,
                 provider_config=provider_config
             )
+        else:
+            # Fallback response if no base_client available
+            response = {
+                "content": f"I understand you said: {context.current_message}. However, I need to be properly configured to respond with full context.",
+                "metadata": {"fallback": True}
+            }
         
         return {
             "content": response.get("content", response.get("response", "I'm sorry, I couldn't generate a response.")),
             "metadata": {
                 "context_used": True,
                 "personality_name": context.personality_name,
-                "affinity_level": context.affinity['level'],
+                "affinity_level": context.affinity['current_level'],
                 "facts_count": len(context.user_facts),
                 "history_length": len(context.conversation_history)
             }
@@ -356,7 +366,7 @@ Response:"""
         
         turn_key = f"turn_{turn.timestamp.strftime('%Y%m%d_%H%M%S_%f')}"
         
-        await self.client.storage.save_fact(
+        await self.client.storage_v11.save_fact(
             user_id=session_id,
             category="conversation_history",
             key=turn_key,
@@ -384,18 +394,19 @@ Response:"""
         if any(keyword in conversation_turn.user_message.lower() for keyword in personal_keywords):
             points_change = 3
         
-        new_points = current_affinity["points"] + points_change
+        new_points = current_affinity["affinity_points"] + points_change
         new_points = min(100, new_points)  # Cap at 100
         
         # Update affinity
         await self.client.update_affinity(
-            session_id=session_id,
+            user_id=session_id,
+            personality_name=conversation_turn.personality_name,
             points_delta=points_change,
-            reason="conversation_interaction"
+            interaction_type="conversation_interaction"
         )
         
         return {
             "points_change": points_change,
             "new_points": new_points,
-            "previous_level": current_affinity["level"]
+            "previous_level": current_affinity["current_level"]
         }
