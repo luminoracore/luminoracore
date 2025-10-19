@@ -55,6 +55,123 @@ class LuminoraCoreClientV11:
         # Initialize conversation memory manager - CRITICAL COMPONENT
         self.conversation_manager = ConversationMemoryManager(self) if storage_v11 else None
     
+    # SESSION MANAGEMENT METHODS
+    async def create_session(
+        self,
+        personality_name: str = "default",
+        provider_config: Optional[Dict[str, Any]] = None
+    ) -> str:
+        """
+        Create a new session for conversation memory
+        
+        Args:
+            personality_name: Name of the personality to use
+            provider_config: LLM provider configuration
+            
+        Returns:
+            Session ID
+        """
+        import uuid
+        from datetime import datetime
+        
+        # Generate unique session ID
+        session_id = f"session_{uuid.uuid4().hex[:12]}_{int(datetime.now().timestamp())}"
+        
+        # Initialize session data in storage
+        if self.storage_v11:
+            # Create initial affinity entry
+            await self.storage_v11.save_affinity(
+                user_id=session_id,
+                personality_name=personality_name,
+                affinity_points=0,
+                current_level="stranger"
+            )
+            
+            # Create initial session metadata
+            await self.storage_v11.save_fact(
+                user_id=session_id,
+                category="session_metadata",
+                key="created_at",
+                value=datetime.now().isoformat()
+            )
+            
+            await self.storage_v11.save_fact(
+                user_id=session_id,
+                category="session_metadata",
+                key="personality_name",
+                value=personality_name
+            )
+            
+            if provider_config:
+                await self.storage_v11.save_fact(
+                    user_id=session_id,
+                    category="session_metadata",
+                    key="provider_config",
+                    value=str(provider_config)
+                )
+        
+        logger.info(f"Created v1.1 session: {session_id} with personality: {personality_name}")
+        return session_id
+    
+    async def ensure_session_exists(
+        self,
+        session_id: str,
+        personality_name: str = "default",
+        provider_config: Optional[Dict[str, Any]] = None
+    ) -> str:
+        """
+        Ensure session exists, create if it doesn't
+        
+        Args:
+            session_id: Session ID to check/create
+            personality_name: Name of the personality to use
+            provider_config: LLM provider configuration
+            
+        Returns:
+            Session ID (same as input or newly created)
+        """
+        if not self.storage_v11:
+            return session_id
+            
+        # Check if session exists by looking for affinity data
+        affinity = await self.storage_v11.get_affinity(session_id, personality_name)
+        
+        if affinity is None:
+            # Session doesn't exist, create it
+            logger.info(f"Session {session_id} doesn't exist, creating it")
+            await self.storage_v11.save_affinity(
+                user_id=session_id,
+                personality_name=personality_name,
+                affinity_points=0,
+                current_level="stranger"
+            )
+            
+            # Create initial session metadata
+            from datetime import datetime
+            await self.storage_v11.save_fact(
+                user_id=session_id,
+                category="session_metadata",
+                key="created_at",
+                value=datetime.now().isoformat()
+            )
+            
+            await self.storage_v11.save_fact(
+                user_id=session_id,
+                category="session_metadata",
+                key="personality_name",
+                value=personality_name
+            )
+            
+            if provider_config:
+                await self.storage_v11.save_fact(
+                    user_id=session_id,
+                    category="session_metadata",
+                    key="provider_config",
+                    value=str(provider_config)
+                )
+        
+        return session_id
+    
     # CRITICAL METHOD: Send message with full conversation context
     async def send_message_with_memory(
         self,
@@ -91,6 +208,13 @@ class LuminoraCoreClientV11:
                 "error": "Conversation memory manager not initialized",
                 "response": "I apologize, but the conversation memory system is not available."
             }
+        
+        # Ensure session exists before processing
+        session_id = await self.ensure_session_exists(
+            session_id=session_id,
+            personality_name=personality_name,
+            provider_config=provider_config
+        )
         
         return await self.conversation_manager.send_message_with_full_context(
             session_id=session_id,
