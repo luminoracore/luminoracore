@@ -15,6 +15,7 @@ from .session.storage_dynamodb_v11 import DynamoDBStorageV11
 from .session.memory_v1_1 import MemoryManagerV11
 from .evolution.personality_evolution import PersonalityEvolutionEngine
 from .analysis.sentiment_analyzer import AdvancedSentimentAnalyzer
+from .conversation_memory_manager import ConversationMemoryManager
 from .types.memory import FactDict, EpisodeDict, MemorySearchResult
 from .types.relationship import AffinityDict, AffinityProgressDict
 from .types.snapshot import PersonalitySnapshotDict, SnapshotExportOptions
@@ -50,6 +51,53 @@ class LuminoraCoreClientV11:
         # Initialize advanced systems
         self.evolution_engine = PersonalityEvolutionEngine(storage_v11) if storage_v11 else None
         self.sentiment_analyzer = AdvancedSentimentAnalyzer(storage_v11, base_client.llm_provider if hasattr(base_client, 'llm_provider') else None) if storage_v11 else None
+        
+        # Initialize conversation memory manager - CRITICAL COMPONENT
+        self.conversation_manager = ConversationMemoryManager(self) if storage_v11 else None
+    
+    # CRITICAL METHOD: Send message with full conversation context
+    async def send_message_with_memory(
+        self,
+        session_id: str,
+        user_message: str,
+        personality_name: str = "default",
+        provider_config: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        """
+        CRITICAL METHOD: Send message with full conversation context and memory
+        
+        This is the method that should be used instead of individual message sending.
+        It properly integrates:
+        - Conversation history
+        - User facts from memory
+        - Affinity/relationship level
+        - Personality traits
+        - Context-aware response generation
+        - Automatic fact extraction
+        - Affinity updates
+        
+        Args:
+            session_id: Session identifier
+            user_message: User's message
+            personality_name: Name of personality to use
+            provider_config: LLM provider configuration
+            
+        Returns:
+            Dict with response and metadata
+        """
+        if not self.conversation_manager:
+            return {
+                "success": False,
+                "error": "Conversation memory manager not initialized",
+                "response": "I apologize, but the conversation memory system is not available."
+            }
+        
+        return await self.conversation_manager.send_message_with_full_context(
+            session_id=session_id,
+            user_message=user_message,
+            personality_name=personality_name,
+            provider_config=provider_config
+        )
     
     # MEMORY METHODS
     async def search_memories(

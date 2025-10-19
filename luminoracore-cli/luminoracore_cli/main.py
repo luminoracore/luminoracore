@@ -29,6 +29,7 @@ from .commands import (
     migrate,
     memory,
     snapshot,
+    conversation_memory,
 )
 from .utils.console import console, error_console
 from .utils.errors import CLIError, handle_cli_error
@@ -153,6 +154,7 @@ app.command("info", help="Show personality information")(info_command)
 app.command("migrate", help="Database migration management")(migrate)
 app.add_typer(memory, name="memory", help="Memory management (facts, episodes, affinity)")
 app.add_typer(snapshot, name="snapshot", help="Session snapshot export/import")
+app.command("conversation-memory", help="Test conversation memory integration - CRITICAL FIX")(conversation_memory.main)
 
 # Exception handling
 # @app.callback(invoke_without_command=True)  # DISABLED: conflicts with main callback

@@ -16,6 +16,7 @@ from .info import info_command
 from .migrate import migrate
 from .memory import memory
 from .snapshot import snapshot
+from .conversation_memory import conversation_memory
 
 __all__ = [
     "validate_command",
@@ -31,5 +32,6 @@ __all__ = [
     # v1.1 commands
     "migrate",
     "memory", 
-    "snapshot"
+    "snapshot",
+    "conversation_memory"
 ]
