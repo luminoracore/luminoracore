@@ -56,8 +56,11 @@ class FlexibleSQLiteStorageV11(StorageV11Extension):
         self.moods_table = moods_table
         self.memories_table = memories_table
         
-        # Ensure database directory exists
-        os.makedirs(os.path.dirname(database_path), exist_ok=True)
+        # Ensure database directory exists (only if path is not empty)
+        if database_path and database_path != ":memory:":
+            db_dir = os.path.dirname(database_path)
+            if db_dir:  # Only create directory if there is one
+                os.makedirs(db_dir, exist_ok=True)
         
         # Auto-detect table names if not provided
         self._detect_tables()

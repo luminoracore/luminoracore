@@ -290,7 +290,11 @@ class ConversationMemoryManager:
                     # Create provider from config
                     try:
                         from .providers.factory import ProviderFactory
-                        provider = ProviderFactory.create_provider_from_dict(provider_config.__dict__)
+                        # Handle both dict and ProviderConfig object
+                        if isinstance(provider_config, dict):
+                            provider = ProviderFactory.create_provider_from_dict(provider_config)
+                        else:
+                            provider = ProviderFactory.create_provider_from_dict(provider_config.__dict__)
                     except (ImportError, Exception) as e:
                         print(f"Could not create provider from config: {e}")
                         # Try alternative provider creation
@@ -298,21 +302,31 @@ class ConversationMemoryManager:
                             from .providers.deepseek import DeepSeekProvider
                             from .providers.openai import OpenAIProvider
                             
-                            if provider_config.name.lower() == "deepseek":
+                            # Handle both dict and ProviderConfig object
+                            if isinstance(provider_config, dict):
+                                provider_name = provider_config.get("name", "deepseek")
+                                api_key = provider_config.get("api_key", "mock-key")
+                                model = provider_config.get("model", "deepseek-chat")
+                            else:
+                                provider_name = provider_config.name
+                                api_key = provider_config.api_key
+                                model = provider_config.model
+                            
+                            if provider_name.lower() == "deepseek":
                                 provider = DeepSeekProvider(
-                                    api_key=provider_config.api_key,
-                                    model=provider_config.model
+                                    api_key=api_key,
+                                    model=model
                                 )
-                            elif provider_config.name.lower() == "openai":
+                            elif provider_name.lower() == "openai":
                                 provider = OpenAIProvider(
-                                    api_key=provider_config.api_key,
-                                    model=provider_config.model
+                                    api_key=api_key,
+                                    model=model
                                 )
                             else:
                                 # Generic provider fallback
                                 provider = DeepSeekProvider(
-                                    api_key=provider_config.api_key,
-                                    model=provider_config.model or "deepseek-chat"
+                                    api_key=api_key,
+                                    model=model or "deepseek-chat"
                                 )
                         except Exception as e2:
                             print(f"Could not create fallback provider: {e2}")
@@ -372,11 +386,22 @@ Instructions:
             # Fallback: Use base_client if provider not available
             if hasattr(self.client, 'base_client') and self.client.base_client:
                 try:
+                    # Convert dict to ProviderConfig if needed
+                    if isinstance(provider_config, dict):
+                        from .types.provider import ProviderConfig
+                        provider_config_obj = ProviderConfig(
+                            name=provider_config.get("name", "deepseek"),
+                            api_key=provider_config.get("api_key", "mock-key"),
+                            model=provider_config.get("model", "deepseek-chat")
+                        )
+                    else:
+                        provider_config_obj = provider_config
+                    
                     response = await self.client.base_client.send_message(
                         session_id=context.session_id,
                         message=context.current_message,
                         personality_name=context.personality_name,
-                        provider_config=provider_config
+                        provider_config=provider_config_obj
                     )
                 except Exception as e:
                     print(f"Base client send_message failed: {e}")
