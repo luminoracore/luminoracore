@@ -305,5 +305,5 @@ asyncio.run(chatbot())
 
 ---
 
-_Last updated: October 2025 | LuminoraCore v1.0.0_
+_Last updated: October 2025 | LuminoraCore v1.1.0_
 

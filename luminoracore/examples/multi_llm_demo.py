@@ -14,7 +14,7 @@ from luminoracore import Personality, PersonalityCompiler, LLMProvider
 
 def demonstrate_multi_llm_compilation():
     """Demonstrate compilation for multiple LLM providers."""
-    print("🤖 LuminoraCore Multi-LLM Compilation Example")
+    print("LuminoraCore Multi-LLM Compilation Example")
     print("=" * 60)
     
     # Load a personality

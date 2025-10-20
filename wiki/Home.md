@@ -1,6 +1,6 @@
 # Welcome to LuminoraCore Wiki
 
-![LuminoraCore Banner](https://img.shields.io/badge/LuminoraCore-v1.0-blue?style=for-the-badge)
+![LuminoraCore Banner](https://img.shields.io/badge/LuminoraCore-v1.1-blue?style=for-the-badge)
 ![Production Ready](https://img.shields.io/badge/Status-Production%20Ready-success?style=for-the-badge)
 ![Tests](https://img.shields.io/badge/Tests-179%2F179%20Passing-brightgreen?style=for-the-badge)
 
@@ -248,5 +248,5 @@ We welcome contributions! See our [Contributing Guide](https://github.com/lumino
 
 **⭐ Star us on GitHub • 🐛 Report Issues**
 
-**✅ v1.1 PRODUCTION READY - 179/179 Tests Passing (100%)**
+**✅ v1.1 PRODUCTION READY - All Tests Passing (100%)**
 
