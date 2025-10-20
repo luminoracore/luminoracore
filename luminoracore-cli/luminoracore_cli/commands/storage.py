@@ -171,40 +171,40 @@ def _interactive_config(storage_type: str) -> Dict[str, Any]:
     
     if storage_type == "dynamodb":
         config["storage"]["dynamodb"] = {
-            "table_name": typer.prompt("DynamoDB table name", default="luminora-sessions"),
-            "region": typer.prompt("AWS region", default="eu-west-1"),
-            "hash_key": typer.prompt("Hash key name", default="session_id"),
-            "range_key": typer.prompt("Range key name", default="timestamp")
+            "table_name": typer.prompt("DynamoDB table name"),
+            "region": typer.prompt("AWS region"),
+            "hash_key": typer.prompt("Hash key name"),
+            "range_key": typer.prompt("Range key name")
         }
     elif storage_type == "sqlite":
         config["storage"]["sqlite"] = {
-            "database_path": typer.prompt("SQLite database path", default="./luminora.db"),
-            "facts_table": typer.prompt("Facts table name", default="facts"),
-            "affinity_table": typer.prompt("Affinity table name", default="affinity")
+            "database_path": typer.prompt("SQLite database path"),
+            "facts_table": typer.prompt("Facts table name"),
+            "affinity_table": typer.prompt("Affinity table name")
         }
     elif storage_type == "postgresql":
         config["storage"]["postgresql"] = {
-            "host": typer.prompt("PostgreSQL host", default="localhost"),
-            "port": typer.prompt("PostgreSQL port", default=5432, type=int),
-            "database": typer.prompt("Database name", default="luminora"),
-            "schema": typer.prompt("Schema name", default="public"),
-            "username": typer.prompt("Username", default="postgres"),
+            "host": typer.prompt("PostgreSQL host"),
+            "port": typer.prompt("PostgreSQL port", type=int),
+            "database": typer.prompt("Database name"),
+            "schema": typer.prompt("Schema name"),
+            "username": typer.prompt("Username"),
             "password": typer.prompt("Password", hide_input=True)
         }
     elif storage_type == "redis":
         config["storage"]["redis"] = {
-            "host": typer.prompt("Redis host", default="localhost"),
-            "port": typer.prompt("Redis port", default=6379, type=int),
-            "db": typer.prompt("Redis database number", default=0, type=int),
-            "key_prefix": typer.prompt("Key prefix", default="luminora")
+            "host": typer.prompt("Redis host"),
+            "port": typer.prompt("Redis port", type=int),
+            "db": typer.prompt("Redis database number", type=int),
+            "key_prefix": typer.prompt("Key prefix")
         }
     elif storage_type == "mongodb":
         config["storage"]["mongodb"] = {
-            "host": typer.prompt("MongoDB host", default="localhost"),
-            "port": typer.prompt("MongoDB port", default=27017, type=int),
-            "database": typer.prompt("Database name", default="luminora"),
-            "username": typer.prompt("Username", default=""),
-            "password": typer.prompt("Password", hide_input=True, default="")
+            "host": typer.prompt("MongoDB host"),
+            "port": typer.prompt("MongoDB port", type=int),
+            "database": typer.prompt("Database name"),
+            "username": typer.prompt("Username"),
+            "password": typer.prompt("Password", hide_input=True)
         }
     
     return config
@@ -220,43 +220,43 @@ def _get_default_config(storage_type: str) -> Dict[str, Any]:
     
     if storage_type == "dynamodb":
         config["storage"]["dynamodb"] = {
-            "table_name": "luminora-sessions",
-            "region": "eu-west-1",
-            "hash_key": "session_id",
-            "range_key": "timestamp"
+            "table_name": None,  # Must be configured by user
+            "region": None,      # Must be configured by user
+            "hash_key": None,    # Must be configured by user
+            "range_key": None    # Must be configured by user
         }
     elif storage_type == "sqlite":
         config["storage"]["sqlite"] = {
-            "database_path": "./luminora.db",
-            "facts_table": "facts",
-            "affinity_table": "affinity",
-            "episodes_table": "episodes",
-            "moods_table": "moods",
-            "memories_table": "memories"
+            "database_path": None,  # Must be configured by user
+            "facts_table": None,    # Must be configured by user
+            "affinity_table": None, # Must be configured by user
+            "episodes_table": None, # Must be configured by user
+            "moods_table": None,    # Must be configured by user
+            "memories_table": None  # Must be configured by user
         }
     elif storage_type == "postgresql":
         config["storage"]["postgresql"] = {
-            "host": "localhost",
-            "port": 5432,
-            "database": "luminora",
-            "schema": "public",
-            "username": "postgres",
-            "password": ""
+            "host": None,       # Must be configured by user
+            "port": None,       # Must be configured by user
+            "database": None,   # Must be configured by user
+            "schema": None,     # Must be configured by user
+            "username": None,   # Must be configured by user
+            "password": None    # Must be configured by user
         }
     elif storage_type == "redis":
         config["storage"]["redis"] = {
-            "host": "localhost",
-            "port": 6379,
-            "db": 0,
-            "key_prefix": "luminora"
+            "host": None,       # Must be configured by user
+            "port": None,       # Must be configured by user
+            "db": None,         # Must be configured by user
+            "key_prefix": None  # Must be configured by user
         }
     elif storage_type == "mongodb":
         config["storage"]["mongodb"] = {
-            "host": "localhost",
-            "port": 27017,
-            "database": "luminora",
-            "username": "",
-            "password": ""
+            "host": None,       # Must be configured by user
+            "port": None,       # Must be configured by user
+            "database": None,   # Must be configured by user
+            "username": None,   # Must be configured by user
+            "password": None    # Must be configured by user
         }
     
     return config

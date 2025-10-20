@@ -14,8 +14,8 @@ from datetime import datetime
 from luminoracore_sdk import (
     LuminoraCoreClient,
     LuminoraCoreClientV11,
-    SQLiteStorageV11,
-    DynamoDBStorageV11,
+    FlexibleSQLiteStorageV11,
+    FlexibleDynamoDBStorageV11,
     PersonalityEvolutionEngine,
     AdvancedSentimentAnalyzer
 )
@@ -37,7 +37,7 @@ async def main():
     print("\n📊 1. SQLite Storage Implementation")
     print("-" * 40)
     
-    sqlite_storage = SQLiteStorageV11("demo_luminoracore.db")
+    sqlite_storage = FlexibleSQLiteStorageV11("demo_luminoracore.db")
     client_v11_sqlite = LuminoraCoreClientV11(client, storage_v11=sqlite_storage)
     
     user_id = "demo_user_123"
@@ -149,7 +149,7 @@ async def main():
     
     try:
         # Note: This requires AWS credentials to be configured
-        # dynamodb_storage = DynamoDBStorageV11("luminoracore-v11-demo", "us-east-1")
+        # dynamodb_storage = FlexibleDynamoDBStorageV11("luminoracore-v11-demo", "us-east-1")
         # client_v11_dynamodb = LuminoraCoreClientV11(client, storage_v11=dynamodb_storage)
         
         print("   ℹ️  DynamoDB storage available but requires AWS configuration")

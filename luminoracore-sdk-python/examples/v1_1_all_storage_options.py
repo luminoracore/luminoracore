@@ -16,12 +16,11 @@ from datetime import datetime
 from luminoracore_sdk import (
     LuminoraCoreClient,
     LuminoraCoreClientV11,
-    SQLiteStorageV11,
-    PostgreSQLStorageV11,
-    MySQLStorageV11,
-    MongoDBStorageV11,
-    RedisStorageV11,
-    DynamoDBStorageV11
+    FlexibleSQLiteStorageV11,
+    FlexiblePostgreSQLStorageV11,
+    FlexibleMongoDBStorageV11,
+    FlexibleRedisStorageV11,
+    FlexibleDynamoDBStorageV11
 )
 
 
@@ -90,7 +89,7 @@ async def main():
     # ========================================
     # 1. SQLITE STORAGE
     # ========================================
-    sqlite_storage = SQLiteStorageV11("demo_all_storage.db")
+    sqlite_storage = FlexibleSQLiteStorageV11("demo_all_storage.db")
     client_v11_sqlite = LuminoraCoreClientV11(client, storage_v11=sqlite_storage)
     
     await demo_storage("SQLite", sqlite_storage, client_v11_sqlite)
@@ -100,7 +99,7 @@ async def main():
     # ========================================
     try:
         # Note: Requires PostgreSQL server running
-        postgresql_storage = PostgreSQLStorageV11(
+        postgresql_storage = FlexiblePostgreSQLStorageV11(
             "postgresql://user:password@localhost:5432/luminoracore_v11"
         )
         client_v11_postgresql = LuminoraCoreClientV11(client, storage_v11=postgresql_storage)
@@ -119,7 +118,7 @@ async def main():
     # ========================================
     try:
         # Note: Requires MySQL server running
-        mysql_storage = MySQLStorageV11(
+        mysql_storage = FlexibleMySQLStorageV11(
             host="localhost",
             port=3306,
             user="root",
@@ -142,7 +141,7 @@ async def main():
     # ========================================
     try:
         # Note: Requires MongoDB server running
-        mongodb_storage = MongoDBStorageV11(
+        mongodb_storage = FlexibleMongoDBStorageV11(
             "mongodb://localhost:27017",
             "luminoracore_v11"
         )
@@ -162,7 +161,7 @@ async def main():
     # ========================================
     try:
         # Note: Requires Redis server running
-        redis_storage = RedisStorageV11(
+        redis_storage = FlexibleRedisStorageV11(
             host="localhost",
             port=6379,
             db=0
@@ -183,7 +182,7 @@ async def main():
     # ========================================
     try:
         # Note: Requires AWS credentials configured
-        dynamodb_storage = DynamoDBStorageV11(
+        dynamodb_storage = FlexibleDynamoDBStorageV11(
             table_name="luminoracore-v11-demo",
             region_name="us-east-1"
         )

@@ -134,8 +134,8 @@ class FlexibleStorageManager:
                 from luminoracore_sdk.session import FlexibleDynamoDBStorageV11
                 dynamodb_config = storage_config.get("dynamodb", {})
                 return FlexibleDynamoDBStorageV11(
-                    table_name=dynamodb_config.get("table_name", "luminora-sessions"),
-                    region_name=dynamodb_config.get("region", "eu-west-1"),
+                    table_name=dynamodb_config.get("table_name"),
+                    region_name=dynamodb_config.get("region"),
                     hash_key_name=dynamodb_config.get("hash_key"),
                     range_key_name=dynamodb_config.get("range_key")
                 )
@@ -147,7 +147,7 @@ class FlexibleStorageManager:
                 from luminoracore_sdk.session import FlexibleSQLiteStorageV11
                 sqlite_config = storage_config.get("sqlite", {})
                 return FlexibleSQLiteStorageV11(
-                    database_path=sqlite_config.get("database_path", "./luminora.db"),
+                    database_path=sqlite_config.get("database_path"),
                     facts_table=sqlite_config.get("facts_table"),
                     affinity_table=sqlite_config.get("affinity_table"),
                     episodes_table=sqlite_config.get("episodes_table"),
@@ -162,12 +162,12 @@ class FlexibleStorageManager:
                 from luminoracore_sdk.session import FlexiblePostgreSQLStorageV11
                 postgres_config = storage_config.get("postgresql", {})
                 return FlexiblePostgreSQLStorageV11(
-                    host=postgres_config.get("host", "localhost"),
-                    port=postgres_config.get("port", 5432),
-                    database=postgres_config.get("database", "luminora"),
-                    schema=postgres_config.get("schema", "public"),
-                    username=postgres_config.get("username", "postgres"),
-                    password=postgres_config.get("password", ""),
+                    host=postgres_config.get("host"),
+                    port=postgres_config.get("port"),
+                    database=postgres_config.get("database"),
+                    schema=postgres_config.get("schema"),
+                    username=postgres_config.get("username"),
+                    password=postgres_config.get("password"),
                     facts_table=postgres_config.get("facts_table"),
                     affinity_table=postgres_config.get("affinity_table"),
                     episodes_table=postgres_config.get("episodes_table"),
@@ -182,10 +182,10 @@ class FlexibleStorageManager:
                 from luminoracore_sdk.session import FlexibleRedisStorageV11
                 redis_config = storage_config.get("redis", {})
                 return FlexibleRedisStorageV11(
-                    host=redis_config.get("host", "localhost"),
-                    port=redis_config.get("port", 6379),
-                    db=redis_config.get("db", 0),
-                    key_prefix=redis_config.get("key_prefix", "luminora"),
+                    host=redis_config.get("host"),
+                    port=redis_config.get("port"),
+                    db=redis_config.get("db"),
+                    key_prefix=redis_config.get("key_prefix"),
                     affinity_key_pattern=redis_config.get("affinity_key_pattern"),
                     fact_key_pattern=redis_config.get("fact_key_pattern"),
                     episode_key_pattern=redis_config.get("episode_key_pattern"),
@@ -200,9 +200,9 @@ class FlexibleStorageManager:
                 from luminoracore_sdk.session import FlexibleMongoDBStorageV11
                 mongodb_config = storage_config.get("mongodb", {})
                 return FlexibleMongoDBStorageV11(
-                    host=mongodb_config.get("host", "localhost"),
-                    port=mongodb_config.get("port", 27017),
-                    database=mongodb_config.get("database", "luminora"),
+                    host=mongodb_config.get("host"),
+                    port=mongodb_config.get("port"),
+                    database=mongodb_config.get("database"),
                     username=mongodb_config.get("username"),
                     password=mongodb_config.get("password"),
                     facts_collection=mongodb_config.get("facts_collection"),

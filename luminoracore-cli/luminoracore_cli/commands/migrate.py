@@ -23,7 +23,7 @@ except ImportError as e:
 
 
 @click.command()
-@click.argument('db_path', type=click.Path(), required=False, default='luminora.db')
+@click.argument('db_path', type=click.Path(), required=True)
 @click.option('--dry-run', is_flag=True, help='Show what would be done without applying')
 @click.option('--target', type=int, help='Target version to migrate to')
 @click.option('--status', is_flag=True, help='Show migration status')

@@ -10,8 +10,8 @@ import json
 from datetime import datetime
 
 from .session.storage_v1_1 import StorageV11Extension
-from .session.storage_sqlite_v11 import SQLiteStorageV11
-from .session.storage_dynamodb_v11 import DynamoDBStorageV11
+from .session.storage_sqlite_flexible import FlexibleSQLiteStorageV11
+from .session.storage_dynamodb_flexible import FlexibleDynamoDBStorageV11
 from .session.memory_v1_1 import MemoryManagerV11
 from .evolution.personality_evolution import PersonalityEvolutionEngine
 from .analysis.sentiment_analyzer import AdvancedSentimentAnalyzer

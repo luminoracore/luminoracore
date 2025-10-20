@@ -12,12 +12,11 @@ from .session import (
     StorageV11Extension,
     InMemoryStorageV11,
 )
-from .session.storage_sqlite_v11 import SQLiteStorageV11
-from .session.storage_dynamodb_v11 import DynamoDBStorageV11
-from .session.storage_postgresql_v11 import PostgreSQLStorageV11
-from .session.storage_redis_v11 import RedisStorageV11
-from .session.storage_mongodb_v11 import MongoDBStorageV11
-from .session.storage_mysql_v11 import MySQLStorageV11
+from .session.storage_sqlite_flexible import FlexibleSQLiteStorageV11
+from .session.storage_dynamodb_flexible import FlexibleDynamoDBStorageV11
+from .session.storage_postgresql_flexible import FlexiblePostgreSQLStorageV11
+from .session.storage_redis_flexible import FlexibleRedisStorageV11
+from .session.storage_mongodb_flexible import FlexibleMongoDBStorageV11
 from .evolution.personality_evolution import PersonalityEvolutionEngine
 from .analysis.sentiment_analyzer import AdvancedSentimentAnalyzer
 from .providers import (
@@ -63,12 +62,11 @@ __all__ = [
     "MemoryConfig",
     "StorageV11Extension",
     "InMemoryStorageV11",
-    "SQLiteStorageV11",
-    "DynamoDBStorageV11",
-    "PostgreSQLStorageV11",
-    "RedisStorageV11",
-    "MongoDBStorageV11",
-    "MySQLStorageV11",
+    "FlexibleSQLiteStorageV11",
+    "FlexibleDynamoDBStorageV11",
+    "FlexiblePostgreSQLStorageV11",
+    "FlexibleRedisStorageV11",
+    "FlexibleMongoDBStorageV11",
     "PersonalityEvolutionEngine",
     "AdvancedSentimentAnalyzer",
     # Providers

@@ -6,6 +6,7 @@ The user can use their own tables with their own schemas.
 """
 
 import json
+import os
 import boto3
 from typing import List, Optional, Dict, Any, Union
 from datetime import datetime, timedelta
@@ -41,7 +42,7 @@ class FlexibleDynamoDBStorageV11(StorageV11Extension):
     def __init__(
         self, 
         table_name: str, 
-        region_name: str = "us-east-1",
+        region_name: str = None,
         hash_key_name: str = None,
         range_key_name: str = None,
         gsi_name: str = None,
@@ -61,7 +62,7 @@ class FlexibleDynamoDBStorageV11(StorageV11Extension):
             gsi_range_key: Name of GSI range key (auto-detected if None)
         """
         self.table_name = table_name
-        self.region_name = region_name
+        self.region_name = region_name or os.getenv("AWS_REGION") or "us-east-1"
         
         try:
             self.dynamodb = boto3.resource('dynamodb', region_name=region_name)
