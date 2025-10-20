@@ -227,12 +227,12 @@ async def main():
     # SUMMARY
     # ========================================
     print("\n" + "=" * 60)
-    print("✓ SDK v1.1 Features Summary:")
+    print("[OK] SDK v1.1 Features Summary:")
     print(f"  - Affinity: {final_affinity['affinity_points']} points ({final_affinity['current_level']})")
     print(f"  - Facts stored: {len(all_facts)}")
     print(f"  - Episodes created: {len(all_episodes)}")
     print(f"  - Important episodes: {len(important_episodes)}")
-    print("\n✓ All v1.1 SDK features demonstrated successfully!")
+    print("\n[OK] All v1.1 SDK features demonstrated successfully!")
     
     # Cleanup
     await base_client.cleanup()

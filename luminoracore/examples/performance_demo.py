@@ -8,18 +8,18 @@ from luminoracore import Personality, PersonalityCompiler, LLMProvider, Personal
 
 def demonstrate_caching_performance():
     """Demonstrate the performance benefits of caching."""
-    print("🚀 LuminoraCore Performance Demo")
+    print("LuminoraCore Performance Demo")
     print("=" * 50)
     
     # Load a personality
-    personality_path = Path(__file__).parent.parent.parent / "luminoracore" / "personalities" / "dr_luna.json"
+    personality_path = Path(__file__).parent.parent / "luminoracore" / "personalities" / "dr_luna.json"
     personality = Personality(personality_path)
     
     # Create compiler with cache
     compiler = PersonalityCompiler(cache_size=64)
     
     # Test compilation without cache (first run)
-    print("\n📊 Testing compilation performance...")
+    print("\nTesting compilation performance...")
     
     providers = [
         LLMProvider.OPENAI,
@@ -44,50 +44,54 @@ def demonstrate_caching_performance():
     
     # Show cache statistics
     stats = compiler.get_cache_stats()
-    print(f"\n📈 Cache Statistics:")
+    print(f"\nCache Statistics:")
     print(f"  Cache hits: {stats['cache_hits']}")
     print(f"  Cache misses: {stats['cache_misses']}")
     print(f"  Hit rate: {stats['hit_rate']}%")
     print(f"  Cache size: {stats['cache_size']}/{stats['max_cache_size']}")
     
     # Performance improvement
-    improvement = ((first_run_time - second_run_time) / first_run_time) * 100
-    print(f"\n⚡ Performance Improvement: {improvement:.1f}%")
+    if first_run_time > 0:
+        improvement = ((first_run_time - second_run_time) / first_run_time) * 100
+        print(f"\nPerformance Improvement: {improvement:.1f}%")
+    else:
+        improvement = 0
+        print(f"\nPerformance Improvement: {improvement:.1f}% (cached)")
     print(f"  First run: {first_run_time:.3f}s")
     print(f"  Second run: {second_run_time:.3f}s")
 
 def demonstrate_validation_performance():
     """Demonstrate performance validation features."""
-    print("\n🔍 Performance Validation Demo")
+    print("\nPerformance Validation Demo")
     print("=" * 50)
     
     # Create validator with performance checks enabled
     validator = PersonalityValidator(enable_performance_checks=True)
     
     # Load personality
-    personality_path = Path(__file__).parent.parent.parent / "luminoracore" / "personalities" / "dr_luna.json"
+    personality_path = Path(__file__).parent.parent / "luminoracore" / "personalities" / "dr_luna.json"
     
     # Validate with performance checks
     result = validator.validate(personality_path)
     
-    print(f"Validation Result: {'✅ Valid' if result.is_valid else '❌ Invalid'}")
+    print(f"Validation Result: {'[OK] Valid' if result.is_valid else '[ERROR] Invalid'}")
     
     if result.warnings:
-        print(f"\n⚠️  Warnings ({len(result.warnings)}):")
+        print(f"\nWarnings ({len(result.warnings)}):")
         for warning in result.warnings:
             print(f"  • {warning}")
     
     if result.suggestions:
-        print(f"\n💡 Suggestions ({len(result.suggestions)}):")
+        print(f"\nSuggestions ({len(result.suggestions)}):")
         for suggestion in result.suggestions:
             print(f"  • {suggestion}")
 
 def demonstrate_compilation_all_providers():
     """Demonstrate compilation for all providers with performance metrics."""
-    print("\n🌐 Multi-Provider Compilation Demo")
+    print("\nMulti-Provider Compilation Demo")
     print("=" * 50)
     
-    personality_path = Path(__file__).parent.parent.parent / "luminoracore" / "personalities" / "dr_luna.json"
+    personality_path = Path(__file__).parent.parent / "luminoracore" / "personalities" / "dr_luna.json"
     personality = Personality(personality_path)
     
     compiler = PersonalityCompiler(cache_size=128)
@@ -113,9 +117,9 @@ if __name__ == "__main__":
         demonstrate_validation_performance()
         demonstrate_compilation_all_providers()
         
-        print("\n🎉 Performance demo completed successfully!")
+        print("\nPerformance demo completed successfully!")
         
     except Exception as e:
-        print(f"\n❌ Demo failed: {e}")
+        print(f"\n[ERROR] Demo failed: {e}")
         import traceback
         traceback.print_exc()

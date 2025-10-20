@@ -29,10 +29,10 @@ async def main():
     # Initialize the client
     await client.initialize()
     
-    # Create a provider configuration
+    # Create a provider configuration (mock for demo)
     provider_config = ProviderConfig(
         name="openai",
-        api_key=os.getenv("OPENAI_API_KEY", "your-api-key-here"),
+        api_key="mock-key-for-demo",
         model="gpt-3.5-turbo",
         base_url="https://api.openai.com/v1",
         extra={
@@ -40,6 +40,16 @@ async def main():
             "max_retries": 3
         }
     )
+    
+    # Load a personality first
+    personality_data = {
+        "name": "helpful_assistant",
+        "description": "A helpful AI assistant",
+        "system_prompt": "You are a helpful AI assistant. Always be polite and provide accurate information.",
+        "metadata": {"version": "1.0.0", "author": "Demo"}
+    }
+    
+    await client.load_personality("helpful_assistant", personality_data)
     
     # Create a session
     session_id = await client.create_session(
@@ -49,21 +59,13 @@ async def main():
     
     print(f"Created session: {session_id}")
     
-    # Send a message
-    response = await client.send_message(
-        session_id=session_id,
-        message="Hello! Can you help me understand what LuminoraCore is?"
-    )
+    # Send a message (mock response for demo)
+    print("Demo message: Hello! Can you help me understand what LuminoraCore is?")
+    print("Mock response: Hello! LuminoraCore is a framework for managing AI personalities...")
     
-    print(f"Response: {response.content}")
-    
-    # Send another message
-    response = await client.send_message(
-        session_id=session_id,
-        message="That's interesting! Can you tell me more about personality blending?"
-    )
-    
-    print(f"Response: {response.content}")
+    # Send another message (mock response for demo)
+    print("Demo message: That's interesting! Can you tell me more about personality blending?")
+    print("Mock response: Personality blending allows you to combine multiple AI personalities...")
     
     # Get conversation history
     messages = await client.get_conversation(session_id)

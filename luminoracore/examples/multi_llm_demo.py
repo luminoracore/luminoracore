@@ -21,11 +21,11 @@ def demonstrate_multi_llm_compilation():
     print("\n1. Loading personality...")
     try:
         personality = Personality("luminoracore/luminoracore/personalities/dr_luna.json")
-        print(f"✓ Loaded: {personality.persona.name}")
+        print(f"[OK] Loaded: {personality.persona.name}")
         print(f"  Archetype: {personality.core_traits.archetype}")
         print(f"  Compatibility: {', '.join(personality.persona.compatibility)}")
     except Exception as e:
-        print(f"✗ Failed to load personality: {e}")
+        print(f"[ERROR] Failed to load personality: {e}")
         return
     
     # Create compiler
@@ -48,16 +48,16 @@ def demonstrate_multi_llm_compilation():
         try:
             result = compiler.compile(personality, provider)
             results[provider] = result
-            print(f"✓ {provider.value}: {result.token_estimate} tokens, {result.metadata['format']} format")
+            print(f"[OK] {provider.value}: {result.token_estimate} tokens, {result.metadata['format']} format")
         except Exception as e:
-            print(f"✗ {provider.value}: Failed - {e}")
+            print(f"[ERROR] {provider.value}: Failed - {e}")
     
     # Show detailed comparison
     print("\n3. Detailed Provider Comparison:")
     print("=" * 60)
     
     for provider, result in results.items():
-        print(f"\n🔧 {provider.value.upper()}:")
+        print(f"\n{provider.value.upper()}:")
         print(f"   Token estimate: {result.token_estimate}")
         print(f"   Format: {result.metadata['format']}")
         print(f"   Model: {result.metadata.get('model', 'N/A')}")
@@ -81,7 +81,7 @@ def demonstrate_multi_llm_compilation():
     # OpenAI format
     if LLMProvider.OPENAI in results:
         openai_result = results[LLMProvider.OPENAI]
-        print(f"\n📝 OpenAI Format (Messages):")
+        print(f"\nOpenAI Format (Messages):")
         if isinstance(openai_result.prompt, dict) and 'messages' in openai_result.prompt:
             messages = openai_result.prompt['messages']
             print(f"   Messages count: {len(messages)}")
@@ -91,7 +91,7 @@ def demonstrate_multi_llm_compilation():
     # Anthropic format
     if LLMProvider.ANTHROPIC in results:
         anthropic_result = results[LLMProvider.ANTHROPIC]
-        print(f"\n📝 Anthropic Format (XML):")
+        print(f"\nAnthropic Format (XML):")
         if isinstance(anthropic_result.prompt, str):
             lines = anthropic_result.prompt.split('\n')
             print(f"   Lines: {len(lines)}")
@@ -102,7 +102,7 @@ def demonstrate_multi_llm_compilation():
     # Llama format
     if LLMProvider.LLAMA in results:
         llama_result = results[LLMProvider.LLAMA]
-        print(f"\n📝 Llama Format (Text):")
+        print(f"\nLlama Format (Text):")
         if isinstance(llama_result.prompt, str):
             lines = llama_result.prompt.split('\n')
             print(f"   Lines: {len(lines)}")
@@ -113,7 +113,7 @@ def demonstrate_multi_llm_compilation():
     # Universal format
     if LLMProvider.UNIVERSAL in results:
         universal_result = results[LLMProvider.UNIVERSAL]
-        print(f"\n📝 Universal Format (Portable):")
+        print(f"\nUniversal Format (Portable):")
         if isinstance(universal_result.prompt, dict):
             print(f"   Keys: {list(universal_result.prompt.keys())}")
             if 'personality_info' in universal_result.prompt:
@@ -142,10 +142,10 @@ def demonstrate_multi_llm_compilation():
     
     for provider in providers:
         compatible = personality.is_compatible_with(provider.value)
-        status = "✓ Compatible" if compatible else "✗ Not compatible"
+        status = "[OK] Compatible" if compatible else "[ERROR] Not compatible"
         print(f"   {provider.value:12}: {status}")
     
-    print(f"\n🎉 Multi-LLM compilation example completed!")
+    print(f"\nMulti-LLM compilation example completed!")
     print(f"   Successfully compiled for {len(results)} providers")
 
 
