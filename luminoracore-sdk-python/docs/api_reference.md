@@ -418,6 +418,39 @@ storage_v11 = InMemoryStorageV11()
 client_v11 = LuminoraCoreClientV11(base_client, storage_v11=storage_v11)
 ```
 
+#### Session Management Methods
+
+##### `create_session(personality_name: str = "default", provider_config: Optional[Dict[str, Any]] = None) -> str`
+Create a new session for conversation memory.
+
+```python
+# Create session with personality
+session_id = await client_v11.create_session(
+    personality_name="alicia",
+    provider_config={"name": "openai", "model": "gpt-3.5-turbo"}
+)
+```
+
+##### `ensure_session_exists(session_id: str) -> bool`
+Ensure a session exists, creating it if necessary.
+
+```python
+# Ensure session exists
+exists = await client_v11.ensure_session_exists("session_123")
+```
+
+##### `send_message_with_memory(session_id: str, user_message: str, personality_name: str, provider_config: Dict[str, Any]) -> Dict[str, Any]`
+Send a message with full memory integration.
+
+```python
+response = await client_v11.send_message_with_memory(
+    session_id="session_123",
+    user_message="Hello, I'm Carlos from Madrid",
+    personality_name="alicia",
+    provider_config={"name": "openai", "model": "gpt-3.5-turbo"}
+)
+```
+
 #### Memory Methods
 
 ##### `get_facts(user_id: str, category: Optional[str]) -> List[FactDict]`
@@ -431,6 +464,28 @@ facts = await client_v11.get_facts(user_id="user123")
 personal_facts = await client_v11.get_facts("user123", category="personal_info")
 ```
 
+##### `save_fact(user_id: str, category: str, key: str, value: Any, confidence: float = 0.8, source: str = "user_input") -> bool`
+Save a user fact to memory.
+
+```python
+# Save personal fact
+await client_v11.save_fact(
+    user_id="user123",
+    category="personal_info",
+    key="name",
+    value="Carlos",
+    confidence=0.95
+)
+```
+
+##### `delete_fact(user_id: str, category: str, key: str) -> bool`
+Delete a specific fact from memory.
+
+```python
+# Delete a fact
+deleted = await client_v11.delete_fact("user123", "personal_info", "name")
+```
+
 ##### `get_episodes(user_id: str, min_importance: Optional[float], max_results: Optional[int]) -> List[EpisodeDict]`
 Get memorable episodes, optionally filtered by importance.
 
@@ -440,6 +495,31 @@ episodes = await client_v11.get_episodes(user_id="user123")
 
 # Get important episodes only
 important = await client_v11.get_episodes("user123", min_importance=7.0, max_results=10)
+```
+
+##### `save_episode(user_id: str, episode_type: str, title: str, summary: str, importance: float, sentiment: str = "neutral") -> bool`
+Save a memorable episode.
+
+```python
+# Save memorable episode
+await client_v11.save_episode(
+    user_id="user123",
+    episode_type="milestone",
+    title="First conversation",
+    summary="User introduced themselves",
+    importance=8.5,
+    sentiment="positive"
+)
+```
+
+##### `get_memory_stats(user_id: str) -> Dict[str, Any]`
+Get comprehensive memory statistics.
+
+```python
+# Get memory statistics
+stats = await client_v11.get_memory_stats("user123")
+print(f"Total facts: {stats['total_facts']}")
+print(f"Total episodes: {stats['total_episodes']}")
 ```
 
 ##### `search_memories(user_id: str, query: str, top_k: int) -> List[MemorySearchResult]`
@@ -510,6 +590,54 @@ print(f"Total messages: {analytics['total_messages']}")
 print(f"Facts learned: {analytics['facts_learned']}")
 ```
 
+#### Sentiment Analysis Methods
+
+##### `analyze_sentiment(message: str, context: Optional[List[str]] = None) -> Dict[str, Any]`
+Analyze sentiment of a message using keyword-based or LLM-based analysis.
+
+```python
+# Analyze sentiment
+sentiment = await client_v11.analyze_sentiment(
+    message="I'm so frustrated with this bug!",
+    context=["technical_support"]
+)
+print(f"Sentiment: {sentiment['sentiment']}")
+print(f"Confidence: {sentiment['confidence']}")
+```
+
+##### `get_sentiment_history(user_id: str, limit: Optional[int] = None) -> List[Dict[str, Any]]`
+Get sentiment analysis history for a user.
+
+```python
+# Get sentiment history
+history = await client_v11.get_sentiment_history("user123", limit=10)
+```
+
+#### Personality Evolution Methods
+
+##### `evolve_personality(user_id: str, personality_name: str, evolution_data: Dict[str, Any]) -> Dict[str, Any]`
+Evolve a personality based on user interactions and preferences.
+
+```python
+# Evolve personality
+evolution = await client_v11.evolve_personality(
+    user_id="user123",
+    personality_name="alicia",
+    evolution_data={
+        "interaction_patterns": ["positive", "technical"],
+        "preferences": {"formality": 0.3, "humor": 0.8}
+    }
+)
+```
+
+##### `get_evolution_history(user_id: str, personality_name: str) -> List[Dict[str, Any]]`
+Get the evolution history for a personality.
+
+```python
+# Get evolution history
+history = await client_v11.get_evolution_history("user123", "alicia")
+```
+
 ### v1.1 Storage Extensions
 
 #### StorageV11Extension
@@ -540,20 +668,132 @@ Save mood state.
 ##### `get_mood(...) -> Optional[Dict]`
 Retrieve mood state.
 
-#### InMemoryStorageV11
+#### Flexible Storage Options
 
-In-memory implementation of v1.1 storage.
+All storage implementations support flexible configuration for any database schema.
+
+##### InMemoryStorageV11
+In-memory implementation for development and testing.
 
 ```python
 from luminoracore_sdk.session.storage_v1_1 import InMemoryStorageV11
 
 storage = InMemoryStorageV11()
+```
 
-# Save affinity
-await storage.save_affinity("user1", "alicia", 50, "friend")
+##### FlexibleDynamoDBStorageV11
+DynamoDB storage that works with any table schema.
 
-# Get affinity
-affinity = await storage.get_affinity("user1", "alicia")
+```python
+from luminoracore_sdk.session.storage_dynamodb_flexible import FlexibleDynamoDBStorageV11
+
+# Works with ANY DynamoDB table
+storage = FlexibleDynamoDBStorageV11(
+    table_name="your-existing-table",
+    region="eu-west-1"
+)
+```
+
+##### FlexibleSQLiteStorageV11
+SQLite storage that works with any database file.
+
+```python
+from luminoracore_sdk.session.storage_sqlite_flexible import FlexibleSQLiteStorageV11
+
+# Works with ANY SQLite database
+storage = FlexibleSQLiteStorageV11(
+    database_path="./your-existing.db"
+)
+```
+
+##### FlexiblePostgreSQLStorageV11
+PostgreSQL storage that works with any database and schema.
+
+```python
+from luminoracore_sdk.session.storage_postgresql_flexible import FlexiblePostgreSQLStorageV11
+
+# Works with ANY PostgreSQL database
+storage = FlexiblePostgreSQLStorageV11(
+    connection_string="postgresql://user:pass@localhost/your_db",
+    table_prefix="custom_"
+)
+```
+
+##### FlexibleRedisStorageV11
+Redis storage that works with any Redis instance.
+
+```python
+from luminoracore_sdk.session.storage_redis_flexible import FlexibleRedisStorageV11
+
+# Works with ANY Redis instance
+storage = FlexibleRedisStorageV11(
+    connection_string="redis://localhost:6379/0",
+    key_prefix="your_app:"
+)
+```
+
+##### FlexibleMongoDBStorageV11
+MongoDB storage that works with any database and collection.
+
+```python
+from luminoracore_sdk.session.storage_mongodb_flexible import FlexibleMongoDBStorageV11
+
+# Works with ANY MongoDB database
+storage = FlexibleMongoDBStorageV11(
+    connection_string="mongodb://localhost:27017/your_db",
+    collection_prefix="custom_"
+)
+```
+
+##### FlexibleMySQLStorageV11
+MySQL storage that works with any database and schema.
+
+```python
+from luminoracore_sdk.session.storage_mysql_flexible import FlexibleMySQLStorageV11
+
+# Works with ANY MySQL database
+storage = FlexibleMySQLStorageV11(
+    connection_string="mysql://user:pass@localhost/your_db",
+    table_prefix="custom_"
+)
+```
+
+#### Storage Configuration Examples
+
+```python
+# Environment-based configuration
+import os
+
+# DynamoDB (AWS)
+if os.getenv("LUMINORA_STORAGE_TYPE") == "dynamodb":
+    storage = FlexibleDynamoDBStorageV11(
+        table_name=os.getenv("DYNAMODB_TABLE", "your-table"),
+        region=os.getenv("AWS_REGION", "eu-west-1")
+    )
+
+# SQLite (Development)
+elif os.getenv("LUMINORA_STORAGE_TYPE") == "sqlite":
+    storage = FlexibleSQLiteStorageV11(
+        database_path=os.getenv("SQLITE_DATABASE_PATH", "./luminora.db")
+    )
+
+# PostgreSQL (Production)
+elif os.getenv("LUMINORA_STORAGE_TYPE") == "postgresql":
+    storage = FlexiblePostgreSQLStorageV11(
+        connection_string=os.getenv("POSTGRES_URL"),
+        table_prefix=os.getenv("TABLE_PREFIX", "luminora_")
+    )
+
+# Redis (Caching)
+elif os.getenv("LUMINORA_STORAGE_TYPE") == "redis":
+    storage = FlexibleRedisStorageV11(
+        connection_string=os.getenv("REDIS_URL"),
+        key_prefix=os.getenv("REDIS_PREFIX", "luminora:")
+    )
+
+# Default to in-memory
+else:
+    storage = InMemoryStorageV11()
 ```
 
 ### v1.1 Types
@@ -607,33 +847,94 @@ affinity: AffinityDict = {
 
 ```python
 import asyncio
+import os
 from luminoracore_sdk import LuminoraCoreClient
 from luminoracore_sdk.client_v1_1 import LuminoraCoreClientV11
-from luminoracore_sdk.session.storage_v1_1 import InMemoryStorageV11
+from luminoracore_sdk.session.storage_dynamodb_flexible import FlexibleDynamoDBStorageV11
+from luminoracore_sdk.types.provider import ProviderConfig
 
-async def example():
-    # Initialize
+async def complete_example():
+    """Complete example showing all v1.1 features."""
+    
+    # 1. Initialize storage (flexible - works with any DynamoDB table)
+    storage_v11 = FlexibleDynamoDBStorageV11(
+        table_name=os.getenv("DYNAMODB_TABLE", "your-existing-table"),
+        region=os.getenv("AWS_REGION", "eu-west-1")
+    )
+    
+    # 2. Initialize base client
     base_client = LuminoraCoreClient()
     await base_client.initialize()
     
-    storage_v11 = InMemoryStorageV11()
+    # 3. Initialize v1.1 client
     client_v11 = LuminoraCoreClientV11(base_client, storage_v11=storage_v11)
     
-    # Use v1.1 features
-    affinity = await client_v11.update_affinity(
-        "user123", "alicia", points_delta=5, interaction_type="positive"
+    # 4. Create session with memory
+    session_id = await client_v11.create_session(
+        personality_name="alicia",
+        provider_config={"name": "openai", "model": "gpt-3.5-turbo"}
     )
     
-    facts = await client_v11.get_facts("user123")
-    episodes = await client_v11.get_episodes("user123", min_importance=7.0)
+    # 5. Send message with full memory integration
+    response = await client_v11.send_message_with_memory(
+        session_id=session_id,
+        user_message="Hello, I'm Carlos from Madrid, I work as a software developer",
+        personality_name="alicia",
+        provider_config={"name": "openai", "model": "gpt-3.5-turbo"}
+    )
     
-    print(f"Affinity: {affinity['affinity_points']} points")
-    print(f"Facts: {len(facts)}")
-    print(f"Episodes: {len(episodes)}")
+    # 6. Save additional facts
+    await client_v11.save_fact(
+        user_id=session_id,
+        category="personal_info",
+        key="hobby",
+        value="Playing guitar",
+        confidence=0.9
+    )
     
+    # 7. Save memorable episode
+    await client_v11.save_episode(
+        user_id=session_id,
+        episode_type="milestone",
+        title="First conversation",
+        summary="User introduced themselves as Carlos from Madrid",
+        importance=8.5,
+        sentiment="positive"
+    )
+    
+    # 8. Update affinity
+    affinity = await client_v11.update_affinity(
+        user_id=session_id,
+        personality_name="alicia",
+        points_delta=5,
+        interaction_type="positive"
+    )
+    
+    # 9. Analyze sentiment
+    sentiment = await client_v11.analyze_sentiment(
+        message="I'm so excited about this new project!",
+        context=["work", "enthusiasm"]
+    )
+    
+    # 10. Get memory statistics
+    stats = await client_v11.get_memory_stats(session_id)
+    
+    # 11. Export snapshot
+    snapshot = await client_v11.export_snapshot(session_id)
+    
+    # Results
+    print(f"Session: {session_id}")
+    print(f"Response: {response['response']}")
+    print(f"Affinity: {affinity['affinity_points']} points ({affinity['current_level']})")
+    print(f"Sentiment: {sentiment['sentiment']} (confidence: {sentiment['confidence']})")
+    print(f"Memory Stats: {stats['total_facts']} facts, {stats['total_episodes']} episodes")
+    print(f"Snapshot exported: {snapshot['_snapshot_info']['template_name']}")
+    
+    # Cleanup
     await base_client.cleanup()
 
-asyncio.run(example())
+# Run example
+asyncio.run(complete_example())
 ```
 
 ### Migration from v1.0
