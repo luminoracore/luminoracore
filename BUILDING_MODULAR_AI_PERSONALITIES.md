@@ -1,943 +1,469 @@
-# How to Build Modular AI Personalities with LuminoraCore v1.1
+# Building Modular AI Personalities with LuminoraCore v1.1
 
-**Create, test, and deploy AI personalities as reusable modules — across chat, voice, and any LLM with advanced memory and relationship tracking.**
+A comprehensive guide to creating scalable, maintainable AI personality systems.
 
----
+## Architecture Overview
 
-## 📋 Table of Contents
-
-1. [Introduction & Problem Statement](#1-introduction--problem-statement)
-2. [What is LuminoraCore](#2-what-is-luminoracore)
-3. [Architecture Overview](#3-architecture-overview)
-4. [Key Components & Their Roles](#4-key-components--their-roles)
-5. [Step-by-Step Example: VoIP Chatbot with Dynamic Personality](#5-step-by-step-example-voip-chatbot-with-dynamic-personality)
-6. [Advanced v1.1 Features](#6-advanced-v11-features-memory-relationships--evolution)
-7. [Blending & Simulation](#7-blending--simulation)
-8. [Deployment Notes & Best Practices](#8-deployment-notes--best-practices)
-9. [SEO / Performance Considerations](#9-seo--performance-considerations)
-10. [Next Steps & Call to Action](#10-next-steps--call-to-action)
-
----
-
-## 1. Introduction & Problem Statement
-
-The rise of large language models (LLMs) like GPT, Claude, DeepSeek, and Mistral means conversational AI is more powerful than ever. Yet, building **consistent, brand-aligned personalities** across channels remains a challenge:
-
-### The Problems
-
-❌ **Prompt-only approaches are fragile**: When context changes, tone shifts, or a model upgrade happens, you lose control.
-
-❌ **Channel inconsistency**: Each channel (voice, web chat, mobile) often gets a custom prompt treatment — unscalable and inconsistent.
-
-❌ **No versioning or reusability**: No way to version, audit, or reuse personality definitions across models or deployments.
-
-❌ **Vendor lock-in**: Hard-coded prompts for specific providers make it difficult to switch LLMs.
-
-❌ **Testing complexity**: No standardized way to test how a personality behaves before deployment.
-
-### The Solution
-
-**LuminoraCore** addresses this by making **personality an infrastructure component**, not an afterthought. Define once, deploy everywhere.
-
----
-
-## 2. What is LuminoraCore
-
-**LuminoraCore v1.1** is an open-source framework designed to let developers define personality profiles in JSON, compile them into optimized prompts, validate them, blend them, and simulate conversational responses. It supports **7 LLM backends** (DeepSeek, OpenAI, Anthropic, Mistral, Cohere, Google Gemini, Llama) via a unified API, with **advanced memory systems, relationship tracking, and personality evolution**.
-
-### Core Building Blocks (v1.1)
+LuminoraCore v1.1 provides a modular architecture that separates concerns and enables easy scaling:
 
 ```
-┌─────────────────────────────────────────────────┐
-│ 1. Persona JSON                                 │
-│    Define traits, linguistic profile, rules     │
-├─────────────────────────────────────────────────┤
-│ 2. Compiler / Prompt Generator                  │
-│    Turn JSON → optimal prompt per LLM           │
-├─────────────────────────────────────────────────┤
-│ 3. Validator                                    │
-│    Ensure personality conforms to schema        │
-├─────────────────────────────────────────────────┤
-│ 4. Memory System (v1.1)                        │
-│    Store facts, episodes, user relationships    │
-├─────────────────────────────────────────────────┤
-│ 5. Affinity Manager (v1.1)                     │
-│    Track relationship evolution (0-100 points)  │
-├─────────────────────────────────────────────────┤
-│ 6. Feature Flags (v1.1)                        │
-│    Dynamic feature control and configuration    │
-├─────────────────────────────────────────────────┤
-│ 7. Database Migrations (v1.1)                  │
-│    Schema management and version control        │
-├─────────────────────────────────────────────────┤
-│ 8. Simulator                                    │
-│    Test conversation responses                  │
-├─────────────────────────────────────────────────┤
-│ 9. Blender (PersonaBlend™)                      │
-│    Mix multiple personalities dynamically       │
-├─────────────────────────────────────────────────┤
-│ 10. Listing / Catalog APIs                      │
-│     Manage existing personalities               │
-└─────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                    LuminoraCore v1.1                       │
+├─────────────────────────────────────────────────────────────┤
+│  Core Engine    │  Memory System  │  Evolution Engine      │
+│                 │                 │                        │
+│ • Personality   │ • Fact Storage  │ • Dynamic Adaptation   │
+│   Engine        │ • Context Mgmt  │ • Affinity Tracking    │
+│ • Validation    │ • Search        │ • Relationship Mgmt    │
+│ • Compilation   │ • Retrieval     │ • Personality Updates  │
+└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                    Storage Layer                           │
+├─────────────────────────────────────────────────────────────┤
+│  SQLite  │  PostgreSQL  │  DynamoDB  │  Redis  │  MongoDB  │
+│          │              │            │         │           │
+│ • Local  │ • Relational │ • NoSQL    │ • Cache │ • Document│
+│ • Simple │ • ACID       │ • Scalable │ • Fast  │ • Flexible│
+└─────────────────────────────────────────────────────────────┘
 ```
 
----
+## Core Components
 
-## 3. Architecture Overview
+### 1. Personality Engine
 
-```
-LuminoraCore Platform
-├── 🧠 Core Engine — JSON → prompt compilation, validation, blending
-├── 🛠️ CLI Tool — for validation, blending, testing locally
-└── 🐍 SDK / API — integration into your application stack
-
-Your Application (Web, Voice, Mobile)
-    ↓
-LuminoraCore SDK/API
-    ↓
-Compiled Personality Prompt
-    ↓
-LLM (DeepSeek, OpenAI, Anthropic, etc.)
-    ↓
-Response to User
-```
-
-### Key Benefits (v1.1)
-
-✅ **Provider-agnostic**: Switch between OpenAI, DeepSeek, Anthropic without rewriting prompts  
-✅ **Version-controlled**: Store personality JSONs in Git for full audit trail  
-✅ **Testable**: Validate and simulate before deployment  
-✅ **Reusable**: Define once, use across web, mobile, voice, email  
-✅ **Blendable**: Create hybrid personalities on-the-fly  
-✅ **Memory-enabled**: AI remembers users across conversations  
-✅ **Relationship-aware**: Personalities evolve based on user interactions  
-✅ **Feature-flagged**: Dynamic feature control for safe deployments  
-✅ **Migration-ready**: Database schema management with version control  
-✅ **Storage-flexible**: Support for SQLite, DynamoDB, PostgreSQL, MySQL, MongoDB, Redis
-
----
-
-## 4. Key Components & Their Roles
-
-### Core Engine Functions
-
-| Component | Input | Output | Use Case |
-|-----------|-------|--------|----------|
-| **Compiler** | `{ persona_json, provider }` | `compiled_prompt` | Convert personality JSON to LLM-specific prompt |
-| **Validator** | `{ persona_json }` | `{ is_valid, errors[] }` | Ensure personality conforms to schema before use |
-| **Blender** | `{ personas[], weights[] }` | `blended_persona_json` | Create hybrid personalities (e.g., 70% professional + 30% friendly) |
-
-### SDK Methods (Python v1.1)
+The personality engine handles personality definition, validation, and compilation:
 
 ```python
-from luminoracore import Personality, PersonalityCompiler, LLMProvider
-from luminoracore_sdk import LuminoraCoreClientV11
-from luminoracore_sdk.types.provider import ProviderConfig
-from luminoracore_sdk.types.session import StorageConfig
+from luminoracore import Personality, PersonalityValidator
 
-# Load and validate
-personality = Personality("customer_support.json")
+# Define personality
+personality_data = {
+    "name": "helpful_assistant",
+    "description": "A helpful AI assistant",
+    "system_prompt": "You are a helpful AI assistant...",
+    "metadata": {
+        "version": "1.0.0",
+        "author": "Your Team",
+        "category": "support"
+    }
+}
 
-# Compile for specific provider
-compiler = PersonalityCompiler()
-result = compiler.compile(personality, LLMProvider.DEEPSEEK)
-# → Returns optimized prompt for DeepSeek
-
-# Use with SDK v1.1 for real conversations with memory
-client = LuminoraCoreClientV11(
-    storage_config=StorageConfig(storage_type="dynamodb")  # or sqlite, postgresql, etc.
-)
-await client.initialize()
-
-# Configure provider (DeepSeek: ~$0.14/1M tokens)
-provider = ProviderConfig(
-    name="deepseek",
-    api_key=os.getenv("DEEPSEEK_API_KEY"),
-    model="deepseek-chat"
-)
-
-session_id = await client.create_session(
-    personality_name="customer_support",
-    provider_config=provider
-)
-
-# Send message with automatic memory storage
-response = await client.send_message(
-    session_id=session_id,
-    message="I need help with my order"
-)
-
-# Access memory features
-facts = await client.get_facts(session_id)
-episodes = await client.get_episodes(session_id)
-affinity = await client.get_affinity(session_id)
-```
-
-### CLI Commands (v1.1)
-
-```bash
 # Validate personality
-luminoracore validate customer_support.json
-
-# Compile for specific provider
-luminoracore compile customer_support.json --provider deepseek
-
-# Test with real API
-luminoracore test customer_support.json --provider deepseek
-
-# Blend personalities
-luminoracore blend \
-  "support.json:0.7" \
-  "friendly.json:0.3" \
-  --output support_friendly.json
-
-# Memory and relationship management (v1.1)
-luminoracore memory list --session-id user_123
-luminoracore memory export --session-id user_123 --format json
-luminoracore affinity get --session-id user_123
-
-# Database migrations (v1.1)
-luminoracore migrate status
-luminoracore migrate up
-luminoracore migrate rollback
-
-# Feature flags (v1.1)
-luminoracore features list
-luminoracore features enable memory_system
-luminoracore features disable semantic_search
-
-# Snapshots (v1.1)
-luminoracore snapshot export --session-id user_123
-luminoracore snapshot import backup_20241201.json
-```
-
----
-
-## 5. Step-by-Step Example: VoIP Chatbot with Dynamic Personality
-
-Below is a real-world example using **Node.js + Express + Twilio** where the bot switches personality mid-call based on detected user sentiment.
-
-### Architecture
-
-```
-User Call → Twilio → Your Express Server
-                           ↓
-                   LuminoraCore SDK
-                           ↓
-              DeepSeek / OpenAI (LLM)
-                           ↓
-                    Bot Response
-```
-
-### Implementation
-
-```javascript
-import express from 'express';
-import twilio from 'twilio';
-import axios from 'axios';
-
-const app = express();
-app.use(express.urlencoded({ extended: true }));
-const VoiceResponse = twilio.twiml.VoiceResponse;
-
-// LuminoraCore API endpoint
-const LUMINORA_API = 'https://api.luminoracore.com/v1';
-
-// Personality state
-let currentPersona = 'friendly_assistant';
-
-// Load personality JSONs (in production, load from database)
-const friendlyPersona = require('./personalities/friendly_assistant.json');
-const supportPersona = require('./personalities/empathetic_support.json');
-const technicalPersona = require('./personalities/technical_expert.json');
-
-// Compile personality for DeepSeek
-async function compilePersona(personaJson) {
-  const response = await axios.post(`${LUMINORA_API}/compile`, {
-    persona_json: personaJson,
-    provider: 'deepseek',
-    model: 'deepseek-chat'
-  });
-  return response.data.compiled_prompt;
-}
-
-// Simulate conversation with personality
-async function simulateResponse(personaJson, userMessage) {
-  const response = await axios.post(`${LUMINORA_API}/simulate`, {
-    persona_json: personaJson,
-    prompt: userMessage,
-    provider: 'deepseek'
-  });
-  return response.data.response;
-}
-
-// Sentiment detection (basic keyword-based)
-function detectSentiment(text) {
-  const frustrationKeywords = /frustrated|angry|not working|terrible|awful|useless/i;
-  const technicalKeywords = /error|code|api|technical|debug|configure/i;
-  
-  if (frustrationKeywords.test(text)) {
-    return 'frustrated';
-  } else if (technicalKeywords.test(text)) {
-    return 'technical';
-  }
-  return 'neutral';
-}
-
-// Dynamic personality switching
-function selectPersona(sentiment, currentPersona) {
-  switch (sentiment) {
-    case 'frustrated':
-      return 'empathetic_support';
-    case 'technical':
-      return 'technical_expert';
-    default:
-      return currentPersona;
-  }
-}
-
-// Main voice endpoint
-app.post('/voice', async (req, res) => {
-  const twiml = new VoiceResponse();
-  const userSpeech = req.body.SpeechResult || '';
-  
-  console.log(`User said: ${userSpeech}`);
-  
-  // Detect sentiment and switch persona if needed
-  const sentiment = detectSentiment(userSpeech);
-  const newPersona = selectPersona(sentiment, currentPersona);
-  
-  if (newPersona !== currentPersona) {
-    console.log(`Switching persona: ${currentPersona} → ${newPersona}`);
-    currentPersona = newPersona;
-  }
-  
-  // Get the appropriate persona JSON
-  let personaJson;
-  switch (currentPersona) {
-    case 'empathetic_support':
-      personaJson = supportPersona;
-      break;
-    case 'technical_expert':
-      personaJson = technicalPersona;
-      break;
-    default:
-      personaJson = friendlyPersona;
-  }
-  
-  // Generate response using LuminoraCore
-  try {
-    const botReply = await simulateResponse(personaJson, userSpeech);
-    
-    // Respond via Twilio
-    twiml.say({
-      voice: 'Polly.Joanna'
-    }, botReply);
-    
-    // Continue listening
-    twiml.gather({
-      input: 'speech',
-      action: '/voice',
-      timeout: 3,
-      speechTimeout: 'auto'
-    });
-    
-  } catch (error) {
-    console.error('Error generating response:', error);
-    twiml.say('I apologize, but I encountered a technical issue. Please try again.');
-  }
-  
-  res.type('text/xml').send(twiml.toString());
-});
-
-// Welcome message
-app.post('/welcome', (req, res) => {
-  const twiml = new VoiceResponse();
-  twiml.say({
-    voice: 'Polly.Joanna'
-  }, 'Hello! I\'m your AI assistant. How can I help you today?');
-  
-  twiml.gather({
-    input: 'speech',
-    action: '/voice',
-    timeout: 3
-  });
-  
-  res.type('text/xml').send(twiml.toString());
-});
-
-app.listen(3000, () => {
-  console.log('VoIP bot running on port 3000');
-});
-```
-
-### Alternative: Using LuminoraCore Python SDK (Compact Version)
-
-For Python-based backends or quick prototypes, here's a **compact, production-ready example**:
-
-```python
-"""Voice Bot with Dynamic Personality Switching - Compact Version"""
-
-import asyncio
-import os
-import re
-from dataclasses import dataclass
-from luminoracore_sdk import LuminoraCoreClientV11
-from luminoracore_sdk.types.provider import ProviderConfig
-from luminoracore_sdk.types.session import StorageConfig
-
-
-@dataclass
-class Persona:
-    """Personality as a reusable module."""
-    name: str
-    prompt: str
-
-
-# Define personalities (modular, version-controlled)
-friendly = Persona(
-    name="friendly_assistant",
-    prompt="You are a friendly assistant. Speak warmly, be helpful."
-)
-empathetic = Persona(
-    name="empathetic_support",
-    prompt="You are empathetic. Acknowledge frustration, calm the user."
-)
-technical = Persona(
-    name="technical_expert",
-    prompt="You are technical. Explain clearly with precise steps."
-)
-
-
-class SentimentDetector:
-    """Simple sentiment detection."""
-    FRUSTRATION = [r'\b(frustrated|angry|error|not working)\b']
-    TECH = [r'\b(error|api|debug|how to)\b']
-    
-    @classmethod
-    def classify(cls, text: str) -> str:
-        t = text.lower()
-        for p in cls.FRUSTRATION:
-            if re.search(p, t):
-                return 'frustrated'
-        for p in cls.TECH:
-            if re.search(p, t):
-                return 'technical'
-        return 'neutral'
-
-
-class VoiceBot:
-    """Voice bot powered by LuminoraCore."""
-    
-    def __init__(self):
-        self.client = None
-        self.session_id = None
-        self.current = friendly
-    
-    async def init(self):
-        """Initialize LuminoraCore client."""
-        # Initialize with memory storage (supports Redis, PostgreSQL, etc.)
-        self.client = LuminoraCoreClientV11(
-            storage_config=StorageConfig(storage_type="memory")
-        )
-        await self.client.initialize()
-        
-        # Configure provider (DeepSeek: ~$0.14/1M tokens)
-        provider = ProviderConfig(
-            name="deepseek",
-            api_key=os.getenv("DEEPSEEK_API_KEY"),
-            model="deepseek-chat"
-        )
-        
-        # Load personalities into LuminoraCore
-        for persona in [friendly, empathetic, technical]:
-            await self.client.load_personality(
-                persona.name,
-                {"system_prompt": persona.prompt}
-            )
-        
-        # Create session
-        self.session_id = await self.client.create_session(
-            personality_name=friendly.name,
-            provider_config=provider
-        )
-    
-    async def handle(self, user_msg: str) -> str:
-        """Handle message with dynamic personality switching."""
-        # Detect sentiment
-        sentiment = SentimentDetector.classify(user_msg)
-        
-        # Select personality
-        new_persona = (
-            empathetic if sentiment == 'frustrated' else
-            technical if sentiment == 'technical' else
-            self.current
-        )
-        
-        # Switch if needed (LuminoraCore maintains context)
-        if new_persona.name != self.current.name:
-            print(f"🔄 Switching: {self.current.name} → {new_persona.name}")
-            await self.client.switch_personality(
-                self.session_id,
-                new_persona.name
-            )
-            self.current = new_persona
-        
-        # Generate response
-        resp = await self.client.send_message(
-            session_id=self.session_id,
-            message=user_msg,
-            max_tokens=150
-        )
-        return resp.content
-
-
-# Example usage
-async def main():
-    bot = VoiceBot()
-    await bot.init()
-    
-    conversation = [
-        "Hi, I need help logging in",
-        "I keep getting error 500, this is so frustrating!",
-        "Can you help me debug the API authentication call?",
-    ]
-    
-    for msg in conversation:
-        print(f"User: {msg}")
-        reply = await bot.handle(msg)
-        print(f"Bot ({bot.current.name}): {reply}\n")
-    
-    await bot.client.cleanup()
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
-```
-
-**What makes this powerful (v1.1):**
-
-✅ **~150 lines** of clean, production-ready code  
-✅ **Personalities as modules** - define once, use everywhere  
-✅ **Dynamic switching** - seamless transitions mid-conversation  
-✅ **Provider-agnostic** - works with DeepSeek, OpenAI, Anthropic, etc.  
-✅ **Memory-enabled** - AI remembers users across conversations  
-✅ **Relationship-aware** - Personalities evolve based on user interactions  
-✅ **Feature-flagged** - Dynamic feature control for safe deployments  
-✅ **Migration-ready** - Database schema management with version control  
-✅ **Storage-flexible** - Supports SQLite, DynamoDB, PostgreSQL, MySQL, MongoDB, Redis  
-✅ **Testable** - easy to unit test sentiment detection and personality logic  
-✅ **Scalable** - production-ready with advanced storage backends
-
-**Full example:** See [`voice_bot_dynamic_personality.py`](luminoracore-sdk-python/examples/voice_bot_dynamic_personality.py) in the repository for the complete, production-ready implementation using the official LuminoraCore personality format.
-
----
-
-## 6. Advanced v1.1 Features: Memory, Relationships & Evolution
-
-### Memory System - AI That Remembers
-
-```python
-# Automatic fact extraction from conversations
-facts = await client.get_facts(session_id)
-# Returns: [{"key": "user_name", "value": "Sarah", "confidence": 0.95}, ...]
-
-# Episodic memory for important moments
-episodes = await client.get_episodes(session_id)
-# Returns: [{"timestamp": "2024-12-01", "event": "completed_marathon", "importance": 0.9}, ...]
-
-# Semantic search across memories
-results = await client.semantic_search(session_id, "user's favorite foods")
-# Returns relevant facts and episodes about food preferences
-```
-
-### Relationship Evolution - From Stranger to Soulmate
-
-```python
-# Track relationship progression (0-100 points)
-affinity = await client.get_affinity(session_id)
-# Returns: {"points": 78, "level": "close_friend", "progress": 0.78}
-
-# Personality automatically adapts based on relationship level:
-# 0-20:   Stranger (formal, professional)
-# 21-40:  Acquaintance (friendly, helpful)
-# 41-60:  Friend (casual, enthusiastic)
-# 61-80:  Close friend (warm, personal)
-# 81-100: Soulmate (intimate, deep connection)
-```
-
-### Feature Flags - Dynamic Control
-
-```python
-from luminoracore.core.config.feature_flags import FeatureFlagManager
-
-# Enable/disable features dynamically
-manager = FeatureFlagManager()
-manager.enable_feature("memory_system")
-manager.disable_feature("semantic_search")
-
-# Check if feature is enabled
-if manager.is_enabled("memory_system"):
-    # Use memory features
-    facts = await client.get_facts(session_id)
-```
-
-### Database Migrations - Schema Management
-
-```python
-from luminoracore.storage.migrations import MigrationManager
-
-# Run migrations
-manager = MigrationManager()
-await manager.migrate()
-
-# Check migration status
-status = await manager.get_current_version()
-pending = await manager.get_pending_migrations()
-```
-
----
-
-## 7. Blending & Simulation
-
-### PersonaBlend™: Create Hybrid Personalities
-
-Instead of abrupt switches, create **smooth transitions** by blending personalities:
-
-```python
-from luminoracore import PersonalityBlender
-
-blender = PersonalityBlender()
-
-# Blend 70% technical + 30% empathetic
-blended = blender.blend_personalities(
-    personalities=[technical_expert, empathetic_support],
-    weights=[0.7, 0.3],
-    strategy="weighted_average"
-)
-
-# Result: A personality that explains technical issues with empathy
-```
-
-### CLI Blending
-
-```bash
-# Create a balanced blend
-luminoracore blend \
-  "technical_expert.json:0.6" \
-  "friendly_assistant.json:0.4" \
-  --output tech_friendly.json
-
-# Validate the blend
-luminoracore validate tech_friendly.json
-
-# Test with real API
-luminoracore test tech_friendly.json \
-  --provider deepseek \
-  --prompt "Can you explain how to configure the API?"
-```
-
-### Use Cases for Blending
-
-| Scenario | Blend | Result |
-|----------|-------|--------|
-| **Customer escalation** | 80% empathy + 20% technical | Caring but competent support |
-| **Technical documentation** | 60% expert + 40% educator | Clear, accurate explanations |
-| **Sales conversation** | 70% professional + 30% enthusiastic | Credible but engaging pitch |
-
----
-
-## 7. Deployment Notes & Best Practices
-
-### 🔧 Production Deployment
-
-#### 1. **Cache Compiled Prompts**
-
-```python
-# BAD: Compile on every request
-result = compiler.compile(personality, provider)
-
-# GOOD: Cache compiled prompts
-compiler = PersonalityCompiler(cache_size=128)
-result = compiler.compile(personality, provider)  # Cached after first call
-```
-
-#### 2. **Version Your Persona JSONs**
-
-```
-your_repo/
-├── personalities/
-│   ├── v1.0/
-│   │   ├── support.json
-│   │   └── sales.json
-│   └── v1.1/
-│       ├── support.json
-│       └── sales.json
-├── .git/
-└── deployment/
-```
-
-Track changes with Git:
-```bash
-git log personalities/support.json  # See all changes
-git diff v1.0 v1.1 -- personalities/support.json  # Compare versions
-```
-
-#### 3. **Validate Before Deployment**
-
-```python
-from luminoracore import PersonalityValidator
-
 validator = PersonalityValidator()
-result = validator.validate(personality)
+is_valid = validator.validate_personality(personality_data)
 
-if not result.is_valid:
-    raise ValueError(f"Invalid personality: {result.errors}")
-
-# Deploy only if valid
-deploy_personality(personality)
+# Compile personality
+personality = Personality(personality_data)
 ```
 
-#### 4. **Limit Switching Frequency**
+### 2. Memory System
+
+Advanced memory management with multiple storage backends:
 
 ```python
-# BAD: Switch on every message
-if sentiment == 'negative':
-    switch_personality('empathetic')
+from luminoracore_sdk import FlexibleSQLiteStorageV11
 
-# GOOD: Switch with cooldown
-MIN_SWITCH_INTERVAL = 60  # seconds
-last_switch_time = time.time()
+# Initialize storage
+storage = FlexibleSQLiteStorageV11(
+    database_path="personalities.db",
+    facts_table="facts",
+    affinity_table="affinity"
+)
 
-if sentiment == 'negative' and (time.time() - last_switch_time) > MIN_SWITCH_INTERVAL:
-    switch_personality('empathetic')
-    last_switch_time = time.time()
+# Memory operations
+await storage.save_fact(
+    user_id="user123",
+    category="preferences",
+    key="language",
+    value="spanish",
+    confidence=0.9
+)
+
+facts = await storage.get_facts("user123")
 ```
 
-#### 5. **Track Metrics**
+### 3. Evolution Engine
+
+Dynamic personality adaptation based on user interactions:
 
 ```python
-import structlog
+# Update affinity based on interaction
+affinity = await client.update_affinity(
+    user_id="user123",
+    personality_name="assistant",
+    points_delta=5,
+    interaction_type="positive"
+)
 
-logger = structlog.get_logger()
+# Personality evolves based on affinity level
+if affinity["current_level"] == "friend":
+    # Use warmer, more personal responses
+    personality_traits["warmth"] = 0.8
+    personality_traits["formality"] = 0.3
+```
 
-logger.info(
-    "personality_event",
-    event_type="switch",
-    from_persona=current_persona,
-    to_persona=new_persona,
-    reason=sentiment,
-    session_id=session_id,
-    timestamp=time.time()
+## Modular Design Principles
+
+### 1. Separation of Concerns
+
+Each component has a single responsibility:
+
+- **Personality Engine**: Personality definition and compilation
+- **Memory System**: Data persistence and retrieval
+- **Evolution Engine**: Dynamic adaptation and learning
+- **Storage Layer**: Database abstraction
+
+### 2. Loose Coupling
+
+Components communicate through well-defined interfaces:
+
+```python
+# Storage interface
+class StorageInterface:
+    async def save_fact(self, user_id: str, category: str, key: str, value: str) -> None
+    async def get_facts(self, user_id: str) -> List[Fact]
+    async def update_affinity(self, user_id: str, personality: str, delta: int) -> Affinity
+
+# Memory system uses storage interface
+class MemorySystem:
+    def __init__(self, storage: StorageInterface):
+        self.storage = storage
+```
+
+### 3. High Cohesion
+
+Related functionality is grouped together:
+
+```python
+# All memory operations in one place
+class MemoryManager:
+    async def save_fact(self, ...)
+    async def get_facts(self, ...)
+    async def search_memories(self, ...)
+    async def get_affinity(self, ...)
+    async def update_affinity(self, ...)
+```
+
+## Storage Flexibility
+
+### Database Agnostic Design
+
+LuminoraCore works with any database through flexible storage adapters:
+
+```python
+# SQLite for development
+storage = FlexibleSQLiteStorageV11("dev.db")
+
+# PostgreSQL for production
+storage = FlexiblePostgreSQLStorageV11(
+    host="prod-db.example.com",
+    database="personalities"
+)
+
+# DynamoDB for AWS
+storage = FlexibleDynamoDBStorageV11(
+    table_name="prod-personalities",
+    region_name="us-west-2"
 )
 ```
 
-### 🔒 Security Best Practices
+### Schema Flexibility
+
+Works with existing database schemas:
 
 ```python
-# NEVER hardcode API keys
-api_key = "sk-1234567890"  # ❌ BAD
-
-# ALWAYS use environment variables
-api_key = os.getenv("DEEPSEEK_API_KEY")  # ✅ GOOD
-
-# Validate all personality JSONs
-validator.validate(personality)  # ✅ GOOD
-
-# Sanitize user inputs
-user_input = sanitize(user_input)  # ✅ GOOD
-```
-
-### 📊 Monitoring & Analytics
-
-```python
-# Track token usage
-response = await client.send_message(session_id, message)
-logger.info(f"Tokens used: {response.usage['total_tokens']}")
-
-# Track personality effectiveness
-logger.info(
-    "personality_performance",
-    persona=current_persona,
-    user_satisfaction=sentiment_score,
-    resolution_time=elapsed_time
+# Use your existing tables
+storage = FlexibleSQLiteStorageV11(
+    database_path="existing.db",
+    facts_table="user_preferences",  # Your existing table
+    affinity_table="user_ratings"    # Your existing table
 )
 ```
 
----
+## Personality Modularity
 
-## 8. SEO / Performance Considerations
+### 1. Personality Components
 
-### 📈 SEO Best Practices
+Break personalities into reusable components:
 
-#### 1. **Meaningful URLs**
-```
-✅ /blog/building-modular-ai-personalities-luminoracore
-✅ /docs/personality-blending-guide
-❌ /page123
-```
-
-#### 2. **Meta Tags**
-```html
-<meta name="description" content="Learn how LuminoraCore lets you define modular AI personalities, blend and simulate them, and deploy across multiple large language models with a unified framework.">
-<meta property="og:title" content="Building Modular AI Personalities with LuminoraCore">
-<meta property="og:image" content="/images/luminoracore-architecture.png">
-<meta name="keywords" content="AI personalities, conversational AI, LLM, chatbot, voice bot, open source AI, personality blending">
-```
-
-#### 3. **Canonical Links**
-```html
-<link rel="canonical" href="https://luminoracore.com/blog/building-modular-ai-personalities">
-```
-
-#### 4. **Image Alt Text**
-```html
-<img src="architecture.png" alt="LuminoraCore personality architecture showing JSON compilation to LLM prompts">
-```
-
-#### 5. **Internal Linking**
-- Link to [GitHub repository](https://github.com/luminoracore/luminoracore)
-- Link to [Documentation](https://github.com/luminoracore/luminoracore/wiki)
-- Link to [Quick Start Guide](QUICK_START.md)
-
-### ⚡ Performance Optimization
-
-#### 1. **Cache Everything**
 ```python
-# Cache compiled prompts
-compiler = PersonalityCompiler(cache_size=128)
+# Base personality traits
+base_traits = {
+    "helpfulness": 0.8,
+    "formality": 0.5,
+    "empathy": 0.7
+}
 
-# Cache personality loads
-@lru_cache(maxsize=64)
-def load_personality(name: str) -> Personality:
-    return Personality(f"personalities/{name}.json")
+# Role-specific modifications
+support_traits = {
+    "patience": 0.9,
+    "technical_knowledge": 0.8
+}
+
+sales_traits = {
+    "persuasiveness": 0.8,
+    "enthusiasm": 0.9
+}
+
+# Combine traits
+support_personality = {**base_traits, **support_traits}
+sales_personality = {**base_traits, **sales_traits}
 ```
 
-#### 2. **Use Async**
+### 2. Dynamic Personality Assembly
+
+Assemble personalities based on context:
+
 ```python
-# Process multiple requests in parallel
-tasks = [
-    client.send_message(session1, msg1),
-    client.send_message(session2, msg2),
-    client.send_message(session3, msg3)
-]
-responses = await asyncio.gather(*tasks)
+async def get_personality_for_context(user_id: str, context: str):
+    base_personality = await get_base_personality()
+    user_preferences = await get_user_preferences(user_id)
+    context_modifiers = await get_context_modifiers(context)
+    
+    return combine_personalities([
+        base_personality,
+        user_preferences,
+        context_modifiers
+    ])
 ```
 
-#### 3. **Choose Cost-Effective LLMs**
-```python
-# DeepSeek: ~$0.14 per 1M tokens (cheapest)
-# GPT-3.5: ~$2.00 per 1M tokens
-# GPT-4: ~$30.00 per 1M tokens
+### 3. Personality Inheritance
 
-# Use DeepSeek for development and high-volume production
-provider_config = ProviderConfig(
-    name="deepseek",
-    api_key=os.getenv("DEEPSEEK_API_KEY"),
-    model="deepseek-chat"
+Create personality hierarchies:
+
+```python
+# Base assistant personality
+base_assistant = {
+    "name": "base_assistant",
+    "traits": {"helpfulness": 0.8, "formality": 0.5}
+}
+
+# Specialized personalities inherit from base
+tech_support = {
+    "name": "tech_support",
+    "parent": "base_assistant",
+    "traits": {"technical_knowledge": 0.9, "patience": 0.9}
+}
+
+customer_service = {
+    "name": "customer_service", 
+    "parent": "base_assistant",
+    "traits": {"empathy": 0.9, "problem_solving": 0.8}
+}
+```
+
+## Scalability Patterns
+
+### 1. Horizontal Scaling
+
+Scale memory and personality systems independently:
+
+```python
+# Memory service (scalable)
+memory_service = MemoryService(
+    storage=FlexibleDynamoDBStorageV11("memory-table")
+)
+
+# Personality service (scalable)
+personality_service = PersonalityService(
+    storage=FlexiblePostgreSQLStorageV11("personalities")
+)
+
+# Combined client
+client = LuminoraCoreClientV11(
+    memory_service=memory_service,
+    personality_service=personality_service
 )
 ```
 
----
+### 2. Caching Strategy
 
-## 10. Next Steps & Call to Action
+Implement intelligent caching:
 
-### 🚀 Get Started Today
+```python
+class CachedMemorySystem:
+    def __init__(self, storage: StorageInterface, cache: CacheInterface):
+        self.storage = storage
+        self.cache = cache
+    
+    async def get_facts(self, user_id: str):
+        # Check cache first
+        cached_facts = await self.cache.get(f"facts:{user_id}")
+        if cached_facts:
+            return cached_facts
+        
+        # Load from storage
+        facts = await self.storage.get_facts(user_id)
+        
+        # Cache for future use
+        await self.cache.set(f"facts:{user_id}", facts, ttl=3600)
+        
+        return facts
+```
 
-#### 1. **Install LuminoraCore**
+### 3. Microservices Architecture
+
+Deploy components as separate services:
+
+```yaml
+# docker-compose.yml
+services:
+  personality-service:
+    image: luminoracore/personality-service
+    environment:
+      - DATABASE_URL=postgresql://...
+  
+  memory-service:
+    image: luminoracore/memory-service
+    environment:
+      - REDIS_URL=redis://...
+  
+  api-gateway:
+    image: luminoracore/api-gateway
+    depends_on:
+      - personality-service
+      - memory-service
+```
+
+## Best Practices
+
+### 1. Personality Design
+
+- **Start Simple**: Begin with basic traits and add complexity
+- **Test Interactions**: Validate personality behavior with real users
+- **Monitor Evolution**: Track how personalities adapt over time
+- **Document Changes**: Keep track of personality modifications
+
+### 2. Memory Management
+
+- **Categorize Facts**: Use meaningful categories for organization
+- **Set Confidence Levels**: Track reliability of learned information
+- **Implement Cleanup**: Remove outdated or incorrect facts
+- **Monitor Performance**: Track memory operation performance
+
+### 3. Storage Strategy
+
+- **Choose Appropriate Database**: Match database to use case
+- **Plan for Growth**: Design schemas that scale
+- **Implement Backup**: Regular backups of personality and memory data
+- **Monitor Usage**: Track storage performance and costs
+
+### 4. Testing Strategy
+
+```python
+# Test personality behavior
+def test_personality_response():
+    personality = Personality(test_data)
+    response = personality.generate_response("Hello!")
+    assert "helpful" in response.lower()
+
+# Test memory operations
+async def test_memory_operations():
+    storage = InMemoryStorageV11()
+    await storage.save_fact("user1", "pref", "lang", "en")
+    facts = await storage.get_facts("user1")
+    assert len(facts) == 1
+
+# Test evolution
+async def test_personality_evolution():
+    client = LuminoraCoreClientV11(...)
+    await client.update_affinity("user1", "assistant", 10, "positive")
+    affinity = await client.get_affinity("user1", "assistant")
+    assert affinity["affinity_points"] > 0
+```
+
+## Deployment Strategies
+
+### 1. Development Environment
 
 ```bash
-# Quick install
-git clone https://github.com/luminoracore/luminoracore.git
-cd luminoracore
-.\install_all.ps1  # Windows
-./install_all.sh   # Linux/Mac
-
-# Verify installation
-python verify_installation.py
+# Local development with SQLite
+export LUMINORA_STORAGE_TYPE=sqlite
+export SQLITE_DATABASE_PATH=dev.db
+python app.py
 ```
 
-#### 2. **Try the Examples**
+### 2. Staging Environment
 
 ```bash
-# Run basic example
-cd luminoracore-sdk-python/examples
-python basic_usage.py
-
-# Run voice bot example
-python voice_bot_example.py
-
-# Run FastAPI integration
-python integrations/fastapi_integration.py
+# Staging with PostgreSQL
+export LUMINORA_STORAGE_TYPE=postgresql
+export POSTGRES_URL=postgresql://staging:password@staging-db:5432/luminora
+python app.py
 ```
 
-#### 3. **Read the Documentation**
+### 3. Production Environment
 
-- **[Quick Start Guide](QUICK_START.md)** - Get started in 5 minutes
-- **[Installation Guide](INSTALLATION_GUIDE.md)** - Complete setup instructions
-- **[Creating Personalities](CREATING_PERSONALITIES.md)** - Define your own personalities
-- **[API Reference](https://github.com/luminoracore/luminoracore/wiki)** - Complete API docs
+```bash
+# Production with DynamoDB
+export LUMINORA_STORAGE_TYPE=dynamodb
+export DYNAMODB_TABLE=prod-personalities
+export AWS_REGION=us-west-2
+python app.py
+```
 
-#### 4. **Join the Community**
+## Monitoring and Observability
 
-- ⭐ [Star us on GitHub](https://github.com/luminoracore/luminoracore)
-- 🐛 [Report Issues](https://github.com/luminoracore/luminoracore/issues)
-- 📧 [Contact Us](mailto:contact@luminoracore.com)
-- 📖 [Read the Wiki](https://github.com/luminoracore/luminoracore/wiki)
+### 1. Metrics Collection
 
-### 💡 Use Cases to Explore
+```python
+# Track personality performance
+class PersonalityMetrics:
+    def track_response_time(self, personality: str, duration: float):
+        self.metrics.histogram("personality.response_time", duration, tags={"personality": personality})
+    
+    def track_user_satisfaction(self, personality: str, rating: float):
+        self.metrics.gauge("personality.satisfaction", rating, tags={"personality": personality})
+```
 
-- **Customer Support Bots** - Dynamic personality based on escalation level
-- **Voice Assistants** - Consistent personality across phone, web, mobile
-- **Educational Tutors** - Adapt personality to student's learning style
-- **Sales Chatbots** - Professional but personable sales conversations
-- **Content Generation** - Maintain brand voice across all content
+### 2. Logging Strategy
 
-### 🎯 Why Choose LuminoraCore?
+```python
+import logging
 
-✅ **Open Source** - MIT license, free forever  
-✅ **Production Ready** - 179/179 tests passing (v1.1)  
-✅ **Multi-Provider** - 7 LLM providers supported  
-✅ **Flexible Storage** - 6 storage backend options (SQLite, DynamoDB, PostgreSQL, MySQL, MongoDB, Redis)  
-✅ **Memory System** - Advanced fact extraction, episodic memory, semantic search  
-✅ **Relationship Tracking** - Dynamic personality evolution based on user interactions  
-✅ **Feature Flags** - Dynamic feature control for safe deployments  
-✅ **Database Migrations** - Schema management with version control  
-✅ **Well-Documented** - Comprehensive guides and examples  
-✅ **Active Development** - Regular updates and improvements
+logger = logging.getLogger(__name__)
 
----
+# Log personality interactions
+logger.info("Personality interaction", extra={
+    "user_id": user_id,
+    "personality": personality_name,
+    "affinity_level": affinity["current_level"],
+    "facts_count": len(facts)
+})
+```
 
-## 📚 Additional Resources
+### 3. Health Checks
 
-### Examples in This Repository
+```python
+# Health check endpoints
+@app.route("/health/personality")
+def personality_health():
+    try:
+        validator = PersonalityValidator()
+        return {"status": "healthy", "personalities": validator.count_personalities()}
+    except Exception as e:
+        return {"status": "unhealthy", "error": str(e)}, 500
 
-- **[basic_usage.py](luminoracore-sdk-python/examples/basic_usage.py)** - Basic SDK usage
-- **[personality_blending.py](luminoracore-sdk-python/examples/personality_blending.py)** - PersonaBlend™ demo
-- **[fastapi_integration.py](luminoracore-sdk-python/examples/integrations/fastapi_integration.py)** - FastAPI REST API
-- **[streamlit_app.py](luminoracore-sdk-python/examples/integrations/streamlit_app.py)** - Interactive web UI
+@app.route("/health/memory")
+def memory_health():
+    try:
+        storage = get_storage()
+        await storage.health_check()
+        return {"status": "healthy"}
+    except Exception as e:
+        return {"status": "unhealthy", "error": str(e)}, 500
+```
 
-### Related Articles
+## Conclusion
 
-- **Performance Benchmarks**: How LuminoraCore compares to prompt-only approaches
-- **Cost Analysis**: DeepSeek vs OpenAI vs Anthropic for personality-driven AI
-- **Case Studies**: Real-world deployments using LuminoraCore
+LuminoraCore v1.1's modular architecture enables building scalable, maintainable AI personality systems. By following these patterns and best practices, you can create robust personality systems that evolve with your users and scale with your business.
 
----
+### Key Takeaways
 
-## 🏷️ Tags
+1. **Modular Design**: Separate concerns for better maintainability
+2. **Storage Flexibility**: Use any database that fits your needs
+3. **Personality Evolution**: Create dynamic, adaptive personalities
+4. **Scalable Architecture**: Design for growth from day one
+5. **Monitoring**: Track performance and user satisfaction
 
-`AI` `conversational-AI` `LLM` `chatbot` `voice-bot` `open-source` `python` `personality-blending` `DeepSeek` `OpenAI` `Anthropic` `architecture` `framework` `SDK` `REST-API`
-
----
-
-<div align="center">
-
-**Made with ❤️ by Ereace - Ruly Altamirano**
-
-[⭐ Star on GitHub](https://github.com/luminoracore/luminoracore) • [📖 Documentation](https://github.com/luminoracore/luminoracore/wiki) • [📧 Contact](mailto:contact@luminoracore.com)
-
-**LuminoraCore v1.1 - Production Ready with Advanced Memory & Relationships**
-
-</div>
-
+**Start building your modular AI personality system today with LuminoraCore v1.1.**

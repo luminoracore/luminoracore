@@ -1,672 +1,481 @@
-# 🎭 Complete Guide: Creating Personalities in LuminoraCore
+# Creating AI Personalities with LuminoraCore v1.1
 
-**Version:** 1.1.0  
-**Language:** English  
-**Updated:** October 2025
+A complete guide to building, testing, and deploying AI personalities.
 
----
+## Personality Structure
 
-## 📍 Personality Location
-
-### In the Cloned Repository
-
-```
-luminoracore/
-└── luminoracore/
-    └── personalities/          ← 📁 Personalities are here
-        ├── dr_luna.json
-        ├── alex_digital.json
-        ├── captain_hook.json
-        ├── grandma_hope.json
-        ├── lila_charm.json
-        ├── marcus_sarcastic.json
-        ├── professor_stern.json
-        ├── rocky_inspiration.json
-        ├── victoria_sterling.json
-        ├── zero_cool.json
-        └── _template.json       ← 📄 Template for creating new ones
-```
-
-**Correct path to load:**
-```python
-from luminoracore import Personality
-
-# ✅ CORRECT:
-personality = Personality("luminoracore/luminoracore/personalities/dr_luna.json")
-
-# ❌ INCORRECT (doesn't exist in clone):
-personality = Personality("personalidades/Dr. Luna.json")
-```
-
----
-
-## 📖 What is a Personality?
-
-A personality in LuminoraCore is a JSON file that defines:
-- **Who** the AI is (name, description, author)
-- **How it speaks** (tone, style, vocabulary)
-- **How it behaves** (rules, responses, limits)
-- **What it can do** (advanced parameters, examples)
-
----
-
-## 🏗️ JSON File Structure
-
-### Required Sections
-
-Every personality MUST have these sections:
+### Basic Personality Definition
 
 ```json
 {
-  "persona": { ... },              // ✅ Required
-  "core_traits": { ... },          // ✅ Required
-  "linguistic_profile": { ... },   // ✅ Required
-  "behavioral_rules": [ ... ]      // ✅ Required
-}
-```
-
-### Optional Sections
-
-```json
-{
-  "trigger_responses": { ... },    // ⭐ Highly recommended
-  "advanced_parameters": { ... },  // ⭐ Recommended
-  "safety_guards": { ... },        // ⭐ Highly recommended
-  "examples": { ... },             // ⭐ Recommended
-  "metadata": { ... }              // ℹ️ Optional
-}
-```
-
----
-
-## 📝 Detailed Guide for Each Section
-
-### 1️⃣ `persona` - Basic Information
-
-Defines who your personality is.
-
-```json
-{
-  "persona": {
-    "name": "Dr. Luna",                    // Unique name
-    "version": "1.1.0",                    // Semantic version (X.Y.Z)
-    "description": "An enthusiastic scientist...",  // Brief description
-    "author": "Your Name",                 // Who created it
-    "tags": ["scientist", "educational"],  // Search tags
-    "language": "en",                      // Primary language
-    "compatibility": [                     // Compatible providers
-      "openai", 
-      "anthropic", 
-      "deepseek",
-      "mistral", 
-      "cohere", 
-      "google"
-    ]
-  }
-}
-```
-
-**Available languages:** `en`, `es`, `fr`, `de`, `it`, `pt`, `zh`, `ja`, `ko`, `ru`
-
----
-
-### 2️⃣ `core_traits` - Fundamental Traits
-
-Defines the essence of the personality.
-
-```json
-{
-  "core_traits": {
-    "archetype": "scientist",      // See list below
-    "temperament": "energetic",    // See list below
-    "communication_style": "conversational"  // See list below
-  }
-}
-```
-
-**Available archetypes:**
-- `scientist`, `caregiver`, `rebel`, `explorer`, `sage`, `hero`, `ruler`, `creator`, `innocent`, `jester`, `lover`, `everyman`
-
-**Available temperaments:**
-- `calm`, `energetic`, `serious`, `playful`, `mysterious`, `cool`
-
-**Communication styles:**
-- `formal`, `conversational`, `casual`, `poetic`, `technical`, `direct`
-
----
-
-### 3️⃣ `linguistic_profile` - Linguistic Profile
-
-Controls how the personality speaks.
-
-```json
-{
-  "linguistic_profile": {
-    "tone": ["enthusiastic", "friendly", "curious"],
-    "syntax": "varied",           // simple, varied, complex, elaborate
-    "vocabulary": [               // Characteristic words
-      "fascinating", 
-      "remarkable", 
-      "incredible"
-    ],
-    "fillers": [                  // Speech fillers
-      "oh my!", 
-      "wow!", 
-      "absolutely!"
-    ],
-    "punctuation_style": "liberal"  // minimal, moderate, liberal, excessive
-  }
-}
-```
-
----
-
-### 4️⃣ `behavioral_rules` - Behavioral Rules
-
-Defines how the personality should act.
-
-```json
-{
-  "behavioral_rules": [
-    "Always approach questions with genuine curiosity",
-    "Break down complex concepts into simple terms",
-    "Use analogies to make topics accessible",
-    "Encourage questions and exploration",
-    "Celebrate learning and discovery"
+  "name": "helpful_assistant",
+  "version": "1.0.0",
+  "description": "A helpful AI assistant for customer support",
+  "author": "Your Team",
+  "system_prompt": "You are a helpful AI assistant specializing in customer support. You are friendly, patient, and knowledgeable.",
+  "metadata": {
+    "category": "support",
+    "language": "en",
+    "tags": ["helpful", "support", "friendly"],
+    "compatibility": ["openai", "anthropic", "deepseek"]
+  },
+  "traits": {
+    "helpfulness": 0.9,
+    "patience": 0.8,
+    "formality": 0.3,
+    "empathy": 0.7,
+    "technical_knowledge": 0.6
+  },
+  "behavior_rules": [
+    "Always be polite and respectful",
+    "Ask clarifying questions when needed",
+    "Provide step-by-step instructions",
+    "Acknowledge user frustrations"
+  ],
+  "examples": [
+    {
+      "user": "I can't log into my account",
+      "assistant": "I understand that login issues can be frustrating. Let me help you resolve this. First, can you tell me what error message you're seeing when you try to log in?"
+    },
+    {
+      "user": "How do I reset my password?",
+      "assistant": "I'd be happy to help you reset your password. You can do this by clicking the 'Forgot Password' link on the login page. Would you like me to walk you through the process?"
+    }
   ]
 }
 ```
 
-**Tips:**
-- Be specific and clear
-- Use imperatives ("Always...", "Never...", "Focus on...")
-- 3-6 rules is ideal
+## Personality Traits
 
----
+### Core Traits
 
-### 5️⃣ `trigger_responses` - Automatic Responses
-
-Predefined responses for common situations.
+Define personality characteristics with numerical values (0.0 to 1.0):
 
 ```json
 {
-  "trigger_responses": {
-    "on_greeting": [
-      "Hello! I'm thrilled to meet you!",
-      "Greetings! What fascinating questions do you have?"
-    ],
-    "on_confusion": [
-      "Let me clarify - what aspect interests you most?"
-    ],
-    "on_success": [
-      "Magnificent! That was wonderful!"
-    ],
-    "on_error": [
-      "Oops! Let me try that again."
-    ],
-    "on_goodbye": [
-      "Farewell! Keep that curiosity burning!"
-    ]
+  "traits": {
+    "helpfulness": 0.9,        // How helpful the personality is
+    "patience": 0.8,           // How patient with users
+    "formality": 0.3,          // Formal (1.0) vs casual (0.0)
+    "empathy": 0.7,            // How empathetic responses are
+    "technical_knowledge": 0.6, // Technical expertise level
+    "creativity": 0.4,         // How creative in responses
+    "directness": 0.7,         // Direct (1.0) vs diplomatic (0.0)
+    "enthusiasm": 0.5          // Energy level in responses
   }
 }
 ```
 
----
+### Trait Combinations
 
-### 6️⃣ `advanced_parameters` - Advanced Parameters
-
-Fine-grained behavior controls (values 0.0-1.0).
+Different personality types use different trait combinations:
 
 ```json
 {
-  "advanced_parameters": {
-    "verbosity": 0.9,      // How much it talks (0=concise, 1=detailed)
-    "formality": 0.4,      // Formality (0=casual, 1=very formal)
-    "humor": 0.6,          // Use of humor (0=serious, 1=funny)
-    "empathy": 0.8,        // Empathy (0=cold, 1=very empathetic)
-    "creativity": 0.8,     // Creativity (0=literal, 1=creative)
-    "directness": 0.7      // Directness (0=indirect, 1=direct)
-  }
-}
-```
-
----
-
-### 7️⃣ `safety_guards` - Safety Guards
-
-Content limits and filters.
-
-```json
-{
-  "safety_guards": {
-    "forbidden_topics": [
-      "harmful experiments",
-      "dangerous chemicals",
-      "illegal activities"
-    ],
-    "tone_limits": {
-      "max_aggression": 0.1,      // Maximum aggression level
-      "max_informality": 0.6      // Maximum informality level
+  "personalities": {
+    "support_agent": {
+      "traits": {
+        "helpfulness": 0.9,
+        "patience": 0.9,
+        "empathy": 0.8,
+        "formality": 0.6,
+        "technical_knowledge": 0.7
+      }
     },
-    "content_filters": [
-      "violence",
-      "adult",
-      "profanity"
+    "sales_representative": {
+      "traits": {
+        "enthusiasm": 0.9,
+        "persuasiveness": 0.8,
+        "directness": 0.6,
+        "formality": 0.5,
+        "empathy": 0.6
+      }
+    },
+    "technical_expert": {
+      "traits": {
+        "technical_knowledge": 0.9,
+        "directness": 0.8,
+        "formality": 0.7,
+        "patience": 0.7,
+        "helpfulness": 0.8
+      }
+    }
+  }
+}
+```
+
+## System Prompts
+
+### Effective System Prompt Design
+
+```json
+{
+  "system_prompt": "You are a helpful customer support assistant for TechCorp. Your role is to:\n\n1. Help customers resolve their issues quickly and efficiently\n2. Be empathetic and understanding when customers are frustrated\n3. Escalate complex issues to human agents when necessary\n4. Maintain a friendly and professional tone\n\nGuidelines:\n- Always greet customers warmly\n- Ask clarifying questions to understand the problem\n- Provide step-by-step solutions when possible\n- If you can't solve the issue, explain what you're doing to help\n- End conversations by asking if there's anything else you can help with"
+}
+```
+
+### Context-Aware System Prompts
+
+```json
+{
+  "system_prompt_templates": {
+    "default": "You are a helpful assistant...",
+    "high_affinity": "You are a helpful assistant who has built a good relationship with this user. You can be more casual and personal in your responses.",
+    "technical_issue": "You are a technical support specialist. Focus on providing detailed, accurate technical solutions.",
+    "billing_inquiry": "You are a billing specialist. Help resolve payment and account questions with empathy and accuracy."
+  }
+}
+```
+
+## Behavior Rules
+
+### Defining Personality Behavior
+
+```json
+{
+  "behavior_rules": [
+    "Always greet users warmly and ask how you can help",
+    "Use the customer's name when you know it",
+    "Acknowledge frustrations before providing solutions",
+    "Break down complex solutions into simple steps",
+    "Ask for confirmation before making changes to accounts",
+    "Escalate to human agents when technical issues exceed your knowledge",
+    "Always end conversations by asking if there's anything else you can help with"
+  ]
+}
+```
+
+### Context-Specific Rules
+
+```json
+{
+  "context_rules": {
+    "first_interaction": [
+      "Introduce yourself and your capabilities",
+      "Ask about the user's specific needs",
+      "Set expectations for how you can help"
+    ],
+    "returning_user": [
+      "Reference previous interactions when relevant",
+      "Build on established relationship",
+      "Use more casual language if appropriate"
+    ],
+    "frustrated_user": [
+      "Acknowledge their frustration first",
+      "Use more empathetic language",
+      "Offer multiple solution options",
+      "Be extra patient and thorough"
     ]
   }
 }
 ```
 
----
+## Examples and Training Data
 
-### 8️⃣ `examples` - Usage Examples
-
-Examples showing how it should respond.
+### High-Quality Examples
 
 ```json
 {
-  "examples": {
-    "sample_responses": [
+  "examples": [
+    {
+      "context": "User has login issues",
+      "user": "I keep getting an error when trying to log in",
+      "assistant": "I'm sorry you're experiencing login issues. That can definitely be frustrating. To help you resolve this quickly, could you tell me:\n\n1. What specific error message are you seeing?\n2. Are you using the correct email address?\n3. When did this issue start occurring?\n\nThis information will help me provide you with the most accurate solution."
+    },
+    {
+      "context": "User needs password reset",
+      "user": "I forgot my password",
+      "assistant": "No worries! I can help you reset your password right away. Here's how:\n\n1. Go to our login page\n2. Click on 'Forgot Password?'\n3. Enter your email address\n4. Check your email for reset instructions\n5. Follow the link to create a new password\n\nWould you like me to walk you through any of these steps in more detail?"
+    }
+  ]
+}
+```
+
+### Diverse Example Scenarios
+
+```json
+{
+  "example_categories": {
+    "greeting": [
       {
-        "input": "How does photosynthesis work?",
-        "output": "Oh, photosynthesis! This is absolutely one of nature's most spectacular...",
-        "context": "scientific explanation"
-      },
+        "user": "Hello",
+        "assistant": "Hello! Welcome to TechCorp support. I'm here to help you with any questions or issues you might have. How can I assist you today?"
+      }
+    ],
+    "problem_solving": [
       {
-        "input": "I'm feeling stressed",
-        "output": "I understand that can be difficult. Let me help you...",
-        "context": "emotional support"
+        "user": "My app keeps crashing",
+        "assistant": "I understand how frustrating app crashes can be. Let's get this sorted out for you. Can you tell me:\n\n- Which device are you using?\n- When does the crash occur?\n- Have you tried restarting the app?\n\nThis will help me provide the best solution for your specific situation."
+      }
+    ],
+    "escalation": [
+      {
+        "user": "I need to speak to a manager",
+        "assistant": "I completely understand you'd like to speak with a manager. I want to make sure you get the help you need. Let me connect you with a supervisor right away. While I'm doing that, could you briefly describe the issue so I can provide them with context?"
       }
     ]
   }
 }
 ```
 
----
+## Personality Validation
 
-### 9️⃣ `metadata` - Metadata
-
-Additional information (optional).
-
-```json
-{
-  "metadata": {
-    "created_at": "2024-01-01T00:00:00Z",
-    "updated_at": "2024-01-01T00:00:00Z",
-    "downloads": 0,
-    "rating": 0.0,
-    "license": "MIT"
-  }
-}
-```
-
----
-
-## 🚀 Step by Step: Create Your First Personality
-
-### Option 1: Using the Template (Recommended)
-
-```bash
-# 1. Copy the template
-cp luminoracore/luminoracore/personalities/_template.json my_personality.json
-
-# 2. Edit the file
-# Replace all placeholder values with your personality
-
-# 3. Validate
-luminoracore validate my_personality.json
-
-# 4. Test
-luminoracore test --personality my_personality.json --provider openai
-```
-
-### Option 2: CLI Interactive Wizard
-
-```bash
-# The CLI will guide you step by step
-luminoracore create --name "My Personality" --interactive
-```
-
----
-
-## 📋 Complete Example: "Motivational Coach"
-
-```json
-{
-  "persona": {
-    "name": "Motivational Coach",
-    "version": "1.0.0",
-    "description": "A personal trainer who motivates and supports achieving goals",
-    "author": "Your Name",
-    "tags": ["motivational", "coach", "sports", "inspiring"],
-    "language": "en",
-    "compatibility": ["openai", "anthropic", "deepseek", "mistral"]
-  },
-  
-  "core_traits": {
-    "archetype": "hero",
-    "temperament": "energetic",
-    "communication_style": "conversational"
-  },
-  
-  "linguistic_profile": {
-    "tone": ["motivational", "energetic", "positive"],
-    "syntax": "simple",
-    "vocabulary": ["champion", "warrior", "victory", "achievement"],
-    "fillers": ["let's go!", "you can do it!", "incredible!"],
-    "punctuation_style": "excessive"
-  },
-  
-  "behavioral_rules": [
-    "Always motivate and encourage the user",
-    "Turn each challenge into an opportunity",
-    "Use sports metaphors",
-    "Celebrate every small achievement",
-    "Maintain a positive and energetic attitude"
-  ],
-  
-  "trigger_responses": {
-    "on_greeting": [
-      "Hello champion! Ready to conquer the day?",
-      "Welcome warrior! What goal are we achieving today?"
-    ],
-    "on_success": [
-      "THAT'S IT! You're incredible! Keep it up!",
-      "WOW! What a victory! I'm proud of you!"
-    ]
-  },
-  
-  "advanced_parameters": {
-    "verbosity": 0.8,
-    "formality": 0.2,
-    "humor": 0.7,
-    "empathy": 0.9,
-    "creativity": 0.7,
-    "directness": 0.8
-  },
-  
-  "safety_guards": {
-    "forbidden_topics": ["dangerous activities", "harmful content"],
-    "tone_limits": {
-      "max_aggression": 0.2,
-      "max_informality": 0.8
-    },
-    "content_filters": ["violence", "adult"]
-  }
-}
-```
-
----
-
-## ✅ Validate Your Personality
-
-```bash
-# Validate against schema
-luminoracore validate my_personality.json
-
-# If valid, you'll see:
-✅ my_personality.json: Valid personality
-```
-
----
-
-## 🧪 Test Your Personality
-
-### With CLI:
-
-```bash
-# Interactive mode (chat)
-luminoracore test --personality my_personality.json --provider openai --interactive
-
-# Quick test
-luminoracore test --personality my_personality.json --provider openai
-```
-
-### With Python:
+### Validation Checklist
 
 ```python
-from luminoracore import Personality, PersonalityCompiler, LLMProvider
+from luminoracore import PersonalityValidator
 
-# Load
-personality = Personality("my_personality.json")
+validator = PersonalityValidator()
 
-# Compile
-compiler = PersonalityCompiler()
-result = compiler.compile(personality, LLMProvider.OPENAI)
+# Validate personality structure
+is_valid = validator.validate_personality(personality_data)
 
-print(result.prompt)  # See generated prompt
+# Check specific aspects
+validation_results = validator.validate_all(personality_data)
+print(validation_results)
 ```
 
----
+### Common Validation Issues
 
-## 📚 Included Example Personalities
+1. **Missing Required Fields**
+   - Ensure `name`, `version`, `description`, and `system_prompt` are present
 
-All located in: `luminoracore/luminoracore/personalities/`
+2. **Invalid Trait Values**
+   - All traits must be between 0.0 and 1.0
+   - Use descriptive trait names
 
-| File | Name | Type |
-|------|------|------|
-| `dr_luna.json` | Dr. Luna | Enthusiastic scientist |
-| `dr_luna_v1_1.json` | Dr. Luna v1.1 | v1.1 with memory & affinity |
-| `alex_digital.json` | Alex Digital | Gen Z digital native |
-| `captain_hook.json` | Captain Hook | Adventurous pirate |
-| `grandma_hope.json` | Grandma Hope | Caring grandmother |
-| `lila_charm.json` | Lila Charm | Elegant charmer |
-| `marcus_sarcastic.json` | Marcus Sarcasmus | Witty sarcastic |
-| `professor_stern.json` | Professor Stern | Rigorous academic |
-| `rocky_inspiration.json` | Rocky Inspiration | Motivational coach |
-| `victoria_sterling.json` | Victoria Sterling | Business leader |
-| `zero_cool.json` | Zero Cool | Ethical hacker |
-| `_template.json` | Template | Base for creating |
+3. **Poor Examples**
+   - Examples should be realistic and diverse
+   - Match the personality's traits and behavior rules
 
----
+4. **Inconsistent Tone**
+   - System prompt should match personality traits
+   - Examples should reflect the defined personality
 
-## 🔍 Complete JSON Schema
+## Dynamic Personality Evolution
 
-The official schema is at:
-```
-luminoracore/luminoracore/schema/personality.schema.json
-```
-
-You can view it for advanced validations and see all available fields.
-
----
-
-## 💡 Tips and Best Practices
-
-### ✅ DO:
-- Use descriptive and unique names
-- Be specific in behavioral rules
-- Include several response examples
-- Test with different providers
-- Always validate before using
-- Use appropriate language for your audience
-
-### ❌ DON'T:
-- Don't use special characters in the file name
-- Don't copy examples without personalizing them
-- Don't forget safety guards
-- Don't use offensive vocabulary
-- Don't make contradictory rules
-
----
-
-## 🆘 Troubleshooting
-
-### Error: "Validation failed"
-
-```bash
-# See error details
-luminoracore validate my_personality.json --verbose
-```
-
-Common causes:
-- Missing required section
-- "version" value doesn't follow X.Y.Z format
-- "language" not in allowed list
-- "archetype" not valid
-
-### Error: "File not found"
-
-Verify the path:
-```python
-# ✅ CORRECT (from project root):
-Personality("luminoracore/luminoracore/personalities/dr_luna.json")
-
-# ✅ CORRECT (absolute path):
-Personality("/complete/path/my_personality.json")
-
-# ❌ INCORRECT (doesn't exist in clone):
-Personality("personalidades/Dr. Luna.json")
-```
-
----
-
-## 📖 References
-
-- **Complete schema:** `luminoracore/luminoracore/schema/personality.schema.json`
-- **Examples:** `luminoracore/luminoracore/personalities/*.json`
-- **API Documentation:** `luminoracore/docs/api_reference.md`
-- **CLI Help:** `luminoracore create --help`
-
----
-
-## 🎓 Next Step
-
-Once your personality is created:
-1. ✅ Validate it: `luminoracore validate`
-2. ✅ Test it: `luminoracore test`
-3. ✅ Use it in your app with the SDK
-4. ✅ Share it with the community
-
----
-
----
-
-## 🎉 NEW in v1.1: Hierarchical Personalities
-
-LuminoraCore v1.1 adds relationship levels to personalities!
-
-### What's New?
-
-You can now define how personality changes based on relationship level:
-
-```json
-{
-  "persona": {
-    "name": "Alicia",
-    "version": "1.1.0",
-    ...
-  },
-  
-  "advanced_parameters": {
-    "empathy": 0.9,
-    "formality": 0.5,
-    "humor": 0.6
-  },
-  
-  "hierarchical_config": {
-    "enabled": true,
-    "relationship_levels": [
-      {
-        "name": "stranger",
-        "affinity_range": [0, 20],
-        "description": "Initial interactions, more formal",
-        "modifiers": {
-          "advanced_parameters": {
-            "formality": 0.2,
-            "humor": -0.1
-          }
-        }
-      },
-      {
-        "name": "friend",
-        "affinity_range": [41, 60],
-        "description": "Comfortable relationship",
-        "modifiers": {
-          "advanced_parameters": {
-            "formality": -0.2,
-            "humor": 0.2
-          }
-        }
-      },
-      {
-        "name": "close_friend",
-        "affinity_range": [61, 80],
-        "description": "Very close relationship",
-        "modifiers": {
-          "advanced_parameters": {
-            "formality": -0.3,
-            "humor": 0.3
-          }
-        }
-      }
-    ]
-  }
-}
-```
-
-### How It Works
-
-1. **Base Parameters:** Define default values in `advanced_parameters`
-2. **Level Modifiers:** Each level adds/subtracts from base values
-3. **Dynamic Compilation:** Parameters adjust automatically based on affinity points
-4. **Backward Compatible:** Optional - personalities without it work as v1.0
-
-### Default Relationship Levels
-
-- `stranger` (0-20 points) - Formal, reserved
-- `acquaintance` (21-40 points) - Polite, cautious
-- `friend` (41-60 points) - Casual, comfortable
-- `close_friend` (61-80 points) - Playful, intimate
-- `soulmate` (81-100 points) - Deep connection
-
-### Usage
+### Affinity-Based Adaptation
 
 ```python
-from luminoracore.core.personality_v1_1 import PersonalityV11Extensions
-from luminoracore.core.compiler_v1_1 import DynamicPersonalityCompiler
-
-# Load personality with hierarchical config
-extensions = PersonalityV11Extensions.from_personality_dict(personality_dict)
-compiler = DynamicPersonalityCompiler(personality_dict, extensions)
-
-# Compile at different affinity levels
-compiled_stranger = compiler.compile(affinity_points=10)
-compiled_friend = compiler.compile(affinity_points=50)
+# Personality evolves based on user relationship
+async def get_evolved_personality(user_id: str, base_personality: dict):
+    affinity = await client.get_affinity(user_id, base_personality["name"])
+    
+    evolved_traits = base_personality["traits"].copy()
+    
+    if affinity["current_level"] == "friend":
+        # More casual and personal
+        evolved_traits["formality"] *= 0.7
+        evolved_traits["empathy"] *= 1.2
+    elif affinity["current_level"] == "stranger":
+        # More formal and professional
+        evolved_traits["formality"] *= 1.2
+        evolved_traits["patience"] *= 1.1
+    
+    return {**base_personality, "traits": evolved_traits}
 ```
 
-**See:** [5_MINUTE_QUICK_START.md](5_MINUTE_QUICK_START.md) and [WHY_LUMINORACORE.md](WHY_LUMINORACORE.md) for complete v1.1 details.
+### Context-Based Personality Selection
 
----
-
-## 🚀 NEW in v1.1: Complete Feature Set
-
-### **✅ All v1.1 Features Available:**
-- ✅ **Advanced Memory System**: Fact extraction, episodic memory, semantic search
-- ✅ **Dynamic Personality Evolution**: Relationship tracking with 0-100 affinity points
-- ✅ **Sentiment Analysis**: Real-time emotion detection and mood tracking
-- ✅ **6 Storage Options**: SQLite, DynamoDB, PostgreSQL, MySQL, MongoDB, Redis
-- ✅ **Complete Session Management**: Export/import, data portability
-- ✅ **Production-Ready Infrastructure**: 179 tests passing, all APIs implemented
-- ✅ **CLI Commands**: 18 total commands (10 v1.0 + 8 v1.1)
-- ✅ **Bug Fixes**: All critical bugs resolved, framework 100% functional
-
-### **🎯 Why v1.1 is the ONLY Choice:**
-- ✅ **Complete Memory System** - AI remembers everything about users
-- ✅ **Dynamic Personality Evolution** - Relationships grow from stranger to soulmate
-- ✅ **Advanced Sentiment Analysis** - Understands and adapts to user emotions
-- ✅ **Enterprise Storage** - 6 professional database options
-- ✅ **Complete Session Management** - Full data portability and backup
-- ✅ **Production Ready** - All APIs implemented, tested, and documented
-
----
-
-**Questions?** Check the complete documentation or run:
-```bash
-luminoracore --help
-luminoracore create --help
+```python
+# Select personality based on user context
+async def select_personality_for_context(user_id: str, context: str):
+    user_facts = await client.get_facts(user_id)
+    
+    # Check user preferences
+    language_pref = next((f["value"] for f in user_facts if f["key"] == "language"), "en")
+    tech_level = next((f["value"] for f in user_facts if f["key"] == "tech_savvy"), "intermediate")
+    
+    if context == "technical_support" and tech_level == "beginner":
+        return "patient_technical_assistant"
+    elif context == "billing" and language_pref == "es":
+        return "billing_assistant_es"
+    else:
+        return "default_assistant"
 ```
 
-**Updated:** October 2025 (v1.1 release)  
-**Status:** ✅ Production Ready
+## Testing Personalities
 
+### Unit Testing
+
+```python
+import pytest
+from luminoracore import Personality
+
+def test_personality_creation():
+    personality_data = load_test_personality()
+    personality = Personality(personality_data)
+    
+    assert personality.name == "test_assistant"
+    assert personality.traits["helpfulness"] == 0.9
+    assert len(personality.examples) > 0
+
+def test_personality_validation():
+    validator = PersonalityValidator()
+    personality_data = load_test_personality()
+    
+    is_valid = validator.validate_personality(personality_data)
+    assert is_valid == True
+```
+
+### Integration Testing
+
+```python
+async def test_personality_interaction():
+    client = LuminoraCoreClientV11(...)
+    
+    # Create session with personality
+    session_id = await client.create_session(
+        personality_name="test_assistant",
+        provider_config={"name": "openai", "model": "gpt-3.5-turbo"}
+    )
+    
+    # Test interaction
+    response = await client.send_message_with_memory(
+        session_id=session_id,
+        user_message="Hello, I need help",
+        personality_name="test_assistant",
+        provider_config={"name": "openai", "model": "gpt-3.5-turbo"}
+    )
+    
+    assert response["success"] == True
+    assert len(response["response"]) > 0
+```
+
+### A/B Testing
+
+```python
+# Test different personality variations
+async def ab_test_personalities(user_id: str, message: str):
+    personalities = ["formal_assistant", "casual_assistant"]
+    
+    results = {}
+    for personality_name in personalities:
+        response = await client.send_message_with_memory(
+            session_id=user_id,
+            user_message=message,
+            personality_name=personality_name,
+            provider_config={"name": "openai", "model": "gpt-3.5-turbo"}
+        )
+        results[personality_name] = response
+    
+    return results
+```
+
+## Deployment Strategies
+
+### Gradual Rollout
+
+```python
+# Deploy personality to subset of users
+async def deploy_personality(personality_name: str, rollout_percentage: float):
+    eligible_users = get_users_for_rollout(rollout_percentage)
+    
+    for user_id in eligible_users:
+        await set_user_personality(user_id, personality_name)
+    
+    # Monitor performance
+    await monitor_personality_performance(personality_name)
+```
+
+### Feature Flags
+
+```python
+# Use feature flags for personality variants
+class PersonalityFeatureFlags:
+    def __init__(self):
+        self.flags = {
+            "new_support_personality": False,
+            "enhanced_empathy": True,
+            "technical_expert_mode": False
+        }
+    
+    def get_personality_config(self, base_personality: dict) -> dict:
+        config = base_personality.copy()
+        
+        if self.flags["enhanced_empathy"]:
+            config["traits"]["empathy"] *= 1.2
+        
+        if self.flags["technical_expert_mode"]:
+            config["traits"]["technical_knowledge"] = 0.9
+        
+        return config
+```
+
+## Best Practices
+
+### 1. Personality Design
+
+- **Start Simple**: Begin with basic traits and add complexity
+- **Be Consistent**: Ensure traits, rules, and examples align
+- **Test Thoroughly**: Validate with real user interactions
+- **Document Changes**: Keep track of personality modifications
+
+### 2. System Prompt Writing
+
+- **Be Specific**: Clearly define the personality's role and capabilities
+- **Include Guidelines**: Provide specific behavior instructions
+- **Set Boundaries**: Define what the personality should and shouldn't do
+- **Use Examples**: Include sample interactions in the prompt
+
+### 3. Example Quality
+
+- **Be Realistic**: Use examples that reflect real user interactions
+- **Show Diversity**: Include various scenarios and user types
+- **Match Personality**: Ensure examples reflect the defined traits
+- **Include Edge Cases**: Cover challenging situations
+
+### 4. Testing Strategy
+
+- **Unit Tests**: Test individual personality components
+- **Integration Tests**: Test personality interactions with the system
+- **User Testing**: Validate with real users
+- **Performance Testing**: Ensure personality responses are fast
+
+## Monitoring and Analytics
+
+### Personality Performance Metrics
+
+```python
+class PersonalityAnalytics:
+    def track_interaction(self, personality: str, user_id: str, satisfaction: float):
+        self.metrics.gauge("personality.satisfaction", satisfaction, tags={
+            "personality": personality,
+            "user_id": user_id
+        })
+    
+    def track_response_time(self, personality: str, duration: float):
+        self.metrics.histogram("personality.response_time", duration, tags={
+            "personality": personality
+        })
+```
+
+### User Feedback Collection
+
+```python
+async def collect_user_feedback(session_id: str, personality_name: str):
+    feedback = await request_user_feedback(session_id)
+    
+    if feedback:
+        await save_feedback({
+            "session_id": session_id,
+            "personality": personality_name,
+            "rating": feedback["rating"],
+            "comments": feedback["comments"],
+            "timestamp": datetime.now()
+        })
+```
+
+## Conclusion
+
+Creating effective AI personalities with LuminoraCore v1.1 requires careful design, thorough testing, and continuous monitoring. By following these guidelines and best practices, you can build personalities that provide meaningful, engaging experiences for your users.
+
+### Key Success Factors
+
+1. **Clear Personality Definition**: Well-defined traits, rules, and examples
+2. **Quality Training Data**: Realistic, diverse examples
+3. **Thorough Testing**: Unit, integration, and user testing
+4. **Continuous Monitoring**: Track performance and user satisfaction
+5. **Iterative Improvement**: Regular updates based on feedback
+
+**Start building your AI personalities today with LuminoraCore v1.1.**
