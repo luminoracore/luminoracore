@@ -1,17 +1,18 @@
 """
-Memory command for LuminoraCore CLI
+Memory command for LuminoraCore CLI v1.1
 
-Query facts, episodes, and memory data.
+Query facts, episodes, and memory data using flexible storage.
 """
 
 import click
 import json
 from typing import Optional
+import asyncio
 
 
 @click.group()
 def memory():
-    """Memory operations (facts, episodes, search)"""
+    """Memory operations (facts, episodes, search) using flexible storage"""
     pass
 
 

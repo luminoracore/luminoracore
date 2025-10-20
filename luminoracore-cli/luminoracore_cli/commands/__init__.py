@@ -17,6 +17,7 @@ from .migrate import migrate
 from .memory import memory
 from .snapshot import snapshot
 from .conversation_memory import conversation_memory
+from .storage import app as storage_app
 
 __all__ = [
     "validate_command",
@@ -33,5 +34,6 @@ __all__ = [
     "migrate",
     "memory", 
     "snapshot",
-    "conversation_memory"
+    "conversation_memory",
+    "storage_app"
 ]

@@ -1,14 +1,53 @@
 """
-Storage module for LuminoraCore Core
+Flexible Storage Management for LuminoraCore v1.1
 
-Handles database migrations and Core-specific tables.
-
-NOTE: This is separate from SDK's session storage.
-- SDK handles: sessions, messages, conversation state
-- Core handles: affinity, facts, episodes, moods (personality data)
+Provides flexible storage implementations for all database types.
 """
 
-from .migrations.migration_manager import MigrationManager, MigrationError
+# Import flexible storage implementations
+from .flexible_storage import (
+    FlexibleStorageManager,
+    StorageType,
+    StorageConfig
+)
 
-__all__ = ['MigrationManager', 'MigrationError']
+# Import database-specific flexible implementations
+try:
+    from .dynamodb_flexible import FlexibleDynamoDBStorage
+except ImportError:
+    FlexibleDynamoDBStorage = None
 
+try:
+    from .sqlite_flexible import FlexibleSQLiteStorage
+except ImportError:
+    FlexibleSQLiteStorage = None
+
+try:
+    from .postgresql_flexible import FlexiblePostgreSQLStorage
+except ImportError:
+    FlexiblePostgreSQLStorage = None
+
+try:
+    from .redis_flexible import FlexibleRedisStorage
+except ImportError:
+    FlexibleRedisStorage = None
+
+try:
+    from .mongodb_flexible import FlexibleMongoDBStorage
+except ImportError:
+    FlexibleMongoDBStorage = None
+
+# Import migration manager
+from .migrations import MigrationManager
+
+__all__ = [
+    "FlexibleStorageManager",
+    "StorageType",
+    "StorageConfig",
+    "FlexibleDynamoDBStorage",
+    "FlexibleSQLiteStorage", 
+    "FlexiblePostgreSQLStorage",
+    "FlexibleRedisStorage",
+    "FlexibleMongoDBStorage",
+    "MigrationManager",
+]

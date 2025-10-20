@@ -24,6 +24,13 @@ from .core import personality_v1_1
 from .core import compiler_v1_1
 from .storage import migrations
 
+# Flexible storage modules
+from .storage import (
+    FlexibleStorageManager,
+    StorageType,
+    StorageConfig
+)
+
 __all__ = [
     # v1.0 modules
     "Personality",
@@ -41,4 +48,9 @@ __all__ = [
     "personality_v1_1",
     "compiler_v1_1",
     "migrations",
+    
+    # Flexible storage modules
+    "FlexibleStorageManager",
+    "StorageType",
+    "StorageConfig",
 ]

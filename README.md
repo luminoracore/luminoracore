@@ -45,6 +45,8 @@ LuminoraCore is an open-source framework for creating **consistent, evolving AI 
 - 🎭 **Dynamic Personalities** - Adapts tone based on relationship level
 - 📊 **Sentiment Analysis** - Analyzes conversation mood and satisfaction
 - 🔄 **Personality Evolution** - Learns and improves over time
+- 🗄️ **Flexible Storage** - Works with ANY database (DynamoDB, SQLite, PostgreSQL, Redis, MongoDB)
+- ⚙️ **Auto-Configuration** - Automatically detects and adapts to your existing database schema
 
 ### How It Works
 
@@ -133,6 +135,87 @@ learned = facts.extract_sync("user_123", "I love playing guitar!")
 - 📊 **89%** customer satisfaction
 
 **ROI: 1,782% in first year**
+
+---
+
+## 🗄️ Complete Flexibility - Use ANY Database
+
+**LuminoraCore v1.1 is now COMPLETELY FLEXIBLE** - you can use ANY database with ANY configuration:
+
+### ✅ DynamoDB - ANY Table, ANY Schema
+```python
+# Use your existing DynamoDB table with any schema
+from luminoracore_sdk.session import FlexibleDynamoDBStorageV11
+
+storage = FlexibleDynamoDBStorageV11(
+    table_name="your-existing-table",  # Your table
+    region_name="your-region",         # Your region
+    hash_key_name="your-hash-key",     # Your schema
+    range_key_name="your-range-key"    # Your schema
+)
+
+# Or auto-detect everything
+storage = FlexibleDynamoDBStorageV11("your-table", "your-region")
+```
+
+### ✅ SQLite - ANY Database, ANY Tables
+```python
+# Use your existing SQLite database
+from luminoracore_sdk.session import FlexibleSQLiteStorageV11
+
+storage = FlexibleSQLiteStorageV11(
+    database_path="/path/to/your/database.sqlite",
+    facts_table="your_facts_table",
+    affinity_table="your_affinity_table"
+)
+
+# Or auto-detect everything
+storage = FlexibleSQLiteStorageV11("/path/to/your/database.sqlite")
+```
+
+### ✅ PostgreSQL - ANY Database, ANY Schema
+```python
+# Use your existing PostgreSQL database
+from luminoracore_sdk.session import FlexiblePostgreSQLStorageV11
+
+storage = FlexiblePostgreSQLStorageV11(
+    host="your-postgres-host",
+    database="your_database",
+    schema="your_schema",
+    facts_table="your_facts_table"
+)
+```
+
+### ✅ Redis - ANY Redis, ANY Key Patterns
+```python
+# Use your existing Redis instance
+from luminoracore_sdk.session import FlexibleRedisStorageV11
+
+storage = FlexibleRedisStorageV11(
+    host="your-redis-host",
+    key_prefix="your_prefix",
+    affinity_key_pattern="your:pattern:{user_id}:{personality_name}"
+)
+```
+
+### ✅ MongoDB - ANY Database, ANY Collections
+```python
+# Use your existing MongoDB database
+from luminoracore_sdk.session import FlexibleMongoDBStorageV11
+
+storage = FlexibleMongoDBStorageV11(
+    host="your-mongodb-host",
+    database="your_database",
+    facts_collection="your_facts_collection"
+)
+```
+
+### 🎯 Benefits
+- ✅ **No hardcoding** - Use your existing infrastructure
+- ✅ **Auto-detection** - Framework adapts to your schema
+- ✅ **Multi-tenant** - Different configurations per tenant
+- ✅ **Multi-region** - Deploy anywhere
+- ✅ **Enterprise-ready** - Works with your security policies
 
 ---
 

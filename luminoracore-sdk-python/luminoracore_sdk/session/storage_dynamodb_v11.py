@@ -58,7 +58,16 @@ class DynamoDBStorageV11(StorageV11Extension):
         """Ensure DynamoDB table exists with proper schema"""
         try:
             # Try to describe table to check if it exists
-            self.table.table_status
+            response = self.table.meta.client.describe_table(TableName=self.table_name)
+            table_info = response['Table']
+            
+            # Check if GSI1 exists
+            gsi_names = [gsi['IndexName'] for gsi in table_info.get('GlobalSecondaryIndexes', [])]
+            if 'GSI1' not in gsi_names:
+                logger.info(f"Table {self.table_name} exists but GSI1 index is missing. This may cause query errors.")
+                logger.info(f"Available indexes: {gsi_names}")
+                logger.info("Consider recreating the table or adding the GSI1 index manually.")
+                
         except ClientError as e:
             if e.response['Error']['Code'] == 'ResourceNotFoundException':
                 logger.info(f"Creating DynamoDB table: {self.table_name}")
@@ -167,6 +176,9 @@ class DynamoDBStorageV11(StorageV11Extension):
                 'SK': 'AFFINITY',
                 'GSI1PK': f"USER#{user_id}",
                 'GSI1SK': f"PERSONALITY#{personality_name}",
+                'user_id': user_id,  # Add user_id field for DynamoDB
+                'session_id': kwargs.get('session_id', user_id),  # Add session_id field
+                'personality_name': personality_name,  # Add personality_name field
                 'affinity_points': affinity_points,
                 'current_level': current_level,
                 'total_interactions': kwargs.get('total_interactions', 0),
@@ -236,6 +248,8 @@ class DynamoDBStorageV11(StorageV11Extension):
                 'SK': 'FACT',
                 'GSI1PK': f"USER#{user_id}",
                 'GSI1SK': f"CATEGORY#{category}",
+                'user_id': user_id,  # Add user_id field for DynamoDB
+                'session_id': kwargs.get('session_id', user_id),  # Add session_id field
                 'category': category,
                 'key': key,
                 'value': json.dumps(value) if not isinstance(value, str) else value,

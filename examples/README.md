@@ -20,6 +20,7 @@ examples/
     ├── v1_1_complete_workflow.py ⭐ NEW - Complete workflow
     ├── v1_1_feature_flags_demo.py ⭐ NEW - Feature flags
     ├── v1_1_migrations_demo.py ⭐ NEW - Database migrations
+    ├── v1_1_flexible_storage_demo.py ⭐ NEW - Complete flexibility
     ├── luminoracore/examples/v1_1_quick_example.py
     └── luminoracore-sdk-python/examples/v1_1_sdk_usage.py
 ```
