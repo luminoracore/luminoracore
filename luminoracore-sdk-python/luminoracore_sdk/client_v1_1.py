@@ -989,4 +989,346 @@ class LuminoraCoreClientV11:
             "episode_types": list(set(episode.get("episode_type", "") for episode in episodes)),
             "most_important_episode": max(episodes, key=lambda e: e.get("importance", 0)) if episodes else None
         }
+    
+    # SENTIMENT ANALYSIS METHODS
+    
+    async def save_mood(
+        self,
+        user_id: str,
+        personality_name: str,
+        mood: str,
+        intensity: float,
+        context: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Save user mood data"""
+        try:
+            mood_data = {
+                "user_id": user_id,
+                "personality_name": personality_name,
+                "mood": mood,
+                "intensity": intensity,
+                "context": context,
+                "created_at": datetime.now().isoformat()
+            }
+            
+            await self.storage_v11.save_mood(
+                user_id=user_id,
+                mood_data=mood_data
+            )
+            
+            return {
+                "success": True,
+                "mood_saved": True,
+                "mood": mood,
+                "intensity": intensity
+            }
+            
+        except Exception as e:
+            logger.error(f"Error saving mood: {e}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
+    
+    async def get_mood_history(
+        self,
+        user_id: str,
+        personality_name: str,
+        limit: Optional[int] = None
+    ) -> List[Dict[str, Any]]:
+        """Get user mood history"""
+        try:
+            moods = await self.storage_v11.get_moods(
+                user_id=user_id,
+                personality_name=personality_name,
+                max_results=limit
+            )
+            return moods
+            
+        except Exception as e:
+            logger.error(f"Error getting mood history: {e}")
+            return []
+    
+    async def analyze_sentiment(
+        self,
+        user_id: str,
+        message: str,
+        personality_name: str = "default"
+    ) -> Dict[str, Any]:
+        """Analyze sentiment of a message"""
+        try:
+            from .analysis.sentiment_analyzer import AdvancedSentimentAnalyzer
+            
+            analyzer = AdvancedSentimentAnalyzer(self.storage_v11)
+            result = await analyzer.analyze_sentiment(
+                session_id=user_id,
+                user_id=user_id,
+                message=message,
+                personality_name=personality_name
+            )
+            
+            return {
+                "success": True,
+                "sentiment": result.overall_sentiment,
+                "score": result.sentiment_score,
+                "emotions": result.emotions_detected,
+                "confidence": result.confidence
+            }
+            
+        except Exception as e:
+            logger.error(f"Error analyzing sentiment: {e}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
+    
+    async def get_sentiment_history(
+        self,
+        user_id: str,
+        personality_name: str = "default",
+        limit: Optional[int] = None
+    ) -> List[Dict[str, Any]]:
+        """Get sentiment analysis history"""
+        try:
+            from .analysis.sentiment_analyzer import AdvancedSentimentAnalyzer
+            
+            analyzer = AdvancedSentimentAnalyzer(self.storage_v11)
+            history = await analyzer.get_sentiment_history(
+                session_id=user_id,
+                user_id=user_id,
+                limit=limit or 10
+            )
+            
+            return history
+            
+        except Exception as e:
+            logger.error(f"Error getting sentiment history: {e}")
+            return []
+    
+    async def get_sentiment_trends(
+        self,
+        user_id: str,
+        personality_name: str = "default",
+        days: int = 7
+    ) -> Dict[str, Any]:
+        """Get sentiment trends over time"""
+        try:
+            # Get sentiment history
+            sentiment_history = await self.get_sentiment_history(user_id, personality_name, limit=50)
+            
+            # Simple trend analysis
+            if not sentiment_history:
+                return {
+                    "success": True,
+                    "trends": {
+                        "overall_trend": "neutral",
+                        "average_sentiment": 0.0,
+                        "sentiment_count": 0,
+                        "positive_percentage": 0.0,
+                        "negative_percentage": 0.0,
+                        "neutral_percentage": 100.0
+                    }
+                }
+            
+            # Calculate trends
+            sentiments = [entry.get('sentiment', 'neutral') for entry in sentiment_history]
+            sentiment_scores = [entry.get('score', 0.0) for entry in sentiment_history]
+            
+            positive_count = sentiments.count('positive')
+            negative_count = sentiments.count('negative')
+            neutral_count = sentiments.count('neutral')
+            total_count = len(sentiments)
+            
+            avg_sentiment = sum(sentiment_scores) / len(sentiment_scores) if sentiment_scores else 0.0
+            
+            # Determine overall trend
+            if avg_sentiment > 0.1:
+                overall_trend = "positive"
+            elif avg_sentiment < -0.1:
+                overall_trend = "negative"
+            else:
+                overall_trend = "neutral"
+            
+            return {
+                "success": True,
+                "trends": {
+                    "overall_trend": overall_trend,
+                    "average_sentiment": avg_sentiment,
+                    "sentiment_count": total_count,
+                    "positive_percentage": (positive_count / total_count) * 100,
+                    "negative_percentage": (negative_count / total_count) * 100,
+                    "neutral_percentage": (neutral_count / total_count) * 100
+                }
+            }
+            
+        except Exception as e:
+            logger.error(f"Error getting sentiment trends: {e}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
+    
+    # SNAPSHOT MANAGEMENT METHODS
+    
+    async def create_snapshot(
+        self,
+        session_id: str,
+        snapshot_name: Optional[str] = None
+    ) -> str:
+        """Create a snapshot of the current session state"""
+        try:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            snapshot_id = f"{session_id}_{timestamp}"
+            
+            if snapshot_name:
+                snapshot_id = f"{snapshot_name}_{timestamp}"
+            
+            # Export current state
+            snapshot_data = await self.export_snapshot(session_id)
+            
+            # Save snapshot metadata
+            snapshot_metadata = {
+                "snapshot_id": snapshot_id,
+                "session_id": session_id,
+                "created_at": datetime.now().isoformat(),
+                "snapshot_name": snapshot_name or f"snapshot_{timestamp}",
+                "data_size": len(str(snapshot_data))
+            }
+            
+            await self.storage_v11.save_snapshot(
+                user_id=session_id,
+                snapshot_id=snapshot_id,
+                snapshot_data=snapshot_data,
+                metadata=snapshot_metadata
+            )
+            
+            return snapshot_id
+            
+        except Exception as e:
+            logger.error(f"Error creating snapshot: {e}")
+            raise e
+    
+    async def list_snapshots(
+        self,
+        session_id: str,
+        limit: Optional[int] = None
+    ) -> List[Dict[str, Any]]:
+        """List all snapshots for a session"""
+        try:
+            snapshots = await self.storage_v11.get_snapshots(
+                user_id=session_id,
+                max_results=limit
+            )
+            return snapshots
+            
+        except Exception as e:
+            logger.error(f"Error listing snapshots: {e}")
+            return []
+    
+    async def delete_snapshot(
+        self,
+        session_id: str,
+        snapshot_id: str
+    ) -> Dict[str, Any]:
+        """Delete a specific snapshot"""
+        try:
+            await self.storage_v11.delete_snapshot(
+                user_id=session_id,
+                snapshot_id=snapshot_id
+            )
+            
+            return {
+                "success": True,
+                "snapshot_deleted": snapshot_id
+            }
+            
+        except Exception as e:
+            logger.error(f"Error deleting snapshot: {e}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
+    
+    async def get_snapshot_info(
+        self,
+        session_id: str,
+        snapshot_id: str
+    ) -> Dict[str, Any]:
+        """Get information about a specific snapshot"""
+        try:
+            snapshot_info = await self.storage_v11.get_snapshot_info(
+                user_id=session_id,
+                snapshot_id=snapshot_id
+            )
+            
+            return {
+                "success": True,
+                "snapshot_info": snapshot_info
+            }
+            
+        except Exception as e:
+            logger.error(f"Error getting snapshot info: {e}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
+    
+    # CONVERSATION HISTORY METHODS
+    
+    async def get_conversation_history(
+        self,
+        session_id: str,
+        limit: Optional[int] = None
+    ) -> List[Dict[str, Any]]:
+        """Get conversation history for a session"""
+        try:
+            # Get conversation episodes
+            episodes = await self.get_episodes(session_id)
+            
+            # Filter for conversation episodes
+            conversation_episodes = [
+                episode for episode in episodes 
+                if episode.get("episode_type") == "conversation"
+            ]
+            
+            if limit:
+                conversation_episodes = conversation_episodes[-limit:]
+            
+            return conversation_episodes
+            
+        except Exception as e:
+            logger.error(f"Error getting conversation history: {e}")
+            return []
+    
+    async def export_conversation(
+        self,
+        session_id: str,
+        format: str = "json"
+    ) -> Dict[str, Any]:
+        """Export conversation in specified format"""
+        try:
+            conversation_history = await self.get_conversation_history(session_id)
+            facts = await self.get_facts(session_id)
+            affinity = await self.get_affinity(session_id, "default")
+            
+            export_data = {
+                "session_id": session_id,
+                "export_timestamp": datetime.now().isoformat(),
+                "conversation_history": conversation_history,
+                "facts": facts,
+                "affinity": affinity,
+                "format": format
+            }
+            
+            return {
+                "success": True,
+                "export_data": export_data
+            }
+            
+        except Exception as e:
+            logger.error(f"Error exporting conversation: {e}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
 

@@ -118,6 +118,7 @@ class InMemoryStorageV11(StorageV11Extension):
         self._facts: Dict[str, List[Dict[str, Any]]] = {}
         self._episodes: Dict[str, List[Dict[str, Any]]] = {}
         self._moods: Dict[str, Dict[str, Any]] = {}
+        self._snapshots: Dict[str, Dict[str, Any]] = {}
     
     async def save_affinity(
         self,
@@ -256,4 +257,132 @@ class InMemoryStorageV11(StorageV11Extension):
     ) -> Optional[Dict[str, Any]]:
         """Get mood from memory"""
         return self._moods.get(session_id)
+    
+    # MOOD MANAGEMENT METHODS
+    
+    async def save_mood(
+        self,
+        user_id: str,
+        mood_data: Dict[str, Any]
+    ) -> bool:
+        """Save mood data"""
+        try:
+            mood_key = f"{user_id}_mood_{mood_data.get('created_at', 'default')}"
+            self._moods[mood_key] = mood_data
+            return True
+        except Exception as e:
+            logger.error(f"Error saving mood: {e}")
+            return False
+    
+    async def get_moods(
+        self,
+        user_id: str,
+        personality_name: Optional[str] = None,
+        max_results: Optional[int] = None
+    ) -> List[Dict[str, Any]]:
+        """Get mood history for user"""
+        try:
+            moods = []
+            for key, mood_data in self._moods.items():
+                if key.startswith(f"{user_id}_mood_"):
+                    if personality_name is None or mood_data.get('personality_name') == personality_name:
+                        moods.append(mood_data)
+            
+            # Sort by created_at
+            moods.sort(key=lambda x: x.get('created_at', ''), reverse=True)
+            
+            if max_results:
+                moods = moods[:max_results]
+            
+            return moods
+        except Exception as e:
+            logger.error(f"Error getting moods: {e}")
+            return []
+    
+    async def get_mood_history(
+        self,
+        user_id: str,
+        personality_name: Optional[str] = None,
+        days: int = 7,
+        limit: Optional[int] = None
+    ) -> List[Dict[str, Any]]:
+        """Get mood history for user (alias for get_moods)"""
+        return await self.get_moods(user_id, personality_name, limit)
+    
+    # SNAPSHOT MANAGEMENT METHODS
+    
+    async def save_snapshot(
+        self,
+        user_id: str,
+        snapshot_id: str,
+        snapshot_data: Dict[str, Any],
+        metadata: Optional[Dict[str, Any]] = None
+    ) -> bool:
+        """Save snapshot data"""
+        try:
+            snapshot_key = f"{user_id}_snapshot_{snapshot_id}"
+            snapshot_record = {
+                "snapshot_id": snapshot_id,
+                "user_id": user_id,
+                "snapshot_data": snapshot_data,
+                "metadata": metadata or {},
+                "created_at": datetime.now().isoformat()
+            }
+            self._snapshots[snapshot_key] = snapshot_record
+            return True
+        except Exception as e:
+            logger.error(f"Error saving snapshot: {e}")
+            return False
+    
+    async def get_snapshots(
+        self,
+        user_id: str,
+        max_results: Optional[int] = None
+    ) -> List[Dict[str, Any]]:
+        """Get all snapshots for user"""
+        try:
+            snapshots = []
+            for key, snapshot_record in self._snapshots.items():
+                if key.startswith(f"{user_id}_snapshot_"):
+                    snapshots.append(snapshot_record)
+            
+            # Sort by created_at
+            snapshots.sort(key=lambda x: x.get('created_at', ''), reverse=True)
+            
+            if max_results:
+                snapshots = snapshots[:max_results]
+            
+            return snapshots
+        except Exception as e:
+            logger.error(f"Error getting snapshots: {e}")
+            return []
+    
+    async def get_snapshot_info(
+        self,
+        user_id: str,
+        snapshot_id: str
+    ) -> Optional[Dict[str, Any]]:
+        """Get snapshot information"""
+        try:
+            snapshot_key = f"{user_id}_snapshot_{snapshot_id}"
+            return self._snapshots.get(snapshot_key)
+        except Exception as e:
+            logger.error(f"Error getting snapshot info: {e}")
+            return None
+    
+    async def delete_snapshot(
+        self,
+        user_id: str,
+        snapshot_id: str
+    ) -> bool:
+        """Delete snapshot"""
+        try:
+            snapshot_key = f"{user_id}_snapshot_{snapshot_id}"
+            if snapshot_key in self._snapshots:
+                del self._snapshots[snapshot_key]
+                return True
+            return False
+        except Exception as e:
+            logger.error(f"Error deleting snapshot: {e}")
+            return False
 
