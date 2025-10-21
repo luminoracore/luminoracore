@@ -283,122 +283,54 @@ class ConversationMemoryManager:
     ) -> Dict[str, Any]:
         """Generate response using LLM with full context"""
         
-        # Try to use the LLM provider directly for better context handling
         try:
-            # Get the LLM provider from base_client
-            if hasattr(self.client, 'base_client') and self.client.base_client:
-                # Try to get the provider directly
-                provider = None
-                if hasattr(self.client.base_client, 'session_manager') and self.client.base_client.session_manager:
-                    try:
-                        # Get provider from session manager
-                        session_data = await self.client.base_client.session_manager.get_session(context.session_id)
-                        if session_data and 'provider' in session_data:
-                            provider = session_data['provider']
-                    except Exception as e:
-                        print(f"Error getting provider from session manager: {e}")
-                        provider = None
-                
-                if not provider and provider_config:
-                    # Create provider from config
-                    try:
-                        from .providers.factory import ProviderFactory
-                        # Handle both dict and ProviderConfig object
-                        if isinstance(provider_config, dict):
-                            provider = ProviderFactory.create_provider_from_dict(provider_config)
-                        else:
-                            provider = ProviderFactory.create_provider_from_dict(provider_config.__dict__)
-                    except (ImportError, Exception) as e:
-                        print(f"Could not create provider from config: {e}")
-                        # Try alternative provider creation
-                        try:
-                            from .providers.deepseek import DeepSeekProvider
-                            from .providers.openai import OpenAIProvider
-                            
-                            # Handle both dict and ProviderConfig object
-                            if isinstance(provider_config, dict):
-                                provider_name = provider_config.get("name", "deepseek")
-                                api_key = provider_config.get("api_key", "mock-key")
-                                model = provider_config.get("model", "deepseek-chat")
-                            else:
-                                provider_name = provider_config.name
-                                api_key = provider_config.api_key
-                                model = provider_config.model
-                            
-                            if provider_name.lower() == "deepseek":
-                                provider = DeepSeekProvider(
-                                    api_key=api_key,
-                                    model=model
-                                )
-                            elif provider_name.lower() == "openai":
-                                provider = OpenAIProvider(
-                                    api_key=api_key,
-                                    model=model
-                                )
-                            else:
-                                # Generic provider fallback
-                                provider = DeepSeekProvider(
-                                    api_key=api_key,
-                                    model=model or "deepseek-chat"
-                                )
-                        except Exception as e2:
-                            print(f"Could not create fallback provider: {e2}")
-                            provider = None
-                
-                if provider:
-                    # Build messages with full context
-                    messages = []
-                    
-                    # System message with context
-                    facts_text = ', '.join([f"{fact['key']}: {fact['value']}" for fact in context.user_facts]) if context.user_facts else 'No facts yet'
-                    history_text = '\n'.join([f"User: {turn.user_message}\nAssistant: {turn.assistant_response}" for turn in context.conversation_history[-3:]]) if context.conversation_history else 'No previous conversation'
-                    
-                    system_content = f"""You are {context.personality_name}, an AI personality. 
-
-Current relationship level: {context.affinity['current_level']} ({context.affinity['affinity_points']}/100 points)
-
-User Facts:
-{facts_text}
-
-Conversation History:
-{history_text}
-
-Instructions: 
-- Use the personality traits for {context.personality_name}
-- Reference the relationship level ({context.affinity['current_level']})
-- Use known facts about the user
-- Reference previous conversation if relevant
-- Be natural and conversational"""
-                    
-                    messages.append({"role": "system", "content": system_content})
-                    
-                    # Add conversation history
-                    for turn in context.conversation_history[-5:]:
-                        messages.append({"role": "user", "content": str(turn.user_message)})
-                        messages.append({"role": "assistant", "content": str(turn.assistant_response)})
-                    
-                    # Add current message
-                    messages.append({"role": "user", "content": str(context.current_message)})
-                    
-                    # Generate response using provider
-                    response = await provider.chat_with_retry(
-                        messages=messages,
-                        temperature=0.7,
-                        max_tokens=500
-                    )
-                    
-                    return {
-                        "content": response.content,
-                        "metadata": {
-                            "context_used": True,
-                            "provider": provider.__class__.__name__,
-                            "messages_count": len(messages)
-                        }
-                    }
+            # Build a comprehensive context string for the LLM
+            context_parts = []
             
-            # Fallback: Use base_client if provider not available
+            # 1. Personality and relationship context
+            context_parts.append(f"You are {context.personality_name}, an AI personality.")
+            context_parts.append(f"Current relationship level: {context.affinity['current_level']} ({context.affinity['affinity_points']}/100 points)")
+            
+            # 2. User facts context
+            if context.user_facts:
+                facts_text = ', '.join([f"{fact['key']}: {fact['value']}" for fact in context.user_facts])
+                context_parts.append(f"User Facts: {facts_text}")
+            else:
+                context_parts.append("User Facts: No facts yet")
+            
+            # 3. Conversation history
+            if context.conversation_history:
+                history_text = '\n'.join([f"User: {turn.user_message}\nAssistant: {turn.assistant_response}" for turn in context.conversation_history[-3:]])
+                context_parts.append(f"Conversation History:\n{history_text}")
+            else:
+                context_parts.append("Conversation History: No previous conversation")
+            
+            # 4. Instructions based on relationship level
+            if context.affinity['current_level'] == 'stranger':
+                context_parts.append("Instructions: Be professional and formal. Ask questions to learn about the user.")
+            elif context.affinity['current_level'] == 'acquaintance':
+                context_parts.append("Instructions: Be friendly and polite. Reference what you know about the user.")
+            elif context.affinity['current_level'] == 'friend':
+                context_parts.append("Instructions: Be casual and friendly. Reference previous conversations and shared experiences.")
+            elif context.affinity['current_level'] == 'close_friend':
+                context_parts.append("Instructions: Be personal and warm. Show deep understanding of the user and their preferences.")
+            
+            # 5. Current message
+            context_parts.append(f"Current User Message: {context.current_message}")
+            
+            # Build the complete context string
+            full_context = "\n\n".join(context_parts)
+            
+            # Try to use the base_client with the context
             if hasattr(self.client, 'base_client') and self.client.base_client:
                 try:
+                    # Create a context-aware message for the base client
+                    context_aware_message = f"""Contexto del usuario: {full_context}
+
+Usuario: {context.current_message}
+
+Responde como {context.personality_name}, usando el contexto proporcionado para dar una respuesta personalizada y relevante."""
+                    
                     # Convert dict to ProviderConfig if needed
                     if isinstance(provider_config, dict):
                         from .types.provider import ProviderConfig
@@ -410,24 +342,47 @@ Instructions:
                     else:
                         provider_config_obj = provider_config
                     
+                    # Use the base client with the context-aware message
                     response = await self.client.base_client.send_message(
                         session_id=context.session_id,
-                        message=context.current_message,
+                        message=context_aware_message,
                         personality_name=context.personality_name,
                         provider_config=provider_config_obj
                     )
+                    
+                    return {
+                        "content": response.get("content", response.get("response", "I'm sorry, I couldn't generate a response.")),
+                        "metadata": {
+                            "context_used": True,
+                            "personality_name": context.personality_name,
+                            "affinity_level": context.affinity['current_level'],
+                            "facts_count": len(context.user_facts),
+                            "history_length": len(context.conversation_history)
+                        }
+                    }
+                    
                 except Exception as e:
                     print(f"Base client send_message failed: {e}")
-                    # Check if it's a session not found error - use context-aware fallback
-                    if "Session not found" in str(e):
-                        print(f"Session not found in base_client, using context-aware fallback for DynamoDB")
-                        response = self._create_context_aware_fallback_response(context)
-                    else:
-                        # Create a context-aware fallback response for other errors
-                        response = self._create_context_aware_fallback_response(context)
+                    # Use context-aware fallback
+                    fallback_response = self._create_context_aware_fallback_response(context)
+                    return {
+                        "content": fallback_response["content"],
+                        "metadata": {
+                            **fallback_response["metadata"],
+                            "error": True,
+                            "error_message": str(e)
+                        }
+                    }
             else:
                 # Final fallback with context awareness
-                response = self._create_context_aware_fallback_response(context)
+                fallback_response = self._create_context_aware_fallback_response(context)
+                return {
+                    "content": fallback_response["content"],
+                    "metadata": {
+                        **fallback_response["metadata"],
+                        "fallback": True
+                    }
+                }
                 
         except Exception as e:
             # Error handling - use context-aware fallback instead of generic error
@@ -441,17 +396,6 @@ Instructions:
                     "error_message": str(e)
                 }
             }
-        
-        return {
-            "content": response.get("content", response.get("response", "I'm sorry, I couldn't generate a response.")),
-            "metadata": {
-                "context_used": True,
-                "personality_name": context.personality_name,
-                "affinity_level": context.affinity['current_level'],
-                "facts_count": len(context.user_facts),
-                "history_length": len(context.conversation_history)
-            }
-        }
     
     def _create_context_aware_fallback_response(self, context: ConversationContext) -> Dict[str, Any]:
         """Create a context-aware fallback response when LLM is not available"""
