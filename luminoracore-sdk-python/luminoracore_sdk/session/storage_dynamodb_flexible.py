@@ -344,20 +344,20 @@ class FlexibleDynamoDBStorageV11(StorageV11Extension):
         """Get user facts, optionally filtered by category"""
         try:
             # DEBUG: Log all parameters
-            logger.info(f"🔍 DEBUG get_facts() - user_id: {user_id}")
-            logger.info(f"🔍 DEBUG get_facts() - category: {category}")
-            logger.info(f"🔍 DEBUG get_facts() - table_name: {self.table.table_name}")
-            logger.info(f"🔍 DEBUG get_facts() - range_key_name: {self.range_key_name}")
-            logger.info(f"🔍 DEBUG get_facts() - hash_key_name: {self.hash_key_name}")
-            logger.info(f"🔍 DEBUG get_facts() - AWS Region: {self.region_name}")
-            logger.info(f"🔍 DEBUG get_facts() - Table Status: {self.table.table_status}")
+            logger.info(f"DEBUG get_facts() - user_id: {user_id}")
+            logger.info(f"DEBUG get_facts() - category: {category}")
+            logger.info(f"DEBUG get_facts() - table_name: {self.table.table_name}")
+            logger.info(f"DEBUG get_facts() - range_key_name: {self.range_key_name}")
+            logger.info(f"DEBUG get_facts() - hash_key_name: {self.hash_key_name}")
+            logger.info(f"DEBUG get_facts() - AWS Region: {self.region_name}")
+            logger.info(f"DEBUG get_facts() - Table Status: {self.table.table_status}")
             
             # Always use SCAN for maximum compatibility with any table schema
             # This works with their table: session_id (HASH) + timestamp (RANGE)
             
             if category:
                 # Filter by category
-                logger.info(f"🔍 DEBUG get_facts() - Using category filter")
+                logger.info(f"DEBUG get_facts() - Using category filter")
                 response = self.table.scan(
                     FilterExpression='user_id = :user_id AND #category = :category AND begins_with(#range_key, :fact_prefix)',
                     ExpressionAttributeNames={
@@ -372,7 +372,7 @@ class FlexibleDynamoDBStorageV11(StorageV11Extension):
                 )
             else:
                 # Get all facts for user
-                logger.info(f"🔍 DEBUG get_facts() - Getting all facts for user")
+                logger.info(f"DEBUG get_facts() - Getting all facts for user")
                 response = self.table.scan(
                     FilterExpression='user_id = :user_id AND begins_with(#range_key, :fact_prefix)',
                     ExpressionAttributeNames={
@@ -385,24 +385,24 @@ class FlexibleDynamoDBStorageV11(StorageV11Extension):
                 )
             
             # DEBUG: Log scan response
-            logger.info(f"🔍 DEBUG get_facts() - Scan response: {response}")
-            logger.info(f"🔍 DEBUG get_facts() - Items found: {len(response.get('Items', []))}")
+            logger.info(f"DEBUG get_facts() - Scan response: {response}")
+            logger.info(f"DEBUG get_facts() - Items found: {len(response.get('Items', []))}")
             
             # DEBUG: Log first few items
             items = response.get('Items', [])
             if items:
-                logger.info(f"🔍 DEBUG get_facts() - First item: {items[0]}")
+                logger.info(f"DEBUG get_facts() - First item: {items[0]}")
             else:
-                logger.info(f"🔍 DEBUG get_facts() - No items found")
+                logger.info(f"DEBUG get_facts() - No items found")
             
             facts = []
-            logger.info(f"🔍 DEBUG get_facts() - Processing {len(items)} items")
+            logger.info(f"DEBUG get_facts() - Processing {len(items)} items")
             
             for i, item in enumerate(items):
-                logger.info(f"🔍 DEBUG get_facts() - Processing item {i}: {item}")
+                logger.info(f"DEBUG get_facts() - Processing item {i}: {item}")
                 
                 if item.get('key') and item.get('category'):
-                    logger.info(f"🔍 DEBUG get_facts() - Item {i} has key and category")
+                    logger.info(f"DEBUG get_facts() - Item {i} has key and category")
                     try:
                         fact_value = item['value']
                         if isinstance(fact_value, str):
@@ -421,16 +421,16 @@ class FlexibleDynamoDBStorageV11(StorageV11Extension):
                         }
                         
                         facts.append(fact)
-                        logger.info(f"🔍 DEBUG get_facts() - Added fact: {fact}")
+                        logger.info(f"DEBUG get_facts() - Added fact: {fact}")
                         
                     except Exception as e:
                         logger.warning(f"Failed to parse fact item: {e}")
                         continue
                 else:
-                    logger.info(f"🔍 DEBUG get_facts() - Item {i} missing key or category")
+                    logger.info(f"DEBUG get_facts() - Item {i} missing key or category")
             
-            logger.info(f"🔍 DEBUG get_facts() - Final facts count: {len(facts)}")
-            logger.info(f"🔍 DEBUG get_facts() - Final facts: {facts}")
+            logger.info(f"DEBUG get_facts() - Final facts count: {len(facts)}")
+            logger.info(f"DEBUG get_facts() - Final facts: {facts}")
             
             return facts
             
