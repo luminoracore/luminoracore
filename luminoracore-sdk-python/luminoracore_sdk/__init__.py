@@ -25,6 +25,7 @@ from .providers import (
     AnthropicProvider,
     LlamaProvider,
     MistralProvider,
+    DeepSeekProvider,
 )
 from .personality import (
     PersonalityLoader,
