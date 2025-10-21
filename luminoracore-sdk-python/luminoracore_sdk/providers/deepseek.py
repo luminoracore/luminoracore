@@ -18,6 +18,27 @@ class DeepSeekProvider(BaseProvider):
     It's particularly popular among developers for its low pricing.
     """
     
+    def __init__(self, config: Optional[ProviderConfig] = None, **kwargs):
+        """
+        Initialize DeepSeek provider.
+        
+        Args:
+            config: Provider configuration (preferred)
+            **kwargs: Alternative initialization parameters for backward compatibility
+        """
+        if config is None:
+            # Create config from kwargs for backward compatibility
+            from ..types.provider import ProviderConfig
+            config = ProviderConfig(
+                name=kwargs.get('name', 'deepseek'),
+                api_key=kwargs.get('api_key'),
+                model=kwargs.get('model', 'deepseek-chat'),
+                base_url=kwargs.get('base_url'),
+                extra=kwargs.get('extra', {})
+            )
+        
+        super().__init__(config)
+    
     def get_default_model(self) -> str:
         """Get the default DeepSeek model."""
         return "deepseek-chat"

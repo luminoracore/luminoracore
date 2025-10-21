@@ -114,6 +114,22 @@ class FlexibleDynamoDBStorageV11(StorageV11Extension):
             logger.error(f"Failed to initialize flexible DynamoDB storage: {e}")
             raise
     
+    def _serialize_value(self, value):
+        """Safely serialize values for DynamoDB storage"""
+        if isinstance(value, str):
+            return value
+        elif hasattr(value, '__dict__'):
+            # Handle objects with __dict__ (like ProviderConfig)
+            try:
+                return json.dumps(value.__dict__)
+            except:
+                return str(value)
+        else:
+            try:
+                return json.dumps(value)
+            except:
+                return str(value)
+    
     def _detect_table_schema(self):
         """Auto-detect the table schema"""
         try:

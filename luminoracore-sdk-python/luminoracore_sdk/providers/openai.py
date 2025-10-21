@@ -13,6 +13,27 @@ logger = logging.getLogger(__name__)
 class OpenAIProvider(BaseProvider):
     """OpenAI provider implementation."""
     
+    def __init__(self, config: Optional[ProviderConfig] = None, **kwargs):
+        """
+        Initialize OpenAI provider.
+        
+        Args:
+            config: Provider configuration (preferred)
+            **kwargs: Alternative initialization parameters for backward compatibility
+        """
+        if config is None:
+            # Create config from kwargs for backward compatibility
+            from ..types.provider import ProviderConfig
+            config = ProviderConfig(
+                name=kwargs.get('name', 'openai'),
+                api_key=kwargs.get('api_key'),
+                model=kwargs.get('model', 'gpt-3.5-turbo'),
+                base_url=kwargs.get('base_url'),
+                extra=kwargs.get('extra', {})
+            )
+        
+        super().__init__(config)
+    
     def get_default_model(self) -> str:
         """Get the default OpenAI model."""
         return "gpt-3.5-turbo"

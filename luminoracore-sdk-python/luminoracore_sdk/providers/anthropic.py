@@ -13,6 +13,27 @@ logger = logging.getLogger(__name__)
 class AnthropicProvider(BaseProvider):
     """Anthropic provider implementation."""
     
+    def __init__(self, config: Optional[ProviderConfig] = None, **kwargs):
+        """
+        Initialize Anthropic provider.
+        
+        Args:
+            config: Provider configuration (preferred)
+            **kwargs: Alternative initialization parameters for backward compatibility
+        """
+        if config is None:
+            # Create config from kwargs for backward compatibility
+            from ..types.provider import ProviderConfig
+            config = ProviderConfig(
+                name=kwargs.get('name', 'anthropic'),
+                api_key=kwargs.get('api_key'),
+                model=kwargs.get('model', 'claude-3-sonnet-20240229'),
+                base_url=kwargs.get('base_url'),
+                extra=kwargs.get('extra', {})
+            )
+        
+        super().__init__(config)
+    
     def get_default_model(self) -> str:
         """Get the default Anthropic model."""
         return "claude-3-sonnet-20240229"

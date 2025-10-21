@@ -13,6 +13,27 @@ logger = logging.getLogger(__name__)
 class LlamaProvider(BaseProvider):
     """Llama provider implementation."""
     
+    def __init__(self, config: Optional[ProviderConfig] = None, **kwargs):
+        """
+        Initialize Llama provider.
+        
+        Args:
+            config: Provider configuration (preferred)
+            **kwargs: Alternative initialization parameters for backward compatibility
+        """
+        if config is None:
+            # Create config from kwargs for backward compatibility
+            from ..types.provider import ProviderConfig
+            config = ProviderConfig(
+                name=kwargs.get('name', 'llama'),
+                api_key=kwargs.get('api_key'),
+                model=kwargs.get('model', 'llama-2-7b-chat'),
+                base_url=kwargs.get('base_url'),
+                extra=kwargs.get('extra', {})
+            )
+        
+        super().__init__(config)
+    
     def get_default_model(self) -> str:
         """Get the default Llama model."""
         return "llama-2-7b-chat"
