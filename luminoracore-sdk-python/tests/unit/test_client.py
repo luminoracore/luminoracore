@@ -28,6 +28,7 @@ class TestLuminoraCoreClient:
             description="Test personality",
             author="Test Author",
             tags=["test"],
+            system_prompt="You are a helpful test personality. Always respond with test prefix.",
             persona={
                 "name": "test_personality",
                 "description": "Test personality",
@@ -274,6 +275,7 @@ class TestLuminoraCoreClient:
             description="Blended personality",
             author="Test Author",
             tags=["test", "blended"],
+            system_prompt="You are a blended personality. Be helpful and friendly.",
             persona={
                 "name": "blended_personality",
                 "description": "Blended personality",

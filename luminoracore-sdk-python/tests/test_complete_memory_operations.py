@@ -113,16 +113,16 @@ class TestCompleteMemoryOperations:
         assert affinity["affinity_points"] == 15
         assert affinity["current_level"] == "stranger"
         
-        # Update affinity to reach acquaintance level
+        # Update affinity to reach acquaintance level (need more points)
         affinity = await client.update_affinity(
-            user_id, personality_name, points_delta=10, interaction_type="deep_conversation"
+            user_id, personality_name, points_delta=20, interaction_type="deep_conversation"
         )
-        assert affinity["affinity_points"] == 25
+        assert affinity["affinity_points"] == 35
         assert affinity["current_level"] == "acquaintance"
         
         # Get affinity
         current_affinity = await client.get_affinity(user_id, personality_name)
-        assert current_affinity["affinity_points"] == 25
+        assert current_affinity["affinity_points"] == 35
         assert current_affinity["current_level"] == "acquaintance"
     
     @pytest.mark.asyncio

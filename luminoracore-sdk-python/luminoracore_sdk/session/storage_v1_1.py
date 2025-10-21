@@ -240,6 +240,26 @@ class InMemoryStorageV11(StorageV11Extension):
         
         return facts
     
+    async def delete_fact(
+        self,
+        user_id: str,
+        category: str,
+        key: str
+    ) -> bool:
+        """Delete a specific fact"""
+        if user_id not in self._facts:
+            return False
+        
+        # Remove fact with matching category and key
+        original_count = len(self._facts[user_id])
+        self._facts[user_id] = [
+            f for f in self._facts[user_id]
+            if not (f["category"] == category and f["key"] == key)
+        ]
+        
+        # Return True if a fact was actually removed
+        return len(self._facts[user_id]) < original_count
+    
     async def save_episode(
         self,
         user_id: str,
@@ -306,20 +326,6 @@ class InMemoryStorageV11(StorageV11Extension):
         return self._moods.get(session_id)
     
     # MOOD MANAGEMENT METHODS
-    
-    async def save_mood(
-        self,
-        user_id: str,
-        mood_data: Dict[str, Any]
-    ) -> bool:
-        """Save mood data"""
-        try:
-            mood_key = f"{user_id}_mood_{mood_data.get('created_at', 'default')}"
-            self._moods[mood_key] = mood_data
-            return True
-        except Exception as e:
-            logger.error(f"Error saving mood: {e}")
-            return False
     
     async def get_moods(
         self,

@@ -179,6 +179,7 @@ class TestFullSessionWorkflow:
             description="First personality",
             author="Test Author",
             tags=["test", "first"],
+            system_prompt="You are the first personality. Be helpful and friendly.",
             persona={
                 "name": "personality1",
                 "description": "First personality",
@@ -208,6 +209,7 @@ class TestFullSessionWorkflow:
             description="Second personality",
             author="Test Author",
             tags=["test", "second"],
+            system_prompt="You are the second personality. Be helpful and friendly.",
             persona={
                 "name": "personality2",
                 "description": "Second personality",
@@ -242,6 +244,7 @@ class TestFullSessionWorkflow:
             description="Blended personality",
             author="Test Author",
             tags=["test", "blended"],
+            system_prompt="You are a blended personality. Be helpful and friendly.",
             persona={
                 "name": "blended_personality",
                 "description": "Blended personality",

@@ -461,18 +461,8 @@ class LuminoraCoreClientV11:
             logger.warning("Storage v1.1 not configured")
             return False
         
-        # Get current facts
-        facts = await self.storage_v11.get_facts(user_id, category)
-        
-        # Filter out the fact to delete
-        remaining_facts = [
-            f for f in facts 
-            if not (f["category"] == category and f["key"] == key)
-        ]
-        
-        # This is a simplified delete - in production you'd want a proper delete method
-        logger.info(f"Deleted fact: {category}:{key} for user {user_id}")
-        return True
+        # Use the storage's delete_fact method
+        return await self.storage_v11.delete_fact(user_id, category, key)
     
     async def get_memory_stats(
         self,
@@ -565,26 +555,37 @@ class LuminoraCoreClientV11:
         if not affinity:
             # Create new affinity record
             new_points = max(0, min(100, points_delta))
+            new_level = self._calculate_affinity_level(new_points)
             await self.storage_v11.save_affinity(
                 user_id=user_id,
                 personality_name=personality_name,
                 affinity_points=new_points,
-                current_level="stranger"
+                current_level=new_level
             )
         else:
             # Update existing
             new_points = affinity["affinity_points"] + points_delta
             new_points = max(0, min(100, new_points))
+            new_level = self._calculate_affinity_level(new_points)
             
             await self.storage_v11.save_affinity(
                 user_id=user_id,
                 personality_name=personality_name,
                 affinity_points=new_points,
-                current_level=affinity["current_level"]
+                current_level=new_level
             )
         
         # Return updated affinity
         return await self.storage_v11.get_affinity(user_id, personality_name)
+    
+    def _calculate_affinity_level(self, points: int) -> str:
+        """Calculate affinity level based on points"""
+        if points >= 50:
+            return "friend"
+        elif points >= 25:
+            return "acquaintance"
+        else:
+            return "stranger"
     
     # SNAPSHOT METHODS
     async def export_snapshot(
