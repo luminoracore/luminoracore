@@ -1601,3 +1601,76 @@ class LuminoraCoreClientV11:
                 "error": str(e)
             }
 
+    async def export_session(self, session_id: str) -> str:
+        """Export session data as JSON string"""
+        try:
+            if not self.storage_v11:
+                return json.dumps({"error": "Storage v1.1 not configured"})
+            
+            # Get session data
+            session_data = await self.storage_v11.get_session(session_id)
+            if not session_data:
+                return json.dumps({"error": "Session not found"})
+            
+            # Get conversation history
+            conversation_history = await self.conversation_manager._get_conversation_history(session_id)
+            
+            # Get user facts
+            user_id = session_data.get('user_id', session_id)
+            user_facts = await self.get_facts(user_id)
+            
+            # Get affinity
+            personality_name = session_data.get('personality_name', 'default')
+            affinity = await self.get_affinity(user_id, personality_name)
+            
+            # Build export data
+            export_data = {
+                "session_id": session_id,
+                "session_data": session_data,
+                "conversation_history": [
+                    {
+                        "user_message": turn.user_message,
+                        "assistant_response": turn.assistant_response,
+                        "personality_name": turn.personality_name,
+                        "timestamp": turn.timestamp.isoformat(),
+                        "facts_learned": turn.facts_learned
+                    } for turn in conversation_history
+                ],
+                "user_facts": user_facts,
+                "affinity": affinity,
+                "export_timestamp": datetime.now().isoformat()
+            }
+            
+            return json.dumps(export_data, indent=2, ensure_ascii=False)
+            
+        except Exception as e:
+            logger.error(f"Error exporting session: {e}")
+            return json.dumps({"error": str(e)})
+    
+    async def export_user_data(self, user_id: str) -> str:
+        """Export complete user data as JSON string"""
+        try:
+            if not self.storage_v11:
+                return json.dumps({"error": "Storage v1.1 not configured"})
+            
+            # Get all user data
+            user_facts = await self.get_facts(user_id)
+            affinity_data = await self.get_affinity(user_id, "default")
+            sentiment_history = await self.get_sentiment_history(user_id)
+            mood_history = await self.get_mood_history(user_id, "default")
+            
+            # Build export data
+            export_data = {
+                "user_id": user_id,
+                "user_facts": user_facts,
+                "affinity_data": affinity_data,
+                "sentiment_history": sentiment_history,
+                "mood_history": mood_history,
+                "export_timestamp": datetime.now().isoformat()
+            }
+            
+            return json.dumps(export_data, indent=2, ensure_ascii=False)
+            
+        except Exception as e:
+            logger.error(f"Error exporting user data: {e}")
+            return json.dumps({"error": str(e)})

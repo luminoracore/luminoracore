@@ -675,3 +675,118 @@ class FlexibleRedisStorageV11(StorageV11Extension):
         except Exception as e:
             logger.error(f"Failed to delete memory: {e}")
             return False
+    
+    async def save_session(
+        self,
+        session_id: str,
+        user_id: str,
+        personality_name: str,
+        **kwargs
+    ) -> bool:
+        """Save session data"""
+        try:
+            await self._ensure_initialized()
+            
+            session_key = self._get_session_key(session_id)
+            session_data = {
+                'session_id': session_id,
+                'user_id': user_id,
+                'personality_name': personality_name,
+                'created_at': kwargs.get('created_at', datetime.now().isoformat()),
+                'updated_at': datetime.now().isoformat(),
+                'last_activity': datetime.now().isoformat(),
+                'ttl': kwargs.get('ttl', int((datetime.now() + timedelta(days=30)).timestamp()))
+            }
+            
+            # Save session data
+            await self.redis.hset(session_key, mapping=session_data)
+            
+            # Set TTL
+            ttl_seconds = int((datetime.now() + timedelta(days=30)).timestamp()) - int(datetime.now().timestamp())
+            await self.redis.expire(session_key, ttl_seconds)
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to save session: {e}")
+            return False
+    
+    async def get_session(self, session_id: str) -> Optional[Dict[str, Any]]:
+        """Get session data"""
+        try:
+            await self._ensure_initialized()
+            
+            session_key = self._get_session_key(session_id)
+            session_data = await self.redis.hgetall(session_key)
+            
+            if session_data:
+                return {k.decode() if isinstance(k, bytes) else k: 
+                       v.decode() if isinstance(v, bytes) else v 
+                       for k, v in session_data.items()}
+            return None
+            
+        except Exception as e:
+            logger.error(f"Failed to get session: {e}")
+            return None
+    
+    async def update_session_activity(self, session_id: str) -> bool:
+        """Update session activity"""
+        try:
+            await self._ensure_initialized()
+            
+            session_key = self._get_session_key(session_id)
+            await self.redis.hset(session_key, mapping={
+                'last_activity': datetime.now().isoformat(),
+                'updated_at': datetime.now().isoformat()
+            })
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to update session activity: {e}")
+            return False
+    
+    async def get_expired_sessions(self) -> List[Dict[str, Any]]:
+        """Get expired sessions"""
+        try:
+            await self._ensure_initialized()
+            
+            current_time = datetime.now().timestamp()
+            expired_sessions = []
+            
+            # Get all session keys
+            session_keys = await self.redis.keys(f"{self.key_prefix}:sessions:*")
+            
+            for session_key in session_keys:
+                session_data = await self.redis.hgetall(session_key)
+                if session_data:
+                    ttl = session_data.get(b'ttl', session_data.get('ttl'))
+                    if ttl and float(ttl) < current_time:
+                        session_dict = {k.decode() if isinstance(k, bytes) else k: 
+                                       v.decode() if isinstance(v, bytes) else v 
+                                       for k, v in session_data.items()}
+                        expired_sessions.append(session_dict)
+            
+            return expired_sessions
+            
+        except Exception as e:
+            logger.error(f"Failed to get expired sessions: {e}")
+            return []
+    
+    async def delete_session(self, session_id: str) -> bool:
+        """Delete session"""
+        try:
+            await self._ensure_initialized()
+            
+            session_key = self._get_session_key(session_id)
+            await self.redis.delete(session_key)
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to delete session: {e}")
+            return False
+    
+    def _get_session_key(self, session_id: str) -> str:
+        """Get session key"""
+        return f"{self.key_prefix}:sessions:{session_id}"

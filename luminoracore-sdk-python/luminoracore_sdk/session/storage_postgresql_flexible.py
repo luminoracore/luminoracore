@@ -668,3 +668,98 @@ class FlexiblePostgreSQLStorageV11(StorageV11Extension):
         except Exception as e:
             logger.error(f"Failed to delete memory: {e}")
             return False
+    
+    async def save_session(
+        self,
+        session_id: str,
+        user_id: str,
+        personality_name: str,
+        **kwargs
+    ) -> bool:
+        """Save session data"""
+        try:
+            async with self._get_connection() as conn:
+                await conn.execute(f"""
+                    INSERT INTO {self.schema}.{self.sessions_table} 
+                    (session_id, user_id, personality_name, created_at, updated_at, last_activity, ttl)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7)
+                    ON CONFLICT (session_id) DO UPDATE SET
+                        user_id = $2,
+                        personality_name = $3,
+                        updated_at = $5,
+                        last_activity = $6,
+                        ttl = $7
+                """, (
+                    session_id, user_id, personality_name,
+                    kwargs.get('created_at', datetime.now().isoformat()),
+                    datetime.now().isoformat(),
+                    datetime.now().isoformat(),
+                    kwargs.get('ttl', int((datetime.now() + timedelta(days=30)).timestamp()))
+                ))
+                return True
+                
+        except Exception as e:
+            logger.error(f"Failed to save session: {e}")
+            return False
+    
+    async def get_session(self, session_id: str) -> Optional[Dict[str, Any]]:
+        """Get session data"""
+        try:
+            async with self._get_connection() as conn:
+                row = await conn.fetchrow(f"""
+                    SELECT * FROM {self.schema}.{self.sessions_table} 
+                    WHERE session_id = $1
+                """, session_id)
+                
+                if row:
+                    return dict(row)
+                return None
+                
+        except Exception as e:
+            logger.error(f"Failed to get session: {e}")
+            return None
+    
+    async def update_session_activity(self, session_id: str) -> bool:
+        """Update session activity"""
+        try:
+            async with self._get_connection() as conn:
+                await conn.execute(f"""
+                    UPDATE {self.schema}.{self.sessions_table} 
+                    SET last_activity = $1, updated_at = $2
+                    WHERE session_id = $3
+                """, datetime.now().isoformat(), datetime.now().isoformat(), session_id)
+                return True
+                
+        except Exception as e:
+            logger.error(f"Failed to update session activity: {e}")
+            return False
+    
+    async def get_expired_sessions(self) -> List[Dict[str, Any]]:
+        """Get expired sessions"""
+        try:
+            current_time = datetime.now().timestamp()
+            async with self._get_connection() as conn:
+                rows = await conn.fetch(f"""
+                    SELECT * FROM {self.schema}.{self.sessions_table} 
+                    WHERE ttl < $1
+                """, current_time)
+                
+                return [dict(row) for row in rows]
+                
+        except Exception as e:
+            logger.error(f"Failed to get expired sessions: {e}")
+            return []
+    
+    async def delete_session(self, session_id: str) -> bool:
+        """Delete session"""
+        try:
+            async with self._get_connection() as conn:
+                await conn.execute(f"""
+                    DELETE FROM {self.schema}.{self.sessions_table} 
+                    WHERE session_id = $1
+                """, session_id)
+                return True
+                
+        except Exception as e:
+            logger.error(f"Failed to delete session: {e}")
+            return False

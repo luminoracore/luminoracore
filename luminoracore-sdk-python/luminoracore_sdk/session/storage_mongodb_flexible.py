@@ -601,3 +601,114 @@ class FlexibleMongoDBStorageV11(StorageV11Extension):
         except Exception as e:
             logger.error(f"Failed to delete memory: {e}")
             return False
+    
+    async def save_session(
+        self,
+        session_id: str,
+        user_id: str,
+        personality_name: str,
+        **kwargs
+    ) -> bool:
+        """Save session data"""
+        try:
+            await self._ensure_initialized()
+            
+            sessions_coll = self.database[self.sessions_collection]
+            session_data = {
+                'session_id': session_id,
+                'user_id': user_id,
+                'personality_name': personality_name,
+                'created_at': kwargs.get('created_at', datetime.now().isoformat()),
+                'updated_at': datetime.now().isoformat(),
+                'last_activity': datetime.now().isoformat(),
+                'ttl': kwargs.get('ttl', int((datetime.now() + timedelta(days=30)).timestamp()))
+            }
+            
+            # Upsert session
+            await sessions_coll.replace_one(
+                {"session_id": session_id},
+                session_data,
+                upsert=True
+            )
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to save session: {e}")
+            return False
+    
+    async def get_session(self, session_id: str) -> Optional[Dict[str, Any]]:
+        """Get session data"""
+        try:
+            await self._ensure_initialized()
+            
+            sessions_coll = self.database[self.sessions_collection]
+            session_doc = await sessions_coll.find_one({"session_id": session_id})
+            
+            if session_doc:
+                # Remove MongoDB _id field
+                session_doc.pop('_id', None)
+                return session_doc
+            return None
+            
+        except Exception as e:
+            logger.error(f"Failed to get session: {e}")
+            return None
+    
+    async def update_session_activity(self, session_id: str) -> bool:
+        """Update session activity"""
+        try:
+            await self._ensure_initialized()
+            
+            sessions_coll = self.database[self.sessions_collection]
+            result = await sessions_coll.update_one(
+                {"session_id": session_id},
+                {
+                    "$set": {
+                        "last_activity": datetime.now().isoformat(),
+                        "updated_at": datetime.now().isoformat()
+                    }
+                }
+            )
+            
+            return result.modified_count > 0
+            
+        except Exception as e:
+            logger.error(f"Failed to update session activity: {e}")
+            return False
+    
+    async def get_expired_sessions(self) -> List[Dict[str, Any]]:
+        """Get expired sessions"""
+        try:
+            await self._ensure_initialized()
+            
+            current_time = datetime.now().timestamp()
+            sessions_coll = self.database[self.sessions_collection]
+            
+            expired_sessions = await sessions_coll.find({
+                "ttl": {"$lt": current_time}
+            }).to_list(length=None)
+            
+            # Remove MongoDB _id field from each document
+            for session in expired_sessions:
+                session.pop('_id', None)
+            
+            return expired_sessions
+            
+        except Exception as e:
+            logger.error(f"Failed to get expired sessions: {e}")
+            return []
+    
+    async def delete_session(self, session_id: str) -> bool:
+        """Delete session"""
+        try:
+            await self._ensure_initialized()
+            
+            sessions_coll = self.database[self.sessions_collection]
+            result = await sessions_coll.delete_one({"session_id": session_id})
+            
+            return result.deleted_count > 0
+            
+        except Exception as e:
+            logger.error(f"Failed to delete session: {e}")
+            return False
