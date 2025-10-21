@@ -58,64 +58,129 @@ class LuminoraCoreClientV11:
     # SESSION MANAGEMENT METHODS
     async def create_session(
         self,
+        user_id: str = "demo",
         personality_name: str = "default",
-        provider_config: Optional[Dict[str, Any]] = None
+        provider_config: Optional[Dict[str, Any]] = None,
+        session_config: Optional[Dict[str, Any]] = None
     ) -> str:
         """
-        Create a new session for conversation memory
+        Create a new session for conversation memory with proper user management
         
         Args:
+            user_id: User ID (persistent across sessions) - defaults to "demo"
             personality_name: Name of the personality to use
             provider_config: LLM provider configuration
+            session_config: Session configuration (ttl, max_idle, etc.)
             
         Returns:
             Session ID
         """
         import uuid
-        from datetime import datetime
+        from datetime import datetime, timedelta
+        
+        # Default session configuration
+        config = session_config or {}
+        ttl = config.get("ttl", 3600)  # 1 hour default
+        max_idle = config.get("max_idle", 1800)  # 30 minutes default
         
         # Generate unique session ID
         session_id = f"session_{uuid.uuid4().hex[:12]}_{int(datetime.now().timestamp())}"
         
+        # Calculate expiration times
+        created_at = datetime.now()
+        expires_at = created_at + timedelta(seconds=ttl)
+        last_activity = created_at
+        
         # Initialize session data in storage
         if self.storage_v11:
-            # Create initial affinity entry
-            await self.storage_v11.save_affinity(
-                user_id=session_id,
+            # Ensure user exists (create if not exists)
+            await self.ensure_user_exists(user_id, personality_name)
+            
+            # Create session entry
+            await self.storage_v11.save_session(
+                session_id=session_id,
+                user_id=user_id,
                 personality_name=personality_name,
-                affinity_points=0,
-                current_level="stranger"
+                created_at=created_at.isoformat(),
+                expires_at=expires_at.isoformat(),
+                last_activity=last_activity.isoformat(),
+                status="active",
+                provider_config=provider_config
             )
             
             # Create initial session metadata
             await self.storage_v11.save_fact(
-                user_id=session_id,
+                user_id=user_id,
                 category="session_metadata",
+                key=f"session_{session_id}",
+                value={
+                    "session_id": session_id,
+                    "personality_name": personality_name,
+                    "created_at": created_at.isoformat(),
+                    "expires_at": expires_at.isoformat(),
+                    "provider_config": provider_config
+                }
+            )
+        
+        logger.info(f"Created v1.1 session: {session_id} for user: {user_id} with personality: {personality_name}")
+        return session_id
+    
+    async def ensure_user_exists(
+        self,
+        user_id: str,
+        personality_name: str = "default"
+    ) -> bool:
+        """
+        Ensure user exists in storage, create if not exists
+        
+        Args:
+            user_id: User ID to check/create
+            personality_name: Personality name for affinity
+            
+        Returns:
+            True if user exists or was created
+        """
+        if not self.storage_v11:
+            return True
+            
+        # Check if user exists by looking for affinity data
+        affinity = await self.storage_v11.get_affinity(user_id, personality_name)
+        
+        if affinity is None:
+            # User doesn't exist, create it
+            logger.info(f"User {user_id} doesn't exist, creating it")
+            await self.storage_v11.save_affinity(
+                user_id=user_id,
+                personality_name=personality_name,
+                affinity_points=0,
+                current_level="stranger",
+                total_interactions=0,
+                positive_interactions=0,
+                created_at=datetime.now().isoformat(),
+                last_interaction=datetime.now().isoformat()
+            )
+            
+            # Create initial user metadata
+            await self.storage_v11.save_fact(
+                user_id=user_id,
+                category="user_metadata",
                 key="created_at",
                 value=datetime.now().isoformat()
             )
             
             await self.storage_v11.save_fact(
-                user_id=session_id,
-                category="session_metadata",
-                key="personality_name",
+                user_id=user_id,
+                category="user_metadata",
+                key="default_personality",
                 value=personality_name
             )
-            
-            if provider_config:
-                await self.storage_v11.save_fact(
-                    user_id=session_id,
-                    category="session_metadata",
-                    key="provider_config",
-                    value=str(provider_config)
-                )
         
-        logger.info(f"Created v1.1 session: {session_id} with personality: {personality_name}")
-        return session_id
+        return True
     
     async def ensure_session_exists(
         self,
         session_id: str,
+        user_id: str = "demo",
         personality_name: str = "default",
         provider_config: Optional[Dict[str, Any]] = None
     ) -> str:
@@ -124,6 +189,7 @@ class LuminoraCoreClientV11:
         
         Args:
             session_id: Session ID to check/create
+            user_id: User ID (persistent across sessions)
             personality_name: Name of the personality to use
             provider_config: LLM provider configuration
             
@@ -133,43 +199,45 @@ class LuminoraCoreClientV11:
         if not self.storage_v11:
             return session_id
             
-        # Check if session exists by looking for affinity data
-        affinity = await self.storage_v11.get_affinity(session_id, personality_name)
+        # Check if session exists
+        session_exists = await self.storage_v11.get_session(session_id)
         
-        if affinity is None:
+        if session_exists is None:
             # Session doesn't exist, create it
-            logger.info(f"Session {session_id} doesn't exist, creating it")
-            await self.storage_v11.save_affinity(
-                user_id=session_id,
+            logger.info(f"Session {session_id} doesn't exist, creating it for user {user_id}")
+            
+            # Ensure user exists first
+            await self.ensure_user_exists(user_id, personality_name)
+            
+            # Create session entry
+            from datetime import datetime, timedelta
+            created_at = datetime.now()
+            expires_at = created_at + timedelta(seconds=3600)  # 1 hour default
+            
+            await self.storage_v11.save_session(
+                session_id=session_id,
+                user_id=user_id,
                 personality_name=personality_name,
-                affinity_points=0,
-                current_level="stranger"
+                created_at=created_at.isoformat(),
+                expires_at=expires_at.isoformat(),
+                last_activity=created_at.isoformat(),
+                status="active",
+                provider_config=provider_config
             )
             
             # Create initial session metadata
-            from datetime import datetime
             await self.storage_v11.save_fact(
-                user_id=session_id,
+                user_id=user_id,
                 category="session_metadata",
-                key="created_at",
-                value=datetime.now().isoformat()
+                key=f"session_{session_id}",
+                value={
+                    "session_id": session_id,
+                    "personality_name": personality_name,
+                    "created_at": created_at.isoformat(),
+                    "expires_at": expires_at.isoformat(),
+                    "provider_config": provider_config
+                }
             )
-            
-            await self.storage_v11.save_fact(
-                user_id=session_id,
-                category="session_metadata",
-                key="personality_name",
-                value=personality_name
-            )
-            
-            if provider_config:
-                await self.storage_v11.save_fact(
-                    user_id=session_id,
-                    category="session_metadata",
-                    key="provider_config",
-                    value=str(provider_config)
-                )
-            
         
         return session_id
     
@@ -178,11 +246,22 @@ class LuminoraCoreClientV11:
         self,
         session_id: str,
         user_message: str,
+        user_id: str = "demo",
         personality_name: str = "default",
         provider_config: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """
         CRITICAL METHOD: Send message with full conversation context and memory
+        
+        Args:
+            session_id: Session ID for the conversation
+            user_message: User's message
+            user_id: User ID (persistent across sessions) - defaults to "demo"
+            personality_name: Name of the personality to use
+            provider_config: LLM provider configuration
+        
+        Returns:
+            Response with full context and memory integration
         
         This is the method that should be used instead of individual message sending.
         It properly integrates:
@@ -213,6 +292,7 @@ class LuminoraCoreClientV11:
         # Ensure session exists before processing
         session_id = await self.ensure_session_exists(
             session_id=session_id,
+            user_id=user_id,
             personality_name=personality_name,
             provider_config=provider_config
         )
@@ -220,6 +300,7 @@ class LuminoraCoreClientV11:
         return await self.conversation_manager.send_message_with_full_context(
             session_id=session_id,
             user_message=user_message,
+            user_id=user_id,  # Pass user_id to conversation manager
             personality_name=personality_name,
             provider_config=provider_config
         )
@@ -683,6 +764,190 @@ class LuminoraCoreClientV11:
             logger.error(f"Sentiment analysis failed: {e}")
             return {"sentiment": "neutral", "confidence": 0.0, "error": str(e)}
     
+    # EXPORT METHODS
+    async def export_conversation(
+        self,
+        session_id: str,
+        format: str = "json",
+        include_metadata: bool = True
+    ) -> Dict[str, Any]:
+        """
+        Export conversation data
+        
+        Args:
+            session_id: Session ID to export
+            format: Export format ("json", "csv", "markdown", "pdf")
+            include_metadata: Include session metadata
+            
+        Returns:
+            Exported conversation data
+        """
+        try:
+            # Get session information
+            session_data = await self.storage_v11.get_session(session_id) if self.storage_v11 else None
+            
+            # Get conversation history
+            conversation_history = await self._get_conversation_history(session_id)
+            
+            # Get user facts if session exists
+            user_facts = []
+            if session_data:
+                user_id = session_data.get("user_id", "unknown")
+                user_facts = await self.get_facts(user_id)
+            
+            export_data = {
+                "session_id": session_id,
+                "conversation_history": conversation_history,
+                "export_timestamp": datetime.now().isoformat(),
+                "format": format
+            }
+            
+            if include_metadata and session_data:
+                export_data["metadata"] = session_data
+            
+            if user_facts:
+                export_data["user_facts"] = user_facts
+            
+            return {
+                "success": True,
+                "data": export_data,
+                "format": format
+            }
+            
+        except Exception as e:
+            logger.error(f"Error exporting conversation: {e}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
+    
+    async def export_user_conversations(
+        self,
+        user_id: str,
+        format: str = "json",
+        date_range: Optional[Dict[str, str]] = None
+    ) -> Dict[str, Any]:
+        """
+        Export all conversations for a user
+        
+        Args:
+            user_id: User ID to export
+            format: Export format
+            date_range: Optional date range filter
+            
+        Returns:
+            All user conversations
+        """
+        try:
+            # Get all user facts
+            user_facts = await self.get_facts(user_id)
+            
+            # Get user affinity data
+            affinity_data = {}
+            personalities = ["default", "alicia", "dr_luna", "assistant"]  # Common personalities
+            for personality in personalities:
+                affinity = await self.get_affinity(user_id, personality)
+                if affinity:
+                    affinity_data[personality] = affinity
+            
+            # Get sentiment history
+            sentiment_history = await self.get_sentiment_history(user_id, limit=100)
+            
+            export_data = {
+                "user_id": user_id,
+                "export_timestamp": datetime.now().isoformat(),
+                "format": format,
+                "user_facts": user_facts,
+                "affinity_data": affinity_data,
+                "sentiment_history": sentiment_history
+            }
+            
+            if date_range:
+                export_data["date_range"] = date_range
+            
+            return {
+                "success": True,
+                "data": export_data,
+                "format": format
+            }
+            
+        except Exception as e:
+            logger.error(f"Error exporting user conversations: {e}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
+    
+    async def export_complete_user_data(
+        self,
+        user_id: str,
+        include_facts: bool = True,
+        include_episodes: bool = True,
+        include_sentiment_history: bool = True,
+        include_personality_evolution: bool = True
+    ) -> Dict[str, Any]:
+        """
+        Export complete user data
+        
+        Args:
+            user_id: User ID to export
+            include_facts: Include user facts
+            include_episodes: Include episodes
+            include_sentiment_history: Include sentiment history
+            include_personality_evolution: Include personality evolution
+            
+        Returns:
+            Complete user data
+        """
+        try:
+            export_data = {
+                "user_id": user_id,
+                "export_timestamp": datetime.now().isoformat(),
+                "export_type": "complete_user_data"
+            }
+            
+            if include_facts:
+                export_data["facts"] = await self.get_facts(user_id)
+            
+            if include_episodes:
+                export_data["episodes"] = await self.get_episodes(user_id)
+            
+            if include_sentiment_history:
+                export_data["sentiment_history"] = await self.get_sentiment_history(user_id, limit=100)
+            
+            if include_personality_evolution:
+                # Get evolution for common personalities
+                personalities = ["default", "alicia", "dr_luna", "assistant"]
+                evolution_data = {}
+                for personality in personalities:
+                    try:
+                        evolution = await self.get_evolution_history(user_id, personality)
+                        if evolution:
+                            evolution_data[personality] = evolution
+                    except:
+                        pass
+                export_data["personality_evolution"] = evolution_data
+            
+            # Get affinity data
+            affinity_data = {}
+            for personality in ["default", "alicia", "dr_luna", "assistant"]:
+                affinity = await self.get_affinity(user_id, personality)
+                if affinity:
+                    affinity_data[personality] = affinity
+            export_data["affinity_data"] = affinity_data
+            
+            return {
+                "success": True,
+                "data": export_data
+            }
+            
+        except Exception as e:
+            logger.error(f"Error exporting complete user data: {e}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
+    
     # PERSONALITY EVOLUTION METHODS
     async def evolve_personality(
         self,
@@ -1090,16 +1355,14 @@ class LuminoraCoreClientV11:
     ) -> List[Dict[str, Any]]:
         """Get sentiment analysis history"""
         try:
-            from .analysis.sentiment_analyzer import AdvancedSentimentAnalyzer
+            # Get sentiment history from storage directly
+            if self.storage_v11:
+                # Try to get sentiment data from facts
+                sentiment_facts = await self.storage_v11.get_facts(user_id, category="sentiment_history")
+                if sentiment_facts:
+                    return sentiment_facts[:limit] if limit else sentiment_facts
             
-            analyzer = AdvancedSentimentAnalyzer(self.storage_v11)
-            history = await analyzer.get_sentiment_history(
-                session_id=user_id,
-                user_id=user_id,
-                limit=limit or 10
-            )
-            
-            return history
+            return []
             
         except Exception as e:
             logger.error(f"Error getting sentiment history: {e}")

@@ -107,6 +107,52 @@ class StorageV11Extension(ABC):
     ) -> Optional[Dict[str, Any]]:
         """Get current mood state"""
         pass
+    
+    # SESSION MANAGEMENT METHODS
+    @abstractmethod
+    async def save_session(
+        self,
+        session_id: str,
+        user_id: str,
+        personality_name: str,
+        created_at: str,
+        expires_at: str,
+        last_activity: str,
+        status: str,
+        provider_config: Optional[Dict[str, Any]] = None
+    ) -> bool:
+        """Save session information"""
+        pass
+    
+    @abstractmethod
+    async def get_session(
+        self,
+        session_id: str
+    ) -> Optional[Dict[str, Any]]:
+        """Get session information"""
+        pass
+    
+    @abstractmethod
+    async def update_session_activity(
+        self,
+        session_id: str,
+        last_activity: str
+    ) -> bool:
+        """Update session last activity"""
+        pass
+    
+    @abstractmethod
+    async def get_expired_sessions(self) -> List[str]:
+        """Get list of expired session IDs"""
+        pass
+    
+    @abstractmethod
+    async def delete_session(
+        self,
+        session_id: str
+    ) -> bool:
+        """Delete session"""
+        pass
 
 
 class InMemoryStorageV11(StorageV11Extension):
@@ -119,6 +165,7 @@ class InMemoryStorageV11(StorageV11Extension):
         self._episodes: Dict[str, List[Dict[str, Any]]] = {}
         self._moods: Dict[str, Dict[str, Any]] = {}
         self._snapshots: Dict[str, Dict[str, Any]] = {}
+        self._sessions: Dict[str, Dict[str, Any]] = {}
     
     async def save_affinity(
         self,
@@ -384,5 +431,93 @@ class InMemoryStorageV11(StorageV11Extension):
             return False
         except Exception as e:
             logger.error(f"Error deleting snapshot: {e}")
+            return False
+    
+    # SESSION MANAGEMENT METHODS
+    async def save_session(
+        self,
+        session_id: str,
+        user_id: str,
+        personality_name: str,
+        created_at: str,
+        expires_at: str,
+        last_activity: str,
+        status: str,
+        provider_config: Optional[Dict[str, Any]] = None
+    ) -> bool:
+        """Save session information"""
+        try:
+            self._sessions[session_id] = {
+                "session_id": session_id,
+                "user_id": user_id,
+                "personality_name": personality_name,
+                "created_at": created_at,
+                "expires_at": expires_at,
+                "last_activity": last_activity,
+                "status": status,
+                "provider_config": provider_config
+            }
+            return True
+        except Exception as e:
+            logger.error(f"Error saving session: {e}")
+            return False
+    
+    async def get_session(
+        self,
+        session_id: str
+    ) -> Optional[Dict[str, Any]]:
+        """Get session information"""
+        try:
+            return self._sessions.get(session_id)
+        except Exception as e:
+            logger.error(f"Error getting session: {e}")
+            return None
+    
+    async def update_session_activity(
+        self,
+        session_id: str,
+        last_activity: str
+    ) -> bool:
+        """Update session last activity"""
+        try:
+            if session_id in self._sessions:
+                self._sessions[session_id]["last_activity"] = last_activity
+                return True
+            return False
+        except Exception as e:
+            logger.error(f"Error updating session activity: {e}")
+            return False
+    
+    async def get_expired_sessions(self) -> List[str]:
+        """Get list of expired session IDs"""
+        try:
+            from datetime import datetime
+            expired_sessions = []
+            current_time = datetime.now()
+            
+            for session_id, session_data in self._sessions.items():
+                expires_at_str = session_data.get("expires_at")
+                if expires_at_str:
+                    expires_at = datetime.fromisoformat(expires_at_str)
+                    if current_time > expires_at:
+                        expired_sessions.append(session_id)
+            
+            return expired_sessions
+        except Exception as e:
+            logger.error(f"Error getting expired sessions: {e}")
+            return []
+    
+    async def delete_session(
+        self,
+        session_id: str
+    ) -> bool:
+        """Delete session"""
+        try:
+            if session_id in self._sessions:
+                del self._sessions[session_id]
+                return True
+            return False
+        except Exception as e:
+            logger.error(f"Error deleting session: {e}")
             return False
 

@@ -31,7 +31,10 @@ from .commands import (
     snapshot,
     conversation_memory,
 )
-from .commands.storage import app as storage_app
+try:
+    from .commands.storage import app as storage_app
+except ImportError:
+    storage_app = None
 from .utils.console import console, error_console
 from .utils.errors import CLIError, handle_cli_error
 
@@ -158,7 +161,8 @@ app.add_typer(snapshot, name="snapshot", help="Session snapshot export/import")
 app.command("conversation-memory", help="Test conversation memory integration - CRITICAL FIX")(conversation_memory)
 
 # Register flexible storage commands
-app.add_typer(storage_app, name="storage", help="Flexible storage management for all databases")
+if storage_app:
+    app.add_typer(storage_app, name="storage", help="Flexible storage management for all databases")
 
 # Exception handling
 # @app.callback(invoke_without_command=True)  # DISABLED: conflicts with main callback

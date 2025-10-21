@@ -14,7 +14,7 @@ app = typer.Typer(name="storage", help="Flexible storage management for all data
 
 @app.command("init")
 def init_storage(
-    storage_type: str = typer.Option("sqlite", help="Storage type: sqlite, postgresql, redis, mongodb, dynamodb"),
+    storage_type: str = typer.Option("in_memory", help="Storage type: sqlite, postgresql, redis, mongodb, dynamodb, in_memory"),
     config_file: Optional[str] = typer.Option(None, help="Configuration file path"),
     interactive: bool = typer.Option(False, help="Interactive configuration mode")
 ):
@@ -165,8 +165,85 @@ def migrate_storage(
     typer.echo("Storage migration functionality - Coming soon!")
     typer.echo("This will allow migrating data between different database types.")
 
+@app.command("cleanup")
+def cleanup_expired_sessions(
+    config_file: Optional[str] = typer.Option(None, help="Configuration file path")
+):
+    """Clean up expired sessions"""
+    if config_file:
+        config = _load_config_file(config_file)
+    else:
+        config_path = Path("luminora_config.json")
+        if not config_path.exists():
+            typer.echo("No configuration file found. Run 'storage init' first.")
+            raise typer.Exit(1)
+        config = _load_config_file(str(config_path))
+    
+    storage_type = config.get("storage", {}).get("type", "in_memory")
+    typer.echo(f"Cleaning up expired sessions for {storage_type}...")
+    
+    try:
+        if storage_type == "in_memory":
+            from luminoracore_sdk.session import InMemoryStorageV11
+            storage = InMemoryStorageV11()
+            expired_sessions = storage.get_expired_sessions()
+            cleaned_count = len(expired_sessions)
+            for session_id in expired_sessions:
+                storage.delete_session(session_id)
+            typer.echo(f"Cleaned up {cleaned_count} expired sessions")
+        else:
+            typer.echo("Session cleanup not yet implemented for this storage type")
+            
+    except Exception as e:
+        typer.echo(f"Error cleaning up sessions: {e}")
+        raise typer.Exit(1)
+
+@app.command("users")
+def list_users(
+    config_file: Optional[str] = typer.Option(None, help="Configuration file path")
+):
+    """List all users in storage"""
+    if config_file:
+        config = _load_config_file(config_file)
+    else:
+        config_path = Path("luminora_config.json")
+        if not config_path.exists():
+            typer.echo("No configuration file found. Run 'storage init' first.")
+            raise typer.Exit(1)
+        config = _load_config_file(str(config_path))
+    
+    storage_type = config.get("storage", {}).get("type", "in_memory")
+    typer.echo(f"Listing users for {storage_type}...")
+    
+    try:
+        if storage_type == "in_memory":
+            from luminoracore_sdk.session import InMemoryStorageV11
+            storage = InMemoryStorageV11()
+            # Get unique user IDs from affinity data
+            user_ids = set()
+            for key in storage._affinity.keys():
+                user_id = key.split(':')[0]
+                user_ids.add(user_id)
+            
+            if user_ids:
+                typer.echo("Users found:")
+                for user_id in sorted(user_ids):
+                    typer.echo(f"  - {user_id}")
+            else:
+                typer.echo("No users found")
+        else:
+            typer.echo("User listing not yet implemented for this storage type")
+            
+    except Exception as e:
+        typer.echo(f"Error listing users: {e}")
+        raise typer.Exit(1)
+
 def _interactive_config(storage_type: str) -> Dict[str, Any]:
     """Interactive configuration setup"""
+    if storage_type == "in_memory":
+        config = {"storage": {"type": "in_memory"}}
+        return config
+    
     config = {"storage": {"type": f"{storage_type}_flexible"}}
     
     if storage_type == "dynamodb":

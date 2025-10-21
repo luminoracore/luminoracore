@@ -53,11 +53,22 @@ class ConversationMemoryManager:
         self,
         session_id: str,
         user_message: str,
+        user_id: str = "demo",
         personality_name: str = "default",
         provider_config: Optional[ProviderConfig] = None
     ) -> Dict[str, Any]:
         """
         CRITICAL METHOD: Send message with full conversation context
+        
+        Args:
+            session_id: Session ID for the conversation
+            user_message: User's message
+            user_id: User ID (persistent across sessions) - defaults to "demo"
+            personality_name: Name of the personality to use
+            provider_config: LLM provider configuration
+        
+        Returns:
+            Response with full context and memory integration
         
         This is the method that should be used instead of individual message sending.
         It:
@@ -75,10 +86,10 @@ class ConversationMemoryManager:
             conversation_history = await self._get_conversation_history(session_id)
             
             # Step 2: Get user facts from memory
-            user_facts = await self.client.get_facts(session_id)
+            user_facts = await self.client.get_facts(user_id)
             
             # Step 3: Get user affinity/relationship level
-            affinity = await self.client.get_affinity(session_id, personality_name)
+            affinity = await self.client.get_affinity(user_id, personality_name)
             
             # Handle case where affinity is None (new user)
             if affinity is None:

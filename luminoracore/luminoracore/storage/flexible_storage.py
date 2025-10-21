@@ -69,13 +69,13 @@ class FlexibleStorageManager:
     def _auto_detect_config(self) -> StorageConfig:
         """Auto-detect storage configuration from environment variables"""
         
-        # Check for specific storage type
-        storage_type = os.environ.get("LUMINORA_STORAGE_TYPE", "sqlite_flexible")
+        # Check for specific storage type - default to in-memory for demos
+        storage_type = os.environ.get("LUMINORA_STORAGE_TYPE", "in_memory")
         
         try:
             storage_type_enum = StorageType(storage_type)
         except ValueError:
-            storage_type_enum = StorageType.SQLITE_FLEXIBLE
+            storage_type_enum = StorageType.IN_MEMORY
         
         config = {"storage": {"type": storage_type_enum.value}}
         
@@ -236,6 +236,133 @@ class FlexibleStorageManager:
         """Save configuration to file"""
         with open(file_path, 'w') as f:
             json.dump(self.config.to_dict(), f, indent=2)
+    
+    # USER MANAGEMENT METHODS
+    def create_user_session(
+        self,
+        user_id: str = "demo",
+        personality_name: str = "default",
+        session_config: Optional[Dict[str, Any]] = None
+    ) -> str:
+        """
+        Create a new user session with proper user management
+        
+        Args:
+            user_id: User ID (persistent across sessions) - defaults to "demo"
+            personality_name: Name of the personality to use
+            session_config: Session configuration (ttl, max_idle, etc.)
+            
+        Returns:
+            Session ID
+        """
+        import uuid
+        from datetime import datetime, timedelta
+        
+        # Default session configuration
+        config = session_config or {}
+        ttl = config.get("ttl", 3600)  # 1 hour default
+        max_idle = config.get("max_idle", 1800)  # 30 minutes default
+        
+        # Generate unique session ID
+        session_id = f"session_{uuid.uuid4().hex[:12]}_{int(datetime.now().timestamp())}"
+        
+        # Calculate expiration times
+        created_at = datetime.now()
+        expires_at = created_at + timedelta(seconds=ttl)
+        last_activity = created_at
+        
+        # Store session information
+        session_data = {
+            "session_id": session_id,
+            "user_id": user_id,
+            "personality_name": personality_name,
+            "created_at": created_at.isoformat(),
+            "expires_at": expires_at.isoformat(),
+            "last_activity": last_activity.isoformat(),
+            "status": "active",
+            "config": config
+        }
+        
+        # Store in session storage (if available)
+        if hasattr(self.storage, 'save_session'):
+            self.storage.save_session(
+                session_id=session_id,
+                user_id=user_id,
+                personality_name=personality_name,
+                created_at=created_at.isoformat(),
+                expires_at=expires_at.isoformat(),
+                last_activity=last_activity.isoformat(),
+                status="active"
+            )
+        
+        return session_id
+    
+    def get_user_context(
+        self,
+        user_id: str,
+        personality_name: str = "default"
+    ) -> Dict[str, Any]:
+        """
+        Get complete user context for personalized interactions
+        
+        Args:
+            user_id: User ID
+            personality_name: Personality name
+            
+        Returns:
+            Complete user context
+        """
+        context = {
+            "user_id": user_id,
+            "personality_name": personality_name,
+            "facts": [],
+            "affinity": {},
+            "sentiment_history": [],
+            "personality_evolution": {}
+        }
+        
+        if hasattr(self.storage, 'get_facts'):
+            try:
+                context["facts"] = self.storage.get_facts(user_id)
+            except:
+                pass
+        
+        if hasattr(self.storage, 'get_affinity'):
+            try:
+                context["affinity"] = self.storage.get_affinity(user_id, personality_name)
+            except:
+                pass
+        
+        if hasattr(self.storage, 'get_mood'):
+            try:
+                context["sentiment_history"] = self.storage.get_mood(user_id)
+            except:
+                pass
+        
+        return context
+    
+    def cleanup_expired_sessions(self) -> int:
+        """
+        Clean up expired sessions
+        
+        Returns:
+            Number of sessions cleaned up
+        """
+        if not hasattr(self.storage, 'get_expired_sessions'):
+            return 0
+        
+        try:
+            expired_sessions = self.storage.get_expired_sessions()
+            cleaned_count = 0
+            
+            for session_id in expired_sessions:
+                if hasattr(self.storage, 'delete_session'):
+                    if self.storage.delete_session(session_id):
+                        cleaned_count += 1
+            
+            return cleaned_count
+        except:
+            return 0
     
     @classmethod
     def from_config_file(cls, file_path: str) -> "FlexibleStorageManager":
