@@ -73,6 +73,7 @@ async def test_conversation_memory_interactive():
             response = await client.send_message_with_memory(
                 session_id=session_id,
                 user_message=user_message,
+                user_id=session_id,  # CRITICAL FIX: Use session_id as user_id
                 personality_name=personality_name
             )
             
@@ -114,7 +115,7 @@ async def show_memory_status(client: LuminoraCoreClientV11, session_id: str, per
     
     try:
         # Show facts
-        facts = await client.get_facts(session_id)
+        facts = await client.get_facts(session_id)  # Use session_id as user_id
         print(f"📚 Facts learned: {len(facts)}")
         
         if facts:
@@ -122,7 +123,7 @@ async def show_memory_status(client: LuminoraCoreClientV11, session_id: str, per
                 print(f"   - {fact['key']}: {fact['value']}")
         
         # Show affinity
-        affinity = await client.get_affinity(session_id, personality_name)
+        affinity = await client.get_affinity(session_id, personality_name)  # Use session_id as user_id
         print(f"💝 Affinity: {affinity['level']} ({affinity['points']}/100 points)")
         
         # Show conversation history
@@ -175,6 +176,7 @@ async def run_preset_conversation_test():
         response = await client.send_message_with_memory(
             session_id=session_id,
             user_message=message,
+            user_id=session_id,  # CRITICAL FIX: Use session_id as user_id
             personality_name=personality_name
         )
         

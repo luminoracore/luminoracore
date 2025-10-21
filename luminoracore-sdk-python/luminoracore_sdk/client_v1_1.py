@@ -246,7 +246,7 @@ class LuminoraCoreClientV11:
         self,
         session_id: str,
         user_message: str,
-        user_id: str = "demo",
+        user_id: Optional[str] = None,
         personality_name: str = "default",
         provider_config: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
@@ -288,6 +288,12 @@ class LuminoraCoreClientV11:
                 "error": "Conversation memory manager not initialized",
                 "response": "I apologize, but the conversation memory system is not available."
             }
+        
+        # CRITICAL FIX: Use session_id as user_id if not provided
+        # This ensures memory contextual works correctly
+        if user_id is None:
+            user_id = session_id
+            logger.info(f"Using session_id as user_id: {user_id}")
         
         # Ensure session exists before processing
         session_id = await self.ensure_session_exists(
