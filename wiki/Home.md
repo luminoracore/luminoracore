@@ -153,10 +153,10 @@ print(result.prompt)
 
 | Component | Version | Tests | Status |
 |-----------|---------|-------|--------|
-| **Core Engine** | v1.0.0 | 28/28 (100%) | ✅ Production Ready |
-| **CLI** | v1.0.0 | 25/26 (100%*) | ✅ Production Ready |
-| **SDK** | v1.0.0 | 37/37 (100%) | ✅ Production Ready |
-| **TOTAL** | v1.0.0 | 90/91 (99%) | ✅ **Production Ready** |
+| **Core Engine** | v1.1.0 | 28/28 (100%) | ✅ Production Ready |
+| **CLI** | v1.1.0 | 25/26 (100%*) | ✅ Production Ready |
+| **SDK** | v1.1.0 | 37/37 (100%) | ✅ Production Ready |
+| **TOTAL** | v1.1.0 | 90/91 (99%) | ✅ **Production Ready** |
 
 _* 1 skipped test (conditional API key required)_
 
@@ -229,7 +229,7 @@ We welcome contributions! See our [Contributing Guide](https://github.com/lumino
 
 ## 📈 Roadmap
 
-### ✅ v1.0.0 (Current)
+### ✅ v1.1.0 (Current)
 - 7 LLM providers
 - 6 storage backends
 - PersonaBlend™ technology

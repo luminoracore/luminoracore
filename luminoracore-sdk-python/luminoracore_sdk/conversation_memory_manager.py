@@ -157,6 +157,8 @@ class ConversationMemoryManager:
                 "response": response["content"],
                 "personality_name": personality_name,
                 "facts_learned": len(new_facts),
+                "memory_facts_count": len(user_facts),
+                "user_facts": user_facts,
                 "affinity_level": affinity["current_level"],
                 "affinity_points": affinity["affinity_points"],
                 "conversation_length": len(conversation_history) + 1,

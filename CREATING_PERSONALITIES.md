@@ -9,7 +9,7 @@ A complete guide to building, testing, and deploying AI personalities.
 ```json
 {
   "name": "helpful_assistant",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A helpful AI assistant for customer support",
   "author": "Your Team",
   "system_prompt": "You are a helpful AI assistant specializing in customer support. You are friendly, patient, and knowledgeable.",

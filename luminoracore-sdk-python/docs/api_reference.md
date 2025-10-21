@@ -2,7 +2,7 @@
 
 This document provides comprehensive API reference for the LuminoraCore SDK Python.
 
-> **Note:** This covers the v1.0 SDK API. For v1.1 extensions (memory, affinity, snapshots), see [v1.1 SDK Features](#v11-sdk-features) at the end of this document.
+> **Note:** This covers the v1.1 SDK API with full memory, affinity, and relationship features. All v1.0 code continues to work unchanged.
 
 ## Table of Contents
 

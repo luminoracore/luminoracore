@@ -12,7 +12,7 @@
 
 ## Key Features
 
-### Core Features (v1.0)
+### Core Features (v1.1)
 - **✅ Advanced Personality Management**: Create, blend, and manage AI personalities with ease
 - **✅ Session Management**: Stateful conversations with persistent memory
 - **✅ Multi-Provider Support**: Integration with OpenAI, Anthropic, DeepSeek, Mistral, Cohere, Google, Llama
@@ -43,7 +43,7 @@ pip install -e luminoracore-sdk-python/
 
 ## Quick Start
 
-### Basic Usage (v1.0)
+### Basic Usage (v1.1)
 
 ```python
 import asyncio
@@ -275,7 +275,7 @@ memory_config = MemoryConfig(
 
 Check out the `examples/` directory for comprehensive examples:
 
-### v1.0 Examples
+### v1.1 Examples
 - `basic_usage.py` - Basic usage examples
 - `simple_usage.py` - Simple usage examples
 - `personality_blending.py` - Personality blending examples

@@ -521,3 +521,30 @@ class InMemoryStorageV11(StorageV11Extension):
             logger.error(f"Error deleting session: {e}")
             return False
 
+
+# Import flexible storage implementations
+try:
+    from .storage_dynamodb_flexible import FlexibleDynamoDBStorageV11
+except ImportError:
+    FlexibleDynamoDBStorageV11 = None
+
+try:
+    from .storage_sqlite_flexible import FlexibleSQLiteStorageV11
+except ImportError:
+    FlexibleSQLiteStorageV11 = None
+
+try:
+    from .storage_postgresql_flexible import FlexiblePostgreSQLStorageV11
+except ImportError:
+    FlexiblePostgreSQLStorageV11 = None
+
+try:
+    from .storage_redis_flexible import FlexibleRedisStorageV11
+except ImportError:
+    FlexibleRedisStorageV11 = None
+
+try:
+    from .storage_mongodb_flexible import FlexibleMongoDBStorageV11
+except ImportError:
+    FlexibleMongoDBStorageV11 = None
+

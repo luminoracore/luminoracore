@@ -31,6 +31,18 @@ def _convert_floats_to_decimal(obj):
         return obj
 
 
+def _convert_decimal_to_float(obj):
+    """Convert Decimal back to float for JSON serialization"""
+    if isinstance(obj, Decimal):
+        return float(obj)
+    elif isinstance(obj, dict):
+        return {key: _convert_decimal_to_float(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [_convert_decimal_to_float(item) for item in obj]
+    else:
+        return obj
+
+
 class FlexibleDynamoDBStorageV11(StorageV11Extension):
     """
     Flexible DynamoDB storage that adapts to ANY table schema
@@ -121,6 +133,32 @@ class FlexibleDynamoDBStorageV11(StorageV11Extension):
             self.detected_gsi_name = None
             self.detected_gsi_hash_key = None
             self.detected_gsi_range_key = None
+    
+    def _get_gsi_values(self, user_id: str, session_id: str = None) -> Dict[str, str]:
+        """Generate GSI values for queries"""
+        if not self.gsi_name:
+            return {}
+        
+        gsi_values = {}
+        if self.gsi_hash_key:
+            gsi_values[self.gsi_hash_key] = f"USER#{user_id}"
+        if self.gsi_range_key and session_id:
+            gsi_values[self.gsi_range_key] = f"SESSION#{session_id}"
+        elif self.gsi_range_key:
+            gsi_values[self.gsi_range_key] = f"USER#{user_id}"
+        
+        return gsi_values
+    
+    def _convert_decimal_to_float(self, obj):
+        """Convert Decimal back to float for JSON serialization"""
+        if isinstance(obj, Decimal):
+            return float(obj)
+        elif isinstance(obj, dict):
+            return {key: self._convert_decimal_to_float(value) for key, value in obj.items()}
+        elif isinstance(obj, list):
+            return [self._convert_decimal_to_float(item) for item in obj]
+        else:
+            return obj
     
     def _generate_key_values(self, user_id: str, category: str, key: str, item_type: str = "FACT") -> Dict[str, str]:
         """Generate key values based on detected schema"""
@@ -615,6 +653,168 @@ class FlexibleDynamoDBStorageV11(StorageV11Extension):
             
         except Exception as e:
             logger.error(f"Failed to save memory: {e}")
+            return False
+    
+    # SESSION MANAGEMENT METHODS
+    async def save_session(
+        self,
+        session_id: str,
+        user_id: str,
+        personality_name: str,
+        **kwargs
+    ) -> bool:
+        """Save session data"""
+        try:
+            # Use the same key structure as other data
+            hash_key = kwargs.get('hash_key', user_id)
+            range_key = kwargs.get('range_key', f"SESSION#{session_id}")
+            
+            item = {
+                self.hash_key_name: hash_key,
+                self.range_key_name: range_key,
+                'user_id': user_id,
+                'session_id': session_id,
+                'personality_name': personality_name,
+                'created_at': kwargs.get('created_at', datetime.now().isoformat()),
+                'updated_at': datetime.now().isoformat(),
+                'last_activity': datetime.now().isoformat(),
+                'TTL': int((datetime.now() + timedelta(days=30)).timestamp())
+            }
+            
+            # Add GSI values if configured
+            if self.gsi_name:
+                gsi_values = self._get_gsi_values(user_id, session_id)
+                item.update(gsi_values)
+            
+            # Convert floats to Decimal
+            item = _convert_floats_to_decimal(item)
+            
+            self.table.put_item(Item=item)
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to save session: {e}")
+            return False
+    
+    async def get_session(
+        self,
+        session_id: str,
+        user_id: str = None
+    ) -> Optional[Dict[str, Any]]:
+        """Get session data"""
+        try:
+            if user_id:
+                # Try to get with specific user_id
+                hash_key = user_id
+                range_key = f"SESSION#{session_id}"
+            else:
+                # Try to find session by session_id only
+                hash_key = session_id
+                range_key = f"SESSION#{session_id}"
+            
+            response = self.table.get_item(
+                Key={
+                    self.hash_key_name: hash_key,
+                    self.range_key_name: range_key
+                }
+            )
+            
+            if 'Item' in response:
+                item = response['Item']
+                # Convert Decimal back to float for JSON serialization
+                return self._convert_decimal_to_float(item)
+            
+            return None
+            
+        except Exception as e:
+            logger.error(f"Failed to get session: {e}")
+            return None
+    
+    async def update_session_activity(
+        self,
+        session_id: str,
+        user_id: str = None,
+        **kwargs
+    ) -> bool:
+        """Update session activity timestamp"""
+        try:
+            if user_id:
+                hash_key = user_id
+                range_key = f"SESSION#{session_id}"
+            else:
+                hash_key = session_id
+                range_key = f"SESSION#{session_id}"
+            
+            self.table.update_item(
+                Key={
+                    self.hash_key_name: hash_key,
+                    self.range_key_name: range_key
+                },
+                UpdateExpression="SET last_activity = :activity, updated_at = :updated",
+                ExpressionAttributeValues={
+                    ':activity': datetime.now().isoformat(),
+                    ':updated': datetime.now().isoformat()
+                }
+            )
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to update session activity: {e}")
+            return False
+    
+    async def get_expired_sessions(
+        self,
+        max_idle_time: int = 3600
+    ) -> List[Dict[str, Any]]:
+        """Get expired sessions"""
+        try:
+            # Calculate cutoff time
+            cutoff_time = datetime.now() - timedelta(seconds=max_idle_time)
+            cutoff_iso = cutoff_time.isoformat()
+            
+            # Scan for expired sessions
+            response = self.table.scan(
+                FilterExpression="last_activity < :cutoff",
+                ExpressionAttributeValues={
+                    ':cutoff': cutoff_iso
+                }
+            )
+            
+            expired_sessions = []
+            for item in response.get('Items', []):
+                if 'session_id' in item:
+                    expired_sessions.append(self._convert_decimal_to_float(item))
+            
+            return expired_sessions
+            
+        except Exception as e:
+            logger.error(f"Failed to get expired sessions: {e}")
+            return []
+    
+    async def delete_session(
+        self,
+        session_id: str,
+        user_id: str = None
+    ) -> bool:
+        """Delete session"""
+        try:
+            if user_id:
+                hash_key = user_id
+                range_key = f"SESSION#{session_id}"
+            else:
+                hash_key = session_id
+                range_key = f"SESSION#{session_id}"
+            
+            self.table.delete_item(
+                Key={
+                    self.hash_key_name: hash_key,
+                    self.range_key_name: range_key
+                }
+            )
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to delete session: {e}")
             return False
     
     async def get_memory(

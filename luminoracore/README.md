@@ -14,7 +14,7 @@ LuminoraCore is the core AI personality management engine that powers the entire
 
 ## ✨ Key Features
 
-### Core Features (v1.0)
+### Core Features (v1.1)
 - **✅ 10 Pre-built Personalities** - Ready-to-use personality archetypes
 - **✅ Multi-LLM Support** - Compile personalities for OpenAI, Anthropic, Llama, Mistral, Cohere, Google
 - **✅ PersonaBlend™ Technology** - Mix multiple personalities with advanced strategies
@@ -44,7 +44,7 @@ LuminoraCore is the core AI personality management engine that powers the entire
 pip install -e luminoracore/
 ```
 
-### Basic Usage (v1.0)
+### Basic Usage (v1.1)
 
 ```python
 from luminoracore import Personality, PersonalityCompiler, LLMProvider
@@ -167,7 +167,7 @@ pytest tests/ -v --cov=luminoracore
 ### Run Examples
 
 ```bash
-# v1.0 Examples
+# v1.1 Examples
 python examples/basic_usage.py
 python examples/personality_switching.py
 python examples/blending_demo.py

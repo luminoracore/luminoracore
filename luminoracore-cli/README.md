@@ -12,7 +12,7 @@ Professional command-line tool for AI personality management with LuminoraCore. 
 
 ## Key Features
 
-### Core Features (v1.0)
+### Core Features (v1.1)
 - **✅ Validate** - Validate personality files against official schema
 - **✅ Compile** - Compile personalities to provider-specific prompts
 - **✅ Create** - Create new personalities with interactive wizard
@@ -39,7 +39,7 @@ pip install luminoracore-cli
 
 ## Quick Start
 
-### v1.0 Commands
+### v1.1 Commands
 ```bash
 # Validate a personality file
 luminoracore validate my_personality.json
@@ -145,7 +145,7 @@ luminoracore snapshot list
 luminoracore snapshot diff snapshot1.json snapshot2.json
 ```
 
-### v1.0 Commands
+### v1.1 Commands
 
 ### Validate
 Validate personality files against the LuminoraCore schema:

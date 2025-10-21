@@ -42,7 +42,7 @@ personality_data = {
     "description": "A helpful AI assistant",
     "system_prompt": "You are a helpful AI assistant...",
     "metadata": {
-        "version": "1.0.0",
+        "version": "1.1.0",
         "author": "Your Team",
         "category": "support"
     }
