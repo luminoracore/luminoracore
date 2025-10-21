@@ -49,7 +49,7 @@ from .utils.exceptions import (
 try:
     __version__ = version("luminoracore-sdk")
 except PackageNotFoundError:
-    __version__ = "unknown"
+    __version__ = "1.1.1"  # Fixed version for backend compatibility
 
 __all__ = [
     # Main client
