@@ -76,16 +76,51 @@ def validate_command(
     ),
 ) -> None:
     """Synchronous wrapper for async validate_command_impl."""
-    asyncio.run(_validate_command_impl(
-        files=files,
-        schema_url=schema_url,
-        strict=strict,
-        format=format,
-        output_file=output_file,
-        quiet=quiet,
-        parallel=parallel,
-        max_workers=max_workers
-    ))
+    try:
+        # Try to get the current event loop
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            # If we're in a running loop, use create_task
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                future = executor.submit(asyncio.run, _validate_command_impl(
+                    files=files,
+                    schema_url=schema_url,
+                    strict=strict,
+                    format=format,
+                    output_file=output_file,
+                    quiet=quiet,
+                    parallel=parallel,
+                    max_workers=max_workers
+                ))
+                future.result()
+        else:
+            # If no loop is running, use asyncio.run
+            asyncio.run(_validate_command_impl(
+                files=files,
+                schema_url=schema_url,
+                strict=strict,
+                format=format,
+                output_file=output_file,
+                quiet=quiet,
+                parallel=parallel,
+                max_workers=max_workers
+            ))
+    except RuntimeError:
+        # Fallback: run in a new thread
+        import concurrent.futures
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(asyncio.run, _validate_command_impl(
+                files=files,
+                schema_url=schema_url,
+                strict=strict,
+                format=format,
+                output_file=output_file,
+                quiet=quiet,
+                parallel=parallel,
+                max_workers=max_workers
+            ))
+            future.result()
 
 
 async def _validate_command_impl(

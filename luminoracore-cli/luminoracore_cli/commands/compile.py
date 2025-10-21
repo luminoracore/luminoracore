@@ -26,17 +26,54 @@ def compile_command(
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output")
 ) -> int:
     """Synchronous wrapper for async compile_command_impl."""
-    return asyncio.run(_compile_command_impl(
-        personality=personality,
-        provider=provider,
-        model=model,
-        output=output,
-        format=format,
-        include_metadata=include_metadata,
-        validate=validate,
-        strict=strict,
-        verbose=verbose
-    ))
+    try:
+        # Try to get the current event loop
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            # If we're in a running loop, use create_task
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                future = executor.submit(asyncio.run, _compile_command_impl(
+                    personality=personality,
+                    provider=provider,
+                    model=model,
+                    output=output,
+                    format=format,
+                    include_metadata=include_metadata,
+                    validate=validate,
+                    strict=strict,
+                    verbose=verbose
+                ))
+                return future.result()
+        else:
+            # If no loop is running, use asyncio.run
+            return asyncio.run(_compile_command_impl(
+                personality=personality,
+                provider=provider,
+                model=model,
+                output=output,
+                format=format,
+                include_metadata=include_metadata,
+                validate=validate,
+                strict=strict,
+                verbose=verbose
+            ))
+    except RuntimeError:
+        # Fallback: run in a new thread
+        import concurrent.futures
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(asyncio.run, _compile_command_impl(
+                personality=personality,
+                provider=provider,
+                model=model,
+                output=output,
+                format=format,
+                include_metadata=include_metadata,
+                validate=validate,
+                strict=strict,
+                verbose=verbose
+            ))
+            return future.result()
 
 
 async def _compile_command_impl(

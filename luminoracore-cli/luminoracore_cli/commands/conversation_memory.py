@@ -197,10 +197,33 @@ async def run_preset_conversation_test():
 def main():
     """Main CLI function"""
     
-    if len(sys.argv) > 1 and sys.argv[1] == "preset":
-        asyncio.run(run_preset_conversation_test())
-    else:
-        asyncio.run(test_conversation_memory_interactive())
+    try:
+        # Try to get the current event loop
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            # If we're in a running loop, use create_task
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                if len(sys.argv) > 1 and sys.argv[1] == "preset":
+                    future = executor.submit(asyncio.run, run_preset_conversation_test())
+                else:
+                    future = executor.submit(asyncio.run, test_conversation_memory_interactive())
+                future.result()
+        else:
+            # If no loop is running, use asyncio.run
+            if len(sys.argv) > 1 and sys.argv[1] == "preset":
+                asyncio.run(run_preset_conversation_test())
+            else:
+                asyncio.run(test_conversation_memory_interactive())
+    except RuntimeError:
+        # Fallback: run in a new thread
+        import concurrent.futures
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            if len(sys.argv) > 1 and sys.argv[1] == "preset":
+                future = executor.submit(asyncio.run, run_preset_conversation_test())
+            else:
+                future = executor.submit(asyncio.run, test_conversation_memory_interactive())
+            future.result()
 
 
 # Export the main function for CLI
