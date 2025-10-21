@@ -56,9 +56,8 @@ python examples/luminoracore_v1_1_complete_demo.py
 
 ### Key Guides
 - [Installation Guide](INSTALLATION_GUIDE.md) - Complete setup instructions
-- [Creating Personalities](CREATING_PERSONALITIES.md) - Build custom personalities
-- [Business Case](CEO_BUSINESS_CASE.md) - Why choose LuminoraCore
-- [Building Modular AI](BUILDING_MODULAR_AI_PERSONALITIES.md) - Architecture guide
+- [Quick Start](QUICK_START.md) - 5-minute tutorial
+- [Complete Features Guide](LUMINORACORE_V1_1_COMPLETE_FEATURES_GUIDE.md) - All v1.1 features
 
 ---
 

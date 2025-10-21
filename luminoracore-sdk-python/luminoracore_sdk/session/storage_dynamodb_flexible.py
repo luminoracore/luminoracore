@@ -43,6 +43,23 @@ def _convert_decimal_to_float(obj):
         return obj
 
 
+def _serialize_value(value):
+    """Safely serialize values for DynamoDB storage"""
+    if isinstance(value, str):
+        return value
+    elif hasattr(value, '__dict__'):
+        # Handle objects with __dict__ (like ProviderConfig)
+        try:
+            return json.dumps(value.__dict__)
+        except:
+            return str(value)
+    else:
+        try:
+            return json.dumps(value)
+        except:
+            return str(value)
+
+
 class FlexibleDynamoDBStorageV11(StorageV11Extension):
     """
     Flexible DynamoDB storage that adapts to ANY table schema
@@ -286,7 +303,7 @@ class FlexibleDynamoDBStorageV11(StorageV11Extension):
                 'session_id': kwargs.get('session_id', user_id),
                 'category': category,
                 'key': key,
-                'value': json.dumps(value) if not isinstance(value, str) else value,
+                'value': self._serialize_value(value),
                 'confidence': kwargs.get('confidence', 1.0),
                 'created_at': kwargs.get('created_at', datetime.now().isoformat()),
                 'updated_at': datetime.now().isoformat(),
@@ -736,14 +753,9 @@ class FlexibleDynamoDBStorageV11(StorageV11Extension):
     ) -> Optional[Dict[str, Any]]:
         """Get session data"""
         try:
-            if user_id:
-                # Try to get with specific user_id
-                hash_key = user_id
-                range_key = f"SESSION#{session_id}"
-            else:
-                # Try to find session by session_id only
-                hash_key = session_id
-                range_key = f"SESSION#{session_id}"
+            # For backend compatibility, use session_id as hash_key and SESSION# as range_key
+            hash_key = session_id
+            range_key = f"SESSION#{session_id}"
             
             response = self.table.get_item(
                 Key={
@@ -755,6 +767,19 @@ class FlexibleDynamoDBStorageV11(StorageV11Extension):
             if 'Item' in response:
                 item = response['Item']
                 # Convert Decimal back to float for JSON serialization
+                return self._convert_decimal_to_float(item)
+            
+            # If not found with SESSION# prefix, try with just session_id as range_key
+            # This handles cases where the session was saved with different key structure
+            response = self.table.get_item(
+                Key={
+                    self.hash_key_name: hash_key,
+                    self.range_key_name: session_id
+                }
+            )
+            
+            if 'Item' in response:
+                item = response['Item']
                 return self._convert_decimal_to_float(item)
             
             return None

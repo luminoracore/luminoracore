@@ -27,6 +27,7 @@ class TestFullSessionWorkflow:
             description="A helpful test personality",
             author="Test Author",
             tags=["test", "integration"],
+            system_prompt="You are a helpful test personality. Always respond with 'Test response: ' followed by the user's message.",
             persona={
                 "name": "test_personality",
                 "description": "A helpful test personality",
