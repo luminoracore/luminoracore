@@ -310,28 +310,25 @@ class FlexibleDynamoDBStorageV11(StorageV11Extension):
     ) -> List[Dict[str, Any]]:
         """Get user facts, optionally filtered by category"""
         try:
-            if category and self.gsi_name:
-                # Query by category using GSI
-                response = self.table.query(
-                    IndexName=self.gsi_name,
-                    KeyConditionExpression=f'{self.gsi_hash_key} = :user_id AND begins_with({self.gsi_range_key}, :category)',
+            # Always use SCAN for maximum compatibility with any table schema
+            # This works with their table: session_id (HASH) + timestamp (RANGE)
+            
+            if category:
+                # Filter by category
+                response = self.table.scan(
+                    FilterExpression='user_id = :user_id AND #category = :category AND begins_with(#range_key, :fact_prefix)',
+                    ExpressionAttributeNames={
+                        '#range_key': self.range_key_name,
+                        '#category': 'category'
+                    },
                     ExpressionAttributeValues={
-                        ':user_id': f"USER#{user_id}",
-                        ':category': f"CATEGORY#{category}"
-                    }
-                )
-            elif self.gsi_name:
-                # Query all facts for user using GSI
-                response = self.table.query(
-                    IndexName=self.gsi_name,
-                    KeyConditionExpression=f'{self.gsi_hash_key} = :user_id',
-                    ExpressionAttributeValues={
-                        ':user_id': f"USER#{user_id}"
+                        ':user_id': user_id,
+                        ':category': category,
+                        ':fact_prefix': 'FACT#'
                     }
                 )
             else:
-                # Scan table (less efficient but works with any schema)
-                # Use ExpressionAttributeNames to handle reserved keywords
+                # Get all facts for user
                 response = self.table.scan(
                     FilterExpression='user_id = :user_id AND begins_with(#range_key, :fact_prefix)',
                     ExpressionAttributeNames={
