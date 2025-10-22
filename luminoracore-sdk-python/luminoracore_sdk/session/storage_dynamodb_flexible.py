@@ -358,11 +358,11 @@ class FlexibleDynamoDBStorageV11(StorageV11Extension):
             if category:
                 # Filter by category
                 logger.info(f"DEBUG get_facts() - Using category filter")
+                # FIX: Usar f-string y range_key_name directamente
                 response = self.table.scan(
-                    FilterExpression='user_id = :user_id AND #category = :category AND begins_with(#range_key, :fact_prefix)',
+                    FilterExpression=f'user_id = :user_id AND #category = :category AND begins_with({self.range_key_name}, :fact_prefix)',
                     ExpressionAttributeNames={
-                        '#range_key': self.range_key_name,
-                        '#category': 'category'
+                        '#category': 'category'  # Solo para atributos reservados
                     },
                     ExpressionAttributeValues={
                         ':user_id': user_id,
@@ -373,11 +373,9 @@ class FlexibleDynamoDBStorageV11(StorageV11Extension):
             else:
                 # Get all facts for user
                 logger.info(f"DEBUG get_facts() - Getting all facts for user")
+                # FIX: Usar f-string y range_key_name directamente
                 response = self.table.scan(
-                    FilterExpression='user_id = :user_id AND begins_with(#range_key, :fact_prefix)',
-                    ExpressionAttributeNames={
-                        '#range_key': self.range_key_name
-                    },
+                    FilterExpression=f'user_id = :user_id AND begins_with({self.range_key_name}, :fact_prefix)',
                     ExpressionAttributeValues={
                         ':user_id': user_id,
                         ':fact_prefix': 'FACT#'
