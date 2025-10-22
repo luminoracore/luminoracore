@@ -46,6 +46,38 @@ python examples/luminoracore_v1_1_complete_demo.py
 
 ---
 
+## 🔧 Logging Configuration
+
+LuminoraCore provides professional logging configuration out of the box:
+
+```python
+from luminoracore_sdk import setup_logging
+
+# Simple usage
+setup_logging(level="DEBUG")
+
+# Advanced usage
+setup_logging(
+    level="DEBUG",
+    format_type="lambda",  # or "json", "text", "detailed"
+    include_boto=True
+)
+
+# Auto-configuration based on environment
+from luminoracore_sdk import auto_configure
+auto_configure()
+```
+
+### Supported Environments
+- ✅ AWS Lambda / CloudWatch
+- ✅ Docker containers
+- ✅ Local development
+- ✅ Production servers
+- ✅ All databases (DynamoDB, PostgreSQL, SQLite, Redis, MongoDB)
+- ✅ All LLM providers (OpenAI, Anthropic, DeepSeek, etc.)
+
+**[Complete Logging Guide](LOGGING_CONFIGURATION_GUIDE.md)** - Professional logging setup
+
 ## 📖 Documentation
 
 | Component | Description | Documentation |

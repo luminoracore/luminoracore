@@ -47,6 +47,9 @@ from .utils.exceptions import (
     CompilationError,
 )
 
+# Logging configuration
+from .logging_config import setup_logging, auto_configure, get_logger
+
 try:
     __version__ = version("luminoracore-sdk")
 except PackageNotFoundError:
@@ -92,6 +95,10 @@ __all__ = [
     "ProviderError",
     "PersonalityError",
     "CompilationError",
+    # Logging configuration
+    "setup_logging",
+    "auto_configure",
+    "get_logger",
     # Version
     "__version__",
 ]

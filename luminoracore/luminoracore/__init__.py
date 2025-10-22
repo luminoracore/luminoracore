@@ -31,6 +31,9 @@ from .storage import (
     StorageConfig
 )
 
+# Logging configuration
+from .logging_config import setup_logging, auto_configure, get_logger
+
 __all__ = [
     # v1.0 modules
     "Personality",
@@ -53,4 +56,9 @@ __all__ = [
     "FlexibleStorageManager",
     "StorageType",
     "StorageConfig",
+    
+    # Logging configuration
+    "setup_logging",
+    "auto_configure",
+    "get_logger",
 ]
