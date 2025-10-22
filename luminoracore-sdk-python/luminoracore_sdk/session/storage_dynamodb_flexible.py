@@ -514,10 +514,7 @@ class FlexibleDynamoDBStorageV11(StorageV11Extension):
             else:
                 # Scan table
                 response = self.table.scan(
-                    FilterExpression='user_id = :user_id AND begins_with(#range_key, :episode_prefix)',
-                    ExpressionAttributeNames={
-                        '#range_key': self.range_key_name
-                    },
+                    FilterExpression=f'user_id = :user_id AND begins_with({self.range_key_name}, :episode_prefix)',
                     ExpressionAttributeValues={
                         ':user_id': user_id,
                         ':episode_prefix': 'EPISODE#'
@@ -637,10 +634,7 @@ class FlexibleDynamoDBStorageV11(StorageV11Extension):
             else:
                 # Scan table
                 response = self.table.scan(
-                    FilterExpression='user_id = :user_id AND begins_with(#range_key, :mood_prefix)',
-                    ExpressionAttributeNames={
-                        '#range_key': self.range_key_name
-                    },
+                    FilterExpression=f'user_id = :user_id AND begins_with({self.range_key_name}, :mood_prefix)',
                     ExpressionAttributeValues={
                         ':user_id': user_id,
                         ':mood_prefix': 'MOOD#'
