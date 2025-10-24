@@ -1321,38 +1321,6 @@ class LuminoraCoreClientV11:
             logger.error(f"Error getting mood history: {e}")
             return []
     
-    async def analyze_sentiment(
-        self,
-        user_id: str,
-        message: str,
-        personality_name: str = "default"
-    ) -> Dict[str, Any]:
-        """Analyze sentiment of a message"""
-        try:
-            from .analysis.sentiment_analyzer import AdvancedSentimentAnalyzer
-            
-            analyzer = AdvancedSentimentAnalyzer(self.storage_v11)
-            result = await analyzer.analyze_sentiment(
-                session_id=user_id,
-                user_id=user_id,
-                message=message,
-                personality_name=personality_name
-            )
-            
-            return {
-                "success": True,
-                "sentiment": result.overall_sentiment,
-                "score": result.sentiment_score,
-                "emotions": result.emotions_detected,
-                "confidence": result.confidence
-            }
-            
-        except Exception as e:
-            logger.error(f"Error analyzing sentiment: {e}")
-            return {
-                "success": False,
-                "error": str(e)
-            }
     
     async def get_sentiment_history(
         self,

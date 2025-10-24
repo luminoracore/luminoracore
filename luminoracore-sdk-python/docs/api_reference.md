@@ -592,17 +592,28 @@ print(f"Facts learned: {analytics['facts_learned']}")
 
 #### Sentiment Analysis Methods
 
-##### `analyze_sentiment(message: str, context: Optional[List[str]] = None) -> Dict[str, Any]`
-Analyze sentiment of a message using keyword-based or LLM-based analysis.
+##### `analyze_sentiment(user_id: str, message: str, context: Optional[List[str]] = None) -> Dict[str, Any]`
+Analyze sentiment of a message for a specific user using keyword-based or LLM-based analysis.
 
+**Parameters:**
+- `user_id` (str, **required**): User identifier for personalization
+- `message` (str, **required**): Message to analyze
+- `context` (Optional[List[str]]): Optional conversation context
+
+**Returns:**
+- Dict with sentiment analysis results including sentiment, confidence, emotions detected, and personalized insights
+
+**Example:**
 ```python
-# Analyze sentiment
+# Analyze sentiment for a specific user
 sentiment = await client_v11.analyze_sentiment(
+    user_id="user123",
     message="I'm so frustrated with this bug!",
     context=["technical_support"]
 )
 print(f"Sentiment: {sentiment['sentiment']}")
 print(f"Confidence: {sentiment['confidence']}")
+print(f"Emotions: {sentiment['emotions_detected']}")
 ```
 
 ##### `get_sentiment_history(user_id: str, limit: Optional[int] = None) -> List[Dict[str, Any]]`
@@ -912,6 +923,7 @@ async def complete_example():
     
     # 9. Analyze sentiment
     sentiment = await client_v11.analyze_sentiment(
+        user_id=user_id,
         message="I'm so excited about this new project!",
         context=["work", "enthusiasm"]
     )
