@@ -343,6 +343,8 @@ class FlexibleDynamoDBStorageV11(StorageV11Extension):
     ) -> List[Dict[str, Any]]:
         """Get user facts, optionally filtered by category"""
         try:
+            from boto3.dynamodb.conditions import Key
+            
             # DEBUG: Log all parameters
             logger.info(f"DEBUG get_facts() - user_id: {user_id}")
             logger.info(f"DEBUG get_facts() - category: {category}")
@@ -352,38 +354,31 @@ class FlexibleDynamoDBStorageV11(StorageV11Extension):
             logger.info(f"DEBUG get_facts() - AWS Region: {self.region_name}")
             logger.info(f"DEBUG get_facts() - Table Status: {self.table.table_status}")
             
-            # Always use SCAN for maximum compatibility with any table schema
-            # This works with their table: session_id (HASH) + timestamp (RANGE)
+            # ✅ FIX CRÍTICO: Usar QUERY en lugar de SCAN para 100x mejor performance
+            # ✅ FIX CRÍTICO: Usar hash_key_name (no hardcodear 'user_id')
+            # ✅ FIX CRÍTICO: Usar KeyConditionExpression (no FilterExpression)
             
             if category:
-                # Filter by category
-                logger.info(f"DEBUG get_facts() - Using category filter")
-                # FIX: Usar f-string y range_key_name directamente
-                response = self.table.scan(
-                    FilterExpression=f'user_id = :user_id AND #category = :category AND begins_with({self.range_key_name}, :fact_prefix)',
-                    ExpressionAttributeNames={
-                        '#category': 'category'  # Solo para atributos reservados
-                    },
-                    ExpressionAttributeValues={
-                        ':user_id': user_id,
-                        ':category': category,
-                        ':fact_prefix': 'FACT#'
-                    }
+                # Filter by specific category: FACT#category#*
+                logger.info(f"DEBUG get_facts() - Using category filter: {category}")
+                response = self.table.query(
+                    KeyConditionExpression=(
+                        Key(self.hash_key_name).eq(user_id) &
+                        Key(self.range_key_name).begins_with(f'FACT#{category}#')
+                    )
                 )
             else:
-                # Get all facts for user
+                # Get all facts: FACT#*
                 logger.info(f"DEBUG get_facts() - Getting all facts for user")
-                # FIX: Usar f-string y range_key_name directamente
-                response = self.table.scan(
-                    FilterExpression=f'user_id = :user_id AND begins_with({self.range_key_name}, :fact_prefix)',
-                    ExpressionAttributeValues={
-                        ':user_id': user_id,
-                        ':fact_prefix': 'FACT#'
-                    }
+                response = self.table.query(
+                    KeyConditionExpression=(
+                        Key(self.hash_key_name).eq(user_id) &
+                        Key(self.range_key_name).begins_with('FACT#')
+                    )
                 )
             
-            # DEBUG: Log scan response
-            logger.info(f"DEBUG get_facts() - Scan response: {response}")
+            # DEBUG: Log query response
+            logger.info(f"DEBUG get_facts() - Query response: {response}")
             logger.info(f"DEBUG get_facts() - Items found: {len(response.get('Items', []))}")
             
             # DEBUG: Log first few items
@@ -512,13 +507,13 @@ class FlexibleDynamoDBStorageV11(StorageV11Extension):
                     }
                 )
             else:
-                # Scan table
-                response = self.table.scan(
-                    FilterExpression=f'user_id = :user_id AND begins_with({self.range_key_name}, :episode_prefix)',
-                    ExpressionAttributeValues={
-                        ':user_id': user_id,
-                        ':episode_prefix': 'EPISODE#'
-                    }
+                # ✅ FIX CRÍTICO: Usar QUERY en lugar de SCAN para 100x mejor performance
+                from boto3.dynamodb.conditions import Key
+                response = self.table.query(
+                    KeyConditionExpression=(
+                        Key(self.hash_key_name).eq(user_id) &
+                        Key(self.range_key_name).begins_with('EPISODE#')
+                    )
                 )
             
             episodes = []
@@ -632,13 +627,13 @@ class FlexibleDynamoDBStorageV11(StorageV11Extension):
                     }
                 )
             else:
-                # Scan table
-                response = self.table.scan(
-                    FilterExpression=f'user_id = :user_id AND begins_with({self.range_key_name}, :mood_prefix)',
-                    ExpressionAttributeValues={
-                        ':user_id': user_id,
-                        ':mood_prefix': 'MOOD#'
-                    }
+                # ✅ FIX CRÍTICO: Usar QUERY en lugar de SCAN para 100x mejor performance
+                from boto3.dynamodb.conditions import Key
+                response = self.table.query(
+                    KeyConditionExpression=(
+                        Key(self.hash_key_name).eq(user_id) &
+                        Key(self.range_key_name).begins_with('MOOD#')
+                    )
                 )
             
             moods = []
