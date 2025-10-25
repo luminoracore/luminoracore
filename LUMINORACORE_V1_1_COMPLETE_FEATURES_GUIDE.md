@@ -18,6 +18,12 @@
 - ✅ **Análisis sentimental**: Entiende emociones del usuario
 - ✅ **Gestión de sesiones**: Maneja conversaciones por usuario
 - ✅ **Exportación de datos**: Puede exportar conversaciones completas
+- ✅ **Seguimiento de estado de ánimo**: Rastrea el estado emocional del usuario
+- ✅ **Búsqueda semántica**: Busca en memorias usando lenguaje natural
+- ✅ **Análisis de tendencias**: Detecta patrones en el comportamiento del usuario
+- ✅ **Evolución de personalidad**: Las personalidades se adaptan automáticamente
+- ✅ **Analytics avanzados**: Métricas detalladas de interacción
+- ✅ **Snapshots de sesión**: Exporta/importa estados completos de personalidad
 
 ---
 
@@ -122,6 +128,248 @@ Es la capacidad del framework para **entender las emociones** del usuario a part
 
 ---
 
+## 😊 **SEGUIMIENTO DE ESTADO DE ÁNIMO - ¿QUÉ ES Y CÓMO FUNCIONA?**
+
+### **¿Qué es el Seguimiento de Estado de Ánimo?**
+Es la capacidad del framework para **rastrear y recordar el estado emocional** del usuario a lo largo del tiempo, permitiendo respuestas más empáticas y personalizadas.
+
+### **¿Cómo Funciona?**
+1. **Detección Automática**: Analiza el estado de ánimo en cada mensaje
+2. **Clasificación**: Categoriza el estado emocional (feliz, triste, ansioso, etc.)
+3. **Intensidad**: Mide qué tan fuerte es la emoción (1-10)
+4. **Contexto**: Recuerda qué causó ese estado de ánimo
+5. **Historial**: Mantiene un registro temporal de cambios emocionales
+
+### **Tipos de Estado de Ánimo que Detecta:**
+- **Positivos**: Feliz, emocionado, satisfecho, agradecido
+- **Neutros**: Calmado, normal, equilibrado
+- **Negativos**: Triste, ansioso, frustrado, enojado
+- **Complejos**: Mezclados, contradictorios, cambiantes
+
+### **¿Para Qué Sirve?**
+- **Respuestas empáticas**: El AI responde según el estado emocional actual
+- **Prevención**: Detecta cuando el usuario está pasando por un mal momento
+- **Personalización**: Adapta el tono y estilo según el estado de ánimo
+- **Seguimiento**: Monitorea cambios emocionales a lo largo del tiempo
+
+### **Ejemplo de Uso:**
+```python
+# Guardar estado de ánimo
+await client_v11.save_mood(
+    user_id="user123",
+    personality_name="alicia",
+    mood="frustrated",
+    intensity=8.5,
+    context="Having trouble with the database connection"
+)
+
+# Obtener historial de estados de ánimo
+mood_history = await client_v11.get_mood_history("user123", "alicia", limit=10)
+```
+
+---
+
+## 🔍 **BÚSQUEDA SEMÁNTICA - ¿QUÉ ES Y CÓMO FUNCIONA?**
+
+### **¿Qué es la Búsqueda Semántica?**
+Es la capacidad del framework para **buscar información en las memorias** usando lenguaje natural, sin necesidad de palabras exactas o términos técnicos.
+
+### **¿Cómo Funciona?**
+1. **Consulta Natural**: El usuario pregunta en lenguaje natural
+2. **Procesamiento**: El sistema entiende el significado de la pregunta
+3. **Búsqueda Inteligente**: Busca en todas las memorias relevantes
+4. **Ranking**: Ordena los resultados por relevancia
+5. **Respuesta Contextual**: Devuelve la información más pertinente
+
+### **Ejemplos de Búsquedas:**
+- **"¿Recuerdas cuando hablamos de mi perro?"** → Encuentra conversaciones sobre mascotas
+- **"¿Qué sabes sobre mis proyectos?"** → Busca información sobre trabajo/proyectos
+- **"¿Cuándo me sentí triste?"** → Encuentra momentos emocionales específicos
+- **"¿Qué me gusta hacer los fines de semana?"** → Busca preferencias personales
+
+### **¿Para Qué Sirve?**
+- **Memoria Contextual**: Encuentra información específica rápidamente
+- **Continuidad**: Mantiene el hilo de conversaciones anteriores
+- **Personalización**: Usa información relevante para respuestas más precisas
+- **Eficiencia**: No necesita recordar detalles exactos
+
+### **Ejemplo de Uso:**
+```python
+# Búsqueda semántica en memorias
+results = await client_v11.search_memories(
+    user_id="user123",
+    query="remember when we talked about my dog?",
+    top_k=5
+)
+```
+
+---
+
+## 📈 **ANÁLISIS DE TENDENCIAS - ¿QUÉ ES Y CÓMO FUNCIONA?**
+
+### **¿Qué es el Análisis de Tendencias?**
+Es la capacidad del framework para **detectar patrones y cambios** en el comportamiento, emociones y preferencias del usuario a lo largo del tiempo.
+
+### **¿Cómo Funciona?**
+1. **Recopilación**: Recoge datos de múltiples sesiones
+2. **Análisis Temporal**: Identifica patrones en el tiempo
+3. **Detección de Cambios**: Encuentra variaciones significativas
+4. **Predicción**: Anticipa tendencias futuras
+5. **Reportes**: Genera análisis comprensibles
+
+### **Tipos de Tendencias que Detecta:**
+- **Emocionales**: Cambios en el estado de ánimo general
+- **Comportamentales**: Patrones en las interacciones
+- **Preferenciales**: Evolución de gustos y preferencias
+- **Relacionales**: Cambios en la afinidad con el AI
+- **Temáticas**: Intereses que van y vienen
+
+### **¿Para Qué Sirve?**
+- **Adaptación**: El AI se adapta a los cambios del usuario
+- **Prevención**: Detecta cuando algo no va bien
+- **Personalización**: Mejora las respuestas basándose en tendencias
+- **Insights**: Proporciona información valiosa sobre el usuario
+
+### **Ejemplo de Uso:**
+```python
+# Obtener tendencias sentimentales
+trends = await client_v11.get_sentiment_trends(
+    user_id="user123",
+    personality_name="alicia",
+    days=30
+)
+
+print(f"Tendencia general: {trends['trends']['overall_trend']}")
+print(f"Porcentaje positivo: {trends['trends']['positive_percentage']}%")
+```
+
+---
+
+## 🔄 **EVOLUCIÓN DE PERSONALIDAD - ¿QUÉ ES Y CÓMO FUNCIONA?**
+
+### **¿Qué es la Evolución de Personalidad?**
+Es la capacidad del framework para **modificar automáticamente las personalidades** basándose en las interacciones y preferencias del usuario, creando personalidades únicas para cada usuario.
+
+### **¿Cómo Funciona?**
+1. **Análisis de Interacciones**: Estudia cómo responde el usuario
+2. **Detección de Patrones**: Identifica preferencias y estilos
+3. **Modificación Gradual**: Ajusta la personalidad paso a paso
+4. **Validación**: Verifica que los cambios sean apropiados
+5. **Aplicación**: Implementa los cambios en futuras interacciones
+
+### **Aspectos que Pueden Evolucionar:**
+- **Tono**: Formal → Informal, o viceversa
+- **Humor**: Más o menos gracioso
+- **Profesionalismo**: Más técnico o más casual
+- **Empatía**: Más o menos emocional
+- **Estilo**: Más directo o más diplomático
+
+### **¿Para Qué Sirve?**
+- **Personalización Única**: Cada usuario tiene su propia versión del AI
+- **Mejor Compatibilidad**: El AI se adapta al estilo del usuario
+- **Relaciones Más Profundas**: Conexiones más naturales
+- **Satisfacción**: Respuestas que realmente gustan al usuario
+
+### **Ejemplo de Uso:**
+```python
+# Evolucionar personalidad
+evolution = await client_v11.evolve_personality(
+    session_id="session123",
+    user_id="user123",
+    personality_name="alicia"
+)
+
+if evolution['changes_detected']:
+    print(f"Cambios detectados: {evolution['personality_updates']}")
+    print(f"Confianza: {evolution['confidence_score']:.2f}")
+```
+
+---
+
+## 📊 **ANALYTICS AVANZADOS - ¿QUÉ ES Y CÓMO FUNCIONA?**
+
+### **¿Qué son los Analytics Avanzados?**
+Son **métricas detalladas y análisis** del comportamiento del usuario, la efectividad de las interacciones y el rendimiento del sistema.
+
+### **¿Cómo Funciona?**
+1. **Recopilación**: Recoge datos de todas las interacciones
+2. **Procesamiento**: Analiza patrones y métricas
+3. **Agregación**: Combina datos de múltiples sesiones
+4. **Visualización**: Presenta información comprensible
+5. **Insights**: Genera conclusiones útiles
+
+### **Métricas que Proporciona:**
+- **Interacción**: Número de mensajes, duración de sesiones
+- **Memoria**: Hechos aprendidos, episodios creados
+- **Emocional**: Sentimientos detectados, estados de ánimo
+- **Relacional**: Puntos de afinidad, nivel de relación
+- **Técnico**: Rendimiento, errores, tiempo de respuesta
+
+### **¿Para Qué Sirve?**
+- **Optimización**: Mejora el rendimiento del sistema
+- **Personalización**: Entiende mejor al usuario
+- **Monitoreo**: Detecta problemas o patrones
+- **Mejora Continua**: Identifica áreas de mejora
+
+### **Ejemplo de Uso:**
+```python
+# Obtener analytics de sesión
+analytics = await client_v11.get_session_analytics("session123")
+
+print(f"Total mensajes: {analytics['total_messages']}")
+print(f"Hechos aprendidos: {analytics['facts_learned']}")
+print(f"Episodios creados: {analytics['episodes_created']}")
+```
+
+---
+
+## 📦 **SNAPSHOTS DE SESIÓN - ¿QUÉ ES Y CÓMO FUNCIONA?**
+
+### **¿Qué son los Snapshots de Sesión?**
+Son **capturas completas del estado** de una personalidad en un momento específico, incluyendo toda la memoria, afinidad, y configuración.
+
+### **¿Cómo Funciona?**
+1. **Captura**: Toma una foto del estado actual
+2. **Serialización**: Convierte todo a formato exportable
+3. **Almacenamiento**: Guarda el snapshot de forma segura
+4. **Restauración**: Puede recrear el estado exacto
+5. **Transferencia**: Permite mover personalidades entre sistemas
+
+### **¿Qué Incluye un Snapshot?**
+- **Memoria Completa**: Todos los hechos y episodios
+- **Estado de Afinidad**: Puntos y nivel de relación
+- **Configuración**: Personalidad y preferencias
+- **Historial**: Conversaciones y análisis
+- **Metadatos**: Información técnica y temporal
+
+### **¿Para Qué Sirve?**
+- **Backup**: Respaldo completo del estado
+- **Migración**: Mover personalidades entre sistemas
+- **Experimentos**: Probar diferentes configuraciones
+- **Colaboración**: Compartir personalidades entre equipos
+- **Recuperación**: Restaurar después de problemas
+
+### **Ejemplo de Uso:**
+```python
+# Exportar snapshot
+snapshot = await client_v11.export_snapshot(
+    session_id="session123",
+    options={
+        "include_conversation_history": True,
+        "include_facts": True,
+        "include_episodes": True
+    }
+)
+
+# Importar snapshot
+new_session_id = await client_v11.import_snapshot(
+    snapshot, 
+    user_id="user456"
+)
+```
+
+---
+
 ## 📊 **GESTIÓN DE SESIONES - ¿CÓMO FUNCIONA?**
 
 ### **¿Qué es una Sesión?**
@@ -202,24 +450,40 @@ Una sesión es una **conversación continua** entre un usuario y el AI.
 - Usar información previa en las respuestas
 - Mantener contexto entre conversaciones
 - Clasificar información automáticamente
+- Buscar información usando lenguaje natural
+- Encontrar memorias relevantes por significado
 
 #### **Relaciones y Afinidad:**
 - Medir qué tan bien se lleva con el usuario
 - Adaptar personalidad según la afinidad
 - Mejorar relaciones con el tiempo
 - Responder según el nivel de relación
+- Evolucionar personalidades automáticamente
+- Crear personalidades únicas por usuario
 
 #### **Análisis Emocional:**
 - Entender emociones del usuario
 - Adaptar respuestas según el estado emocional
 - Guardar historial emocional
 - Mejorar afinidad con interacciones positivas
+- Rastrear estados de ánimo a lo largo del tiempo
+- Detectar patrones emocionales y tendencias
 
 #### **Gestión de Datos:**
 - Guardar datos en múltiples bases de datos
 - Exportar información del usuario
 - Gestionar sesiones de conversación
 - Limpiar datos expirados automáticamente
+- Crear snapshots completos del estado
+- Migrar personalidades entre sistemas
+
+#### **Analytics y Métricas:**
+- Proporcionar métricas detalladas de interacción
+- Analizar patrones de comportamiento
+- Generar reportes de rendimiento
+- Detectar tendencias y cambios
+- Monitorear la efectividad del sistema
+- Optimizar respuestas basándose en datos
 
 ### **❌ LO QUE NO PUEDE HACER:**
 
@@ -265,6 +529,26 @@ Una sesión es una **conversación continua** entre un usuario y el AI.
 - **Ventaja**: Sugiere tareas basadas en el historial
 - **Resultado**: Mayor productividad
 
+### **5. Asistentes de Salud Mental:**
+- **Qué hace**: Rastrea estados de ánimo y detecta patrones emocionales
+- **Ventaja**: Puede detectar cambios en el bienestar mental
+- **Resultado**: Mejor apoyo emocional y prevención
+
+### **6. Asistentes de Análisis de Datos:**
+- **Qué hace**: Proporciona métricas y análisis del comportamiento
+- **Ventaja**: Entiende patrones y tendencias del usuario
+- **Resultado**: Insights valiosos para toma de decisiones
+
+### **7. Asistentes de Colaboración:**
+- **Qué hace**: Permite compartir personalidades entre equipos
+- **Ventaja**: Consistencia en la experiencia de usuario
+- **Resultado**: Mejor coordinación y eficiencia
+
+### **8. Asistentes de Migración:**
+- **Qué hace**: Mueve personalidades entre sistemas
+- **Ventaja**: Preserva la relación y memoria del usuario
+- **Resultado**: Transiciones sin pérdida de contexto
+
 ---
 
 ## ⚠️ **LIMITACIONES Y CONSIDERACIONES**
@@ -298,12 +582,23 @@ Una sesión es una **conversación continua** entre un usuario y el AI.
 3. **Se Adaptan**: Cambian según la relación con el usuario
 4. **Entienden**: Analizan emociones y contexto
 5. **Persisten**: Mantienen información entre sesiones
+6. **Evolucionan**: Modifican su personalidad automáticamente
+7. **Rastrean**: Monitorean estados de ánimo y tendencias
+8. **Buscan**: Encuentran información usando lenguaje natural
+9. **Analizan**: Proporcionan métricas y insights detallados
+10. **Migran**: Mueven personalidades entre sistemas
 
 ### **Es útil para:**
 - Aplicaciones que necesitan personalización
 - Servicios que requieren contexto
 - Sistemas que benefician de relaciones a largo plazo
 - Aplicaciones que necesitan análisis emocional
+- Sistemas que requieren búsqueda inteligente
+- Aplicaciones que necesitan análisis de tendencias
+- Sistemas que requieren evolución automática
+- Aplicaciones que necesitan métricas detalladas
+- Sistemas que requieren migración de personalidades
+- Aplicaciones que necesitan snapshots de estado
 
 ### **No es útil para:**
 - Aplicaciones que no necesitan memoria
@@ -313,4 +608,4 @@ Una sesión es una **conversación continua** entre un usuario y el AI.
 
 ---
 
-**En resumen: LuminoraCore v1.1 convierte AIs estáticos en AIs inteligentes que recuerdan, aprenden y se adaptan a cada usuario específico.**
+**En resumen: LuminoraCore v1.1 convierte AIs estáticos en AIs inteligentes que recuerdan, aprenden, se adaptan, evolucionan, rastrean, buscan, analizan y migran, creando experiencias únicas y personalizadas para cada usuario específico.**

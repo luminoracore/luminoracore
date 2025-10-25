@@ -458,10 +458,9 @@ class AdvancedSentimentAnalyzer:
             # Save current analysis
             analysis_key = f"sentiment_analysis_{session_id}"
             await self.storage.save_memory(
-                session_id,
-                user_id,
-                analysis_key,
-                json.dumps({
+                user_id=user_id,
+                memory_key=analysis_key,
+                memory_value=json.dumps({
                     "overall_sentiment": result.overall_sentiment,
                     "sentiment_score": result.sentiment_score,
                     "emotions_detected": result.emotions_detected,
@@ -469,7 +468,8 @@ class AdvancedSentimentAnalyzer:
                     "analysis_timestamp": result.analysis_timestamp,
                     "message_count": result.message_count,
                     "sentiment_trend": result.sentiment_trend
-                })
+                }),
+                session_id=session_id
             )
             
             # Save to history
@@ -518,10 +518,10 @@ class AdvancedSentimentAnalyzer:
             
             # Save updated history
             await self.storage.save_memory(
-                session_id,
-                user_id,
-                history_key,
-                json.dumps(history)
+                user_id=user_id,
+                memory_key=history_key,
+                memory_value=json.dumps(history),
+                session_id=session_id
             )
             
             return True

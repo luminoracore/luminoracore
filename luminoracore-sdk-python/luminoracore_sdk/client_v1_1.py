@@ -743,14 +743,14 @@ class LuminoraCoreClientV11:
             
             # Save message for analysis
             await self.storage_v11.save_memory(
-                session_id,
-                user_id,
-                "current_message",
-                {
+                user_id=user_id,
+                memory_key="current_message",
+                memory_value={
                     "content": message,
                     "context": context or [],
                     "timestamp": datetime.now().isoformat()
-                }
+                },
+                session_id=session_id
             )
             
             # Perform advanced sentiment analysis
