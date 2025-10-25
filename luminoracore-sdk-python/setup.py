@@ -35,6 +35,9 @@ setup(
     url="https://github.com/luminoracore/sdk-python",
     packages=find_packages(),
     include_package_data=True,
+    package_data={
+        'luminoracore_sdk': ['personalities/*.json'],
+    },
     python_requires='>=3.8',
     install_requires=[
         'luminoracore>=1.0.0,<2.0.0',

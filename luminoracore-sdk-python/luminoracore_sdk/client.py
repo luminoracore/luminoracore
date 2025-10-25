@@ -17,6 +17,8 @@ from .session.storage import create_storage
 from .personality.manager import PersonalityManager
 from .personality.blender import PersonalityBlender
 from .utils.exceptions import LuminoraCoreSDKError, SessionError, ProviderError
+import os
+import pathlib
 from .utils.helpers import generate_session_id
 
 logger = logging.getLogger(__name__)
@@ -42,7 +44,14 @@ class LuminoraCoreClient:
         # Initialize components
         self.storage_config = storage_config
         self.memory_config = memory_config or MemoryConfig()
-        self.personalities_dir = personalities_dir or "personalities"
+        
+        # Set default personalities directory to SDK's personalities folder
+        if personalities_dir is None:
+            # Get the path to the SDK's personalities directory
+            sdk_dir = pathlib.Path(__file__).parent
+            self.personalities_dir = str(sdk_dir / "personalities")
+        else:
+            self.personalities_dir = personalities_dir
         
         # Create storage backend
         if storage_config:
