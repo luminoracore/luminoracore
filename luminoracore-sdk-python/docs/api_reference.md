@@ -21,8 +21,8 @@ This document provides comprehensive API reference for the LuminoraCore SDK Pyth
 The main client class for interacting with LuminoraCore.
 
 ```python
-from luminoracore import LuminoraCoreClient
-from luminoracore.types.session import StorageConfig, MemoryConfig
+from luminoracore_sdk import LuminoraCoreClient
+from luminoracore_sdk.types.session import StorageConfig, MemoryConfig
 
 client = LuminoraCoreClient(
     storage_config=StorageConfig(storage_type="memory"),
@@ -121,7 +121,7 @@ Get memory for a session.
 Represents a personality configuration.
 
 ```python
-from luminoracore.types.personality import PersonalityData
+from luminoracore_sdk.types.personality import PersonalityData
 
 personality = PersonalityData(
     name="helpful_assistant",
@@ -145,7 +145,7 @@ personality = PersonalityData(
 Represents a personality blend configuration.
 
 ```python
-from luminoracore.types.personality import PersonalityBlend
+from luminoracore_sdk.types.personality import PersonalityBlend
 
 blend = PersonalityBlend(
     personalities=[personality1, personality2],
@@ -168,7 +168,7 @@ blend = PersonalityBlend(
 Configuration for personality sessions.
 
 ```python
-from luminoracore.types.session import SessionConfig, SessionType
+from luminoracore_sdk.types.session import SessionConfig, SessionType
 
 config = SessionConfig(
     session_id="session_123",
@@ -194,7 +194,7 @@ config = SessionConfig(
 Represents a conversation with messages and metadata.
 
 ```python
-from luminoracore.types.session import Conversation, Message, MessageRole
+from luminoracore_sdk.types.session import Conversation, Message, MessageRole
 from datetime import datetime
 
 conversation = Conversation(
@@ -224,7 +224,7 @@ conversation = Conversation(
 Configuration for LLM providers.
 
 ```python
-from luminoracore.types.provider import ProviderConfig
+from luminoracore_sdk.types.provider import ProviderConfig
 
 config = ProviderConfig(
     name="openai",
@@ -259,7 +259,7 @@ config = ProviderConfig(
 Configuration for conversation storage.
 
 ```python
-from luminoracore.types.session import StorageConfig, StorageType
+from luminoracore_sdk.types.session import StorageConfig, StorageType
 
 # In-memory storage
 config = StorageConfig(storage_type=StorageType.MEMORY)
@@ -299,7 +299,7 @@ config = StorageConfig(
 Configuration for conversation memory.
 
 ```python
-from luminoracore.types.session import MemoryConfig
+from luminoracore_sdk.types.session import MemoryConfig
 
 config = MemoryConfig(
     enabled=True,
@@ -350,7 +350,7 @@ config = MemoryConfig(
 Represents a chat message.
 
 ```python
-from luminoracore.types.provider import ChatMessage
+from luminoracore_sdk.types.provider import ChatMessage
 
 message = ChatMessage(
     role="user",
@@ -363,7 +363,7 @@ message = ChatMessage(
 Represents a chat response.
 
 ```python
-from luminoracore.types.provider import ChatResponse
+from luminoracore_sdk.types.provider import ChatResponse
 
 response = ChatResponse(
     content="Hello! How can I help you?",
@@ -384,7 +384,7 @@ The SDK uses custom exceptions for error handling:
 - `StorageError` - Storage-related errors
 
 ```python
-from luminoracore.utils.exceptions import PersonalityError, SessionError
+from luminoracore_sdk.utils.exceptions import PersonalityError, SessionError
 
 try:
     await client.load_personality("invalid", {})
@@ -408,8 +408,8 @@ LuminoraCore SDK v1.1 adds advanced memory and relationship features.
 Extended client with v1.1 features.
 
 ```python
-from luminoracore_sdk.client_v1_1 import LuminoraCoreClientV11
-from luminoracore_sdk.session.storage_v1_1 import InMemoryStorageV11
+from luminoracore_sdk import LuminoraCoreClientV11
+from luminoracore_sdk.session import InMemoryStorageV11
 
 # Create v1.1 storage
 storage_v11 = InMemoryStorageV11()
@@ -687,7 +687,7 @@ All storage implementations support flexible configuration for any database sche
 In-memory implementation for development and testing.
 
 ```python
-from luminoracore_sdk.session.storage_v1_1 import InMemoryStorageV11
+from luminoracore_sdk.session import InMemoryStorageV11
 
 storage = InMemoryStorageV11()
 ```
@@ -696,7 +696,7 @@ storage = InMemoryStorageV11()
 DynamoDB storage that works with any table schema.
 
 ```python
-from luminoracore_sdk.session.storage_dynamodb_flexible import FlexibleDynamoDBStorageV11
+from luminoracore_sdk.session import FlexibleDynamoDBStorageV11
 
 # Works with ANY DynamoDB table
 storage = FlexibleDynamoDBStorageV11(
@@ -709,7 +709,7 @@ storage = FlexibleDynamoDBStorageV11(
 SQLite storage that works with any database file.
 
 ```python
-from luminoracore_sdk.session.storage_sqlite_flexible import FlexibleSQLiteStorageV11
+from luminoracore_sdk.session import FlexibleSQLiteStorageV11
 
 # Works with ANY SQLite database
 storage = FlexibleSQLiteStorageV11(
@@ -721,7 +721,7 @@ storage = FlexibleSQLiteStorageV11(
 PostgreSQL storage that works with any database and schema.
 
 ```python
-from luminoracore_sdk.session.storage_postgresql_flexible import FlexiblePostgreSQLStorageV11
+from luminoracore_sdk.session import FlexiblePostgreSQLStorageV11
 
 # Works with ANY PostgreSQL database
 storage = FlexiblePostgreSQLStorageV11(
@@ -734,7 +734,7 @@ storage = FlexiblePostgreSQLStorageV11(
 Redis storage that works with any Redis instance.
 
 ```python
-from luminoracore_sdk.session.storage_redis_flexible import FlexibleRedisStorageV11
+from luminoracore_sdk.session import FlexibleRedisStorageV11
 
 # Works with ANY Redis instance
 storage = FlexibleRedisStorageV11(
@@ -747,7 +747,7 @@ storage = FlexibleRedisStorageV11(
 MongoDB storage that works with any database and collection.
 
 ```python
-from luminoracore_sdk.session.storage_mongodb_flexible import FlexibleMongoDBStorageV11
+from luminoracore_sdk.session import FlexibleMongoDBStorageV11
 
 # Works with ANY MongoDB database
 storage = FlexibleMongoDBStorageV11(
@@ -760,7 +760,7 @@ storage = FlexibleMongoDBStorageV11(
 MySQL storage that works with any database and schema.
 
 ```python
-from luminoracore_sdk.session.storage_mysql_flexible import FlexibleMySQLStorageV11
+from luminoracore_sdk.session import FlexibleMySQLStorageV11
 
 # Works with ANY MySQL database
 storage = FlexibleMySQLStorageV11(
@@ -813,7 +813,7 @@ else:
 Type definition for facts.
 
 ```python
-from luminoracore_sdk.types.memory import FactDict
+from luminoracore_sdk.types import FactDict
 
 fact: FactDict = {
     "user_id": "user123",
@@ -828,7 +828,7 @@ fact: FactDict = {
 Type definition for episodes.
 
 ```python
-from luminoracore_sdk.types.memory import EpisodeDict
+from luminoracore_sdk.types import EpisodeDict
 
 episode: EpisodeDict = {
     "user_id": "user123",
@@ -844,7 +844,7 @@ episode: EpisodeDict = {
 Type definition for affinity data.
 
 ```python
-from luminoracore_sdk.types.relationship import AffinityDict
+from luminoracore_sdk.types import AffinityDict
 
 affinity: AffinityDict = {
     "user_id": "user123",
@@ -860,8 +860,8 @@ affinity: AffinityDict = {
 import asyncio
 import os
 from luminoracore_sdk import LuminoraCoreClient
-from luminoracore_sdk.client_v1_1 import LuminoraCoreClientV11
-from luminoracore_sdk.session.storage_dynamodb_flexible import FlexibleDynamoDBStorageV11
+from luminoracore_sdk import LuminoraCoreClientV11
+from luminoracore_sdk.session import FlexibleDynamoDBStorageV11
 from luminoracore_sdk.types.provider import ProviderConfig
 
 async def complete_example():

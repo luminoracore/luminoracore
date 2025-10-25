@@ -264,14 +264,14 @@ async def demo_conversation_memory():
     
     # Conversation that demonstrates memory
     conversation = [
-        "Hola, me llamo Carlos y soy de Madrid",
-        "De dnde eres?",
-        "Cmo me llamo?",
-        "Estoy planeando un viaje al Himalaya",
-        "Qu recuerdas sobre m?"
+        "Hello, I'm Carlos from Madrid",
+        "Where are you from?",
+        "What's my name?",
+        "I'm planning a trip to the Himalayas",
+        "What do you remember about me?"
     ]
     
-    print("\n Conversation with memory:")
+    print("\nConversation with memory:")
     print("-" * 50)
     
     for i, message in enumerate(conversation, 1):
@@ -295,7 +295,7 @@ async def demo_conversation_memory():
             print(f"    Error: {response['error']}")
     
     # Show final memory state
-    print("\n Final Memory State:")
+    print("\nFinal Memory State:")
     print("-" * 50)
     
     facts = await client.get_facts(session_id)
@@ -405,7 +405,7 @@ async def main():
         print("    Professional and enterprise-ready")
         
     except Exception as e:
-        print(f" Demo failed: {e}")
+        print(f"Demo failed: {e}")
         import traceback
         traceback.print_exc()
 
