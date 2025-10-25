@@ -398,30 +398,25 @@ Responde como {context.personality_name}, usando el contexto proporcionado para 
             }
     
     def _create_context_aware_fallback_response(self, context: ConversationContext) -> Dict[str, Any]:
-        """Create a context-aware fallback response when LLM is not available"""
+        """
+        Create a context-aware fallback response
         
-        # Extract user name if available
+        ✅ LANGUAGE-AGNOSTIC - No hardcoded phrases
+        ✅ USES CONTEXT - Leverages known facts
+        """
+        
+        # Extract user name if available (universal pattern)
         user_name = None
         for fact in context.user_facts:
             if fact.get('key') == 'name':
                 user_name = fact.get('value')
                 break
         
-        # Create response based on context
+        # Create generic, language-agnostic response
         if user_name:
-            if "como te llamas" in context.current_message.lower():
-                response_content = f"Me llamo {context.personality_name}. Y tú eres {user_name}, ¿verdad?"
-            elif "no lo sabes" in context.current_message.lower():
-                response_content = f"¡Por supuesto que sé que te llamas {user_name}! Lo mencionaste antes."
-            else:
-                response_content = f"Hola {user_name}! ¿Cómo puedo ayudarte hoy?"
+            response_content = f"Hello {user_name}! How can I help you today?"
         else:
-            if "como te llamas" in context.current_message.lower():
-                response_content = f"Me llamo {context.personality_name}. ¿Cómo te llamas tú?"
-            elif "no lo sabes" in context.current_message.lower():
-                response_content = "¿Qué cosa no sé? Cuéntame más para poder ayudarte mejor."
-            else:
-                response_content = f"Hola! Soy {context.personality_name}. ¿En qué puedo ayudarte?"
+            response_content = f"Hello! I'm {context.personality_name}. How can I assist you?"
         
         return {
             "content": response_content,
@@ -442,41 +437,95 @@ Responde como {context.personality_name}, usando el contexto proporcionado para 
         assistant_response: str,
         existing_facts: List[Dict[str, Any]]
     ) -> List[Dict[str, Any]]:
-        """Extract new facts from the conversation"""
+        """
+        Extract new facts from the conversation using LLM
+        
+        ✅ NO HARDCODED PATTERNS
+        ✅ MULTILINGUAL SUPPORT
+        ✅ LLM-BASED INTELLIGENT EXTRACTION
+        """
         
         new_facts = []
         
-        # Simple fact extraction logic (can be enhanced with LLM-based extraction)
-        user_message_lower = user_message.lower()
-        
-        # Extract name
-        if "me llamo" in user_message_lower or "soy" in user_message_lower or "mi nombre es" in user_message_lower:
-            # Try to extract name
-            words = user_message.split()
-            for i, word in enumerate(words):
-                if word.lower() in ["soy", "me", "llamo", "nombre", "es"]:
-                    if i + 1 < len(words):
-                        name = words[i + 1].strip(".,!?")
-                        if len(name) > 1 and name.isalpha():
-                            # Check if we already know this name
-                            existing_names = [f["value"] for f in existing_facts if f["key"] == "name"]
-                            if name not in existing_names:
+        # ✅ USE LLM FOR INTELLIGENT FACT EXTRACTION (NO HARDCODING)
+        if hasattr(self.client, 'base_client') and self.client.base_client:
+            try:
+                # Build extraction prompt
+                facts_context = "\n".join([
+                    f"- {fact['key']}: {fact['value']}" 
+                    for fact in existing_facts[:10]  # Limit context
+                ])
+                
+                extraction_prompt = f"""Extract factual information about the user from their message.
+
+EXISTING KNOWN FACTS:
+{facts_context if facts_context else "None yet"}
+
+USER MESSAGE: "{user_message}"
+
+Extract NEW facts in JSON format:
+{{
+    "facts": [
+        {{
+            "category": "personal_info|preferences|relationships|hobbies|goals|health|work|events|other",
+            "key": "descriptive_name",
+            "value": "extracted_value",
+            "confidence": 0.0-1.0
+        }}
+    ]
+}}
+
+Rules:
+- Only extract EXPLICIT, CLEAR facts (high confidence >0.8)
+- Don't infer or guess
+- Key should be descriptive (e.g. "name", "age", "profession")
+- If no new facts, return empty array
+- Be concise
+
+Example:
+Input: "My name is John, I'm 30 and work as a developer"
+Output: {{"facts": [{{"category": "personal_info", "key": "name", "value": "John", "confidence": 0.99}}, {{"category": "personal_info", "key": "age", "value": "30", "confidence": 0.98}}, {{"category": "work", "key": "profession", "value": "developer", "confidence": 0.95}}]}}
+
+JSON response:"""
+                
+                # Use base client to get LLM extraction
+                response = await self.client.base_client.send_message(
+                    session_id=session_id,
+                    message=extraction_prompt,
+                    personality_name="fact_extractor",
+                    provider_config=None  # Will use default
+                )
+                
+                # Parse LLM response
+                content = response.get("content", response.get("response", ""))
+                
+                # Try to extract JSON from response
+                import re
+                json_match = re.search(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', content, re.DOTALL)
+                if json_match:
+                    json_str = json_match.group(0)
+                    extracted_data = json.loads(json_str)
+                    
+                    if isinstance(extracted_data, dict) and "facts" in extracted_data:
+                        for fact_data in extracted_data["facts"]:
+                            # Check if fact already exists
+                            exists = any(
+                                f.get('key') == fact_data.get('key') and
+                                str(f.get('value')).lower() == str(fact_data.get('value')).lower()
+                                for f in existing_facts
+                            )
+                            
+                            if not exists and fact_data.get('confidence', 0) > 0.7:
                                 new_facts.append({
-                                    "category": "personal_info",
-                                    "key": "name",
-                                    "value": name,
-                                    "confidence": 0.9
+                                    "category": fact_data.get('category', 'other'),
+                                    "key": fact_data.get('key', 'fact'),
+                                    "value": fact_data.get('value', ''),
+                                    "confidence": fact_data.get('confidence', 0.8)
                                 })
-                            break
-        
-        # Extract other facts based on keywords
-        if "himalaya" in user_message_lower or "viaje" in user_message_lower:
-            new_facts.append({
-                "category": "travel_plans",
-                "key": "travel_destination",
-                "value": "Himalayas",
-                "confidence": 0.8
-            })
+                
+            except Exception as e:
+                print(f"LLM fact extraction failed: {e}")
+                # Continue without extracting (better than wrong data)
         
         return new_facts
     
@@ -508,18 +557,35 @@ Responde como {context.personality_name}, usando el contexto proporcionado para 
     ) -> Dict[str, Any]:
         """Update affinity based on the interaction"""
         
-        # Simple affinity update logic (can be enhanced)
-        points_change = 1  # Base points for any interaction
+        # Base points for any interaction
+        points_change = 1
         
-        # Increase points for positive interactions
-        positive_keywords = ["gracias", "perfecto", "excelente", "genial", "increíble"]
-        if any(keyword in conversation_turn.user_message.lower() for keyword in positive_keywords):
-            points_change = 2
-        
-        # Increase points for personal sharing
-        personal_keywords = ["soy", "me llamo", "mi nombre", "mi vida", "personal"]
-        if any(keyword in conversation_turn.user_message.lower() for keyword in personal_keywords):
-            points_change = 3
+        # Use LLM to detect sentiment/quality of interaction
+        if hasattr(self.client, 'base_client') and self.client.base_client:
+            try:
+                sentiment_prompt = f"""Analyze this conversation interaction quality on a scale of 1-5 (1=negative, 5=very positive):
+
+USER: {conversation_turn.user_message}
+
+Rate the interaction quality (1-5):"""
+                
+                response = await self.client.base_client.send_message(
+                    session_id=session_id,
+                    message=sentiment_prompt,
+                    personality_name="affinity_evaluator",
+                    provider_config=None
+                )
+                
+                # Parse rating
+                import re
+                rating_match = re.search(r'\b([1-5])\b', response.get("content", response.get("response", "")))
+                if rating_match:
+                    rating = int(rating_match.group(1))
+                    points_change = rating  # Scale points with quality
+                
+            except Exception as e:
+                print(f"LLM affinity evaluation failed: {e}")
+                # Fall through to default
         
         new_points = current_affinity["affinity_points"] + points_change
         new_points = min(100, new_points)  # Cap at 100

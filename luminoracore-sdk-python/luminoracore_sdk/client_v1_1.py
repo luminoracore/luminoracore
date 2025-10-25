@@ -1053,42 +1053,9 @@ class LuminoraCoreClientV11:
             logger.error(f"Failed to get evolution history: {e}")
             return []
     
-    def _analyze_sentiment_keywords(self, message: str) -> Dict[str, Any]:
-        """Basic keyword-based sentiment analysis"""
-        message_lower = message.lower()
-        
-        # Positive indicators
-        positive_keywords = ['good', 'great', 'excellent', 'love', 'like', 'happy', 'thanks', 'perfect', 'amazing', 'wonderful']
-        negative_keywords = ['bad', 'terrible', 'hate', 'angry', 'frustrated', 'error', 'problem', 'wrong', 'awful', 'horrible']
-        technical_keywords = ['code', 'api', 'debug', 'error', 'technical', 'configure', 'implementation']
-        
-        positive_count = sum(1 for word in positive_keywords if word in message_lower)
-        negative_count = sum(1 for word in negative_keywords if word in message_lower)
-        technical_count = sum(1 for word in technical_keywords if word in message_lower)
-        
-        # Determine sentiment
-        if positive_count > negative_count and positive_count > 0:
-            sentiment = "positive"
-            confidence = min(0.9, 0.5 + (positive_count * 0.1))
-        elif negative_count > positive_count and negative_count > 0:
-            sentiment = "negative"
-            confidence = min(0.9, 0.5 + (negative_count * 0.1))
-        elif technical_count > 0:
-            sentiment = "technical"
-            confidence = min(0.8, 0.4 + (technical_count * 0.1))
-        else:
-            sentiment = "neutral"
-            confidence = 0.5
-        
-        return {
-            "sentiment": sentiment,
-            "confidence": confidence,
-            "positive_indicators": positive_count,
-            "negative_indicators": negative_count,
-            "technical_indicators": technical_count,
-            "analysis_method": "keyword_based"
-        }
-    
+    # ✅ REMOVED: _analyze_sentiment_keywords() method with hardcoded English keywords
+    # Now using LLM-based analysis exclusively (multilingual, no hardcodes)
+
     async def _analyze_sentiment_llm(self, message: str, context: Optional[List[str]] = None) -> Dict[str, Any]:
         """Advanced LLM-based sentiment analysis"""
         # Build prompt for sentiment analysis
