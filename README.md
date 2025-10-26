@@ -1,145 +1,106 @@
-# LuminoraCore v1.1 - AI Personality Framework
+# LuminoraCore - AI Personality Framework
 
-**Build consistent, evolving AI personalities with memory and relationship tracking.**
+[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://python.org)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Status](https://img.shields.io/badge/status-v1.1_production_ready-brightgreen.svg)](#)
 
-[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/luminoracore/luminoracore)
-[![Tests](https://img.shields.io/badge/tests-179%20passing-green.svg)](https://github.com/luminoracore/luminoracore)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://python.org)
+**Professional AI personality framework with intelligent memory, relationship tracking, and contextual conversations.**
 
----
+## 🚀 Quick Start
 
-## 🚀 Quick Start (5 Minutes)
+### Installation
 
 ```bash
-# Install all components
-pip install -e luminoracore/
-pip install -e luminoracore-sdk-python/
-pip install -e luminoracore-cli/
+# Install core framework
+pip install luminoracore
 
-# Run your first intelligent bot
-python examples/luminoracore_v1_1_complete_demo.py
+# Install SDK for applications
+pip install luminoracore-sdk-python
+
+# Install CLI for development
+pip install luminoracore-cli
 ```
 
-## ✨ What's New in v1.1
-
-### 🧠 **Advanced Memory System**
-- **Fact Extraction**: Automatically learns about users
-- **Episodic Memory**: Remembers conversation context
-- **Semantic Search**: Intelligent memory retrieval
-- **Affinity Tracking**: Relationship level progression
-
-### 🔄 **Dynamic Personality Evolution**
-- **Adaptive Responses**: Personalities evolve based on interactions
-- **Affinity-Based Changes**: Relationship affects personality traits
-- **Context Awareness**: Responses consider conversation history
-
-### 💾 **Flexible Storage**
-- **Multiple Databases**: SQLite, PostgreSQL, DynamoDB, Redis, MongoDB
-- **Flexible Configuration**: Works with any existing database schema
-- **No Hardcoded Values**: Fully configurable for any project
-
-### 🛠 **Enhanced CLI & Tools**
-- **Memory Management**: View and manage conversation memory
-- **Database Migrations**: Easy schema updates
-- **Storage Configuration**: Interactive setup for any database
-
----
-
-## 🔧 Logging Configuration
-
-LuminoraCore provides professional logging configuration out of the box:
+### Basic Usage
 
 ```python
-from luminoracore_sdk import setup_logging
+from luminoracore_sdk import LuminoraCoreClient, LuminoraCoreClientV11
 
-# Simple usage
-setup_logging(level="DEBUG")
+# Initialize client
+client = LuminoraCoreClient()
+await client.initialize()
 
-# Advanced usage
-setup_logging(
-    level="DEBUG",
-    format_type="lambda",  # or "json", "text", "detailed"
-    include_boto=True
-)
+# Create session and chat
+session_id = await client.create_session("dr_luna")
+response = await client.send_message(session_id, "Hello!")
 
-# Auto-configuration based on environment
-from luminoracore_sdk import auto_configure
-auto_configure()
+# Use advanced memory features
+client_v11 = LuminoraCoreClientV11(client)
+await client_v11.save_fact("user123", "personal", "name", "Alice")
+facts = await client_v11.get_facts("user123")
 ```
 
-### Supported Environments
-- ✅ AWS Lambda / CloudWatch
-- ✅ Docker containers
-- ✅ Local development
-- ✅ Production servers
-- ✅ All databases (DynamoDB, PostgreSQL, SQLite, Redis, MongoDB)
-- ✅ All LLM providers (OpenAI, Anthropic, DeepSeek, etc.)
+## 🧠 Key Features
 
-**[Complete Logging Guide](LOGGING_CONFIGURATION_GUIDE.md)** - Professional logging setup
+### **Intelligent Memory System**
+- **Automatic Fact Extraction** - AI learns about users from conversations
+- **Relationship Tracking** - Affinity levels evolve based on interactions
+- **Contextual Conversations** - Full conversation history awareness
+- **Multi-Storage Support** - SQLite, PostgreSQL, DynamoDB, Redis, MongoDB
 
-## 📖 Documentation
+### **Dynamic Personality Evolution**
+- **Relationship-Based Adaptation** - Personalities evolve as relationships deepen
+- **Context Awareness** - Every response considers full conversation history
+- **Real-time Evolution** - Changes happen instantly during conversations
 
-| Component | Description | Documentation |
-|-----------|-------------|---------------|
-| **Core** | Personality engine and memory system | [Core Docs](luminoracore/docs/) |
-| **SDK** | Python client library | [SDK Docs](luminoracore-sdk-python/docs/) |
-| **CLI** | Command-line tools | [CLI Guide](luminoracore-cli/README.md) |
+### **Enterprise Ready**
+- **Universal Database Support** - Works with any existing database schema
+- **Flexible Configuration** - Adapts to any enterprise environment
+- **Cloud-Native** - Optimized for AWS, Azure, Google Cloud
+- **Professional Tooling** - CLI, migration system, monitoring
 
-### Key Guides
-- [Installation Guide](INSTALLATION_GUIDE.md) - Complete setup instructions
-- [Quick Start](QUICK_START.md) - 5-minute tutorial
-- [Complete Features Guide](LUMINORACORE_V1_1_COMPLETE_FEATURES_GUIDE.md) - All v1.1 features
+## 📚 Documentation
 
----
+- **[Installation Guide](INSTALLATION_GUIDE.md)** - Complete setup instructions
+- **[Memory System Guide](MEMORY_SYSTEM_DEEP_DIVE.md)** - Deep dive into memory capabilities
+- **[Quick Start Guide](QUICK_START.md)** - Get started in minutes
+- **[API Reference](luminoracore-sdk-python/docs/api_reference.md)** - Complete API documentation
 
-## 🎯 Core Features
+## 🛠 Components
 
-### Memory & Context
-```python
-# Automatic fact extraction and storage
-await client.save_fact(
-    user_id="user123",
-    category="personal_info", 
-    key="name",
-    value="Carlos",
-    confidence=0.95
-)
+### **Core Framework** (`luminoracore/`)
+- Independent core engine
+- Memory and personality systems
+- Storage interfaces
+- No external dependencies
 
-# Context-aware conversations
-response = await client.send_message_with_memory(
-    session_id="session123",
-    user_message="Hello, what do you remember about me?",
-    personality_name="assistant"
-)
+### **SDK** (`luminoracore-sdk-python/`)
+- Python SDK for applications
+- Client implementations
+- Storage backends
+- Provider integrations
+
+### **CLI** (`luminoracore-cli/`)
+- Command-line tools
+- Memory management
+- Database migrations
+- Development utilities
+
+## 🔧 CLI Commands
+
+```bash
+# Validate personalities
+luminoracore validate my_personality.json
+
+# Test with real LLM
+luminoracore test scientist --provider openai
+
+# Manage memory
+luminoracore memory facts --session-id user123
+
+# Database migrations
+luminoracore migrate --status
 ```
-
-### Dynamic Personalities
-```python
-# Personalities evolve based on affinity
-affinity = await client.update_affinity(
-    user_id="user123",
-    personality_name="assistant", 
-    points_delta=5,
-    interaction_type="positive"
-)
-```
-
-### Flexible Storage
-```python
-# Works with any database configuration
-storage = FlexibleSQLiteStorageV11(
-    database_path="your_database.db",
-    facts_table="your_facts_table"
-)
-
-storage = FlexibleDynamoDBStorageV11(
-    table_name="your_table",
-    region_name="your_region"
-)
-```
-
----
 
 ## 🏗 Architecture
 
@@ -147,33 +108,40 @@ storage = FlexibleDynamoDBStorageV11(
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   LuminoraCore  │    │   SDK Python    │    │      CLI        │
 │                 │    │                 │    │                 │
-│ • Personality   │◄───┤ • Client v1.1   │◄───┤ • Memory Mgmt   │
-│   Engine        │    │ • Storage       │    │ • Migrations    │
-│ • Memory System │    │   Management    │    │ • Validation    │
-│ • Evolution     │    │ • Context API   │    │                 │
+│ • Standalone    │◄───┤ • Uses Core     │◄───┤ • Uses Core     │
+│ • Core Engine   │    │ • Client Layer  │    │ • Tools Layer   │
+│ • Memory System │    │ • API Wrapper   │    │ • Management    │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
----
+## 📊 Storage Providers
 
-## 🚀 Use Cases
+- **InMemoryStorageV11** - Development and testing
+- **FlexibleSQLiteStorageV11** - Local development
+- **FlexibleDynamoDBStorageV11** - AWS production
+- **FlexiblePostgreSQLStorageV11** - Enterprise databases
+- **FlexibleRedisStorageV11** - Caching and sessions
+- **FlexibleMongoDBStorageV11** - Document storage
 
-- **Customer Support**: Intelligent bots that remember customer history
-- **Educational AI**: Tutors that adapt to student progress
-- **Gaming NPCs**: Characters with evolving personalities
-- **Personal Assistants**: AI that learns user preferences
-- **Therapeutic AI**: Bots that build emotional connections
+## 🔄 Version Compatibility
 
----
+**100% Backward Compatible** - Existing code continues to work unchanged.
 
-## 📊 Performance
+```python
+# Your existing code works without changes
+from luminoracore_sdk import LuminoraCoreClient, LuminoraCoreClientV11
 
-- **Memory Operations**: < 50ms average
-- **Context Retrieval**: < 100ms average  
-- **Personality Evolution**: Real-time adaptation
-- **Storage Flexibility**: Works with any database
+client = LuminoraCoreClient()
+client_v11 = LuminoraCoreClientV11(client)
+# All functions work exactly the same
+```
 
----
+## 📈 Performance
+
+- **Optimized Architecture** - Core independence improves performance
+- **Intelligent Caching** - Memory system reduces LLM calls
+- **Flexible Storage** - Choose optimal backend for your use case
+- **Async Support** - Non-blocking operations throughout
 
 ## 🤝 Contributing
 
@@ -183,22 +151,16 @@ storage = FlexibleDynamoDBStorageV11(
 4. Add tests
 5. Submit a pull request
 
-See [Contributing Guide](luminoracore/CONTRIBUTING.md) for details.
-
----
-
 ## 📄 License
 
-MIT License - see [LICENSE](luminoracore/LICENSE) for details.
-
----
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🆘 Support
 
-- **Documentation**: Check the [docs](luminoracore/docs/) directory
-- **Examples**: See [examples](examples/) directory
-- **Issues**: [GitHub Issues](https://github.com/luminoracore/luminoracore/issues)
+- **Documentation**: Check the guides above
+- **Issues**: Report bugs and feature requests
+- **Discussions**: Ask questions and share ideas
 
 ---
 
-**Built with ❤️ for the AI community**
+**LuminoraCore** - Building intelligent AI personalities with memory and relationships.

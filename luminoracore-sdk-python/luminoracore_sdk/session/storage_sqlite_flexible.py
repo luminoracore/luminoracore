@@ -343,7 +343,17 @@ class FlexibleSQLiteStorageV11(StorageV11Extension):
                 
                 existing = cursor.fetchone()
                 
-                value_str = json.dumps(value) if not isinstance(value, str) else value
+                # Handle ProviderConfig serialization
+                if hasattr(value, '__dict__') and not isinstance(value, (str, int, float, bool, list, dict)):
+                    # Convert objects to JSON-serializable format
+                    try:
+                        value_str = json.dumps(value.__dict__)
+                    except (TypeError, ValueError):
+                        value_str = str(value)
+                elif isinstance(value, (dict, list)):
+                    value_str = json.dumps(value)
+                else:
+                    value_str = str(value)
                 
                 if existing:
                     # Update existing fact

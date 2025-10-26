@@ -6,6 +6,7 @@ This is the CRITICAL fix for proper conversation memory integration
 
 import asyncio
 import json
+import time
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 from dataclasses import dataclass
@@ -82,6 +83,14 @@ class ConversationMemoryManager:
         8. Updates affinity based on interaction
         """
         try:
+            # Ensure session_id is not None
+            if not session_id:
+                session_id = f"session_{int(time.time())}"
+            
+            # Ensure user_id is not None
+            if not user_id:
+                user_id = session_id
+            
             # Step 1: Get conversation history
             conversation_history = await self._get_conversation_history(session_id)
             
@@ -127,11 +136,12 @@ class ConversationMemoryManager:
             # Step 7: Save new facts to memory
             for fact in new_facts:
                 await self.client.save_fact(
-                    user_id=session_id,
+                    user_id=user_id,  # Facts are per USER, not per session
                     category=fact["category"],
                     key=fact["key"],
                     value=fact["value"],
-                    confidence=fact["confidence"]
+                    confidence=fact["confidence"],
+                    session_id=session_id  # Track which session learned this fact
                 )
             
             # Step 8: Save conversation turn
@@ -149,7 +159,8 @@ class ConversationMemoryManager:
             affinity_change = await self._update_affinity_from_interaction(
                 session_id=session_id,
                 conversation_turn=conversation_turn,
-                current_affinity=affinity
+                current_affinity=affinity,
+                provider_config=provider_config  # Pass provider_config
             )
             
             return {
@@ -351,7 +362,7 @@ Responde como {context.personality_name}, usando el contexto proporcionado para 
                     )
                     
                     return {
-                        "content": response.get("content", response.get("response", "I'm sorry, I couldn't generate a response.")),
+                        "content": response.content if hasattr(response, 'content') else str(response),
                         "metadata": {
                             "context_used": True,
                             "personality_name": context.personality_name,
@@ -447,6 +458,9 @@ Responde como {context.personality_name}, usando el contexto proporcionado para 
         
         new_facts = []
         
+        print(f"🔍 DEBUG: Starting fact extraction for user message: '{user_message[:50]}...'")
+        print(f"🔍 DEBUG: Existing facts count: {len(existing_facts)}")
+        
         # ✅ USE LLM FOR INTELLIGENT FACT EXTRACTION (NO HARDCODING)
         if hasattr(self.client, 'base_client') and self.client.base_client:
             try:
@@ -489,44 +503,74 @@ Output: {{"facts": [{{"category": "personal_info", "key": "name", "value": "John
 JSON response:"""
                 
                 # Use base client to get LLM extraction
+                # CRITICAL FIX: Use the provider_config passed to the method
+                print(f"🔍 DEBUG: Calling LLM for fact extraction with provider: {provider_config.name if provider_config else 'None'}")
                 response = await self.client.base_client.send_message(
                     session_id=session_id,
                     message=extraction_prompt,
                     personality_name="fact_extractor",
-                    provider_config=None  # Will use default
+                    provider_config=provider_config  # Use the actual provider config
                 )
+                print(f"🔍 DEBUG: LLM response received: {response.content[:100] if hasattr(response, 'content') else str(response)[:100]}...")
                 
                 # Parse LLM response
-                content = response.get("content", response.get("response", ""))
+                content = response.content if hasattr(response, 'content') else str(response)
                 
                 # Try to extract JSON from response
                 import re
                 json_match = re.search(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', content, re.DOTALL)
+                print(f"🔍 DEBUG: JSON match found: {json_match is not None}")
+                
                 if json_match:
                     json_str = json_match.group(0)
-                    extracted_data = json.loads(json_str)
-                    
-                    if isinstance(extracted_data, dict) and "facts" in extracted_data:
-                        for fact_data in extracted_data["facts"]:
-                            # Check if fact already exists
-                            exists = any(
-                                f.get('key') == fact_data.get('key') and
-                                str(f.get('value')).lower() == str(fact_data.get('value')).lower()
-                                for f in existing_facts
-                            )
+                    print(f"🔍 DEBUG: Extracted JSON string: {json_str}")
+                    try:
+                        extracted_data = json.loads(json_str)
+                        print(f"🔍 DEBUG: Parsed JSON data: {extracted_data}")
+                        
+                        if isinstance(extracted_data, dict) and "facts" in extracted_data:
+                            print(f"🔍 DEBUG: Found {len(extracted_data['facts'])} facts in response")
                             
-                            if not exists and fact_data.get('confidence', 0) > 0.7:
-                                new_facts.append({
-                                    "category": fact_data.get('category', 'other'),
-                                    "key": fact_data.get('key', 'fact'),
-                                    "value": fact_data.get('value', ''),
-                                    "confidence": fact_data.get('confidence', 0.8)
-                                })
+                            for i, fact_data in enumerate(extracted_data["facts"]):
+                                print(f"🔍 DEBUG: Processing fact {i+1}: {fact_data}")
+                                
+                                # Check if fact already exists
+                                exists = any(
+                                    f.get('key') == fact_data.get('key') and
+                                    str(f.get('value')).lower() == str(fact_data.get('value')).lower()
+                                    for f in existing_facts
+                                )
+                                
+                                print(f"🔍 DEBUG: Fact exists: {exists}, confidence: {fact_data.get('confidence', 0)}")
+                                
+                                if not exists and fact_data.get('confidence', 0) > 0.7:
+                                    new_fact = {
+                                        "category": fact_data.get('category', 'other'),
+                                        "key": fact_data.get('key', 'fact'),
+                                        "value": fact_data.get('value', ''),
+                                        "confidence": fact_data.get('confidence', 0.8)
+                                    }
+                                    new_facts.append(new_fact)
+                                    print(f"🔍 DEBUG: Added new fact: {new_fact}")
+                                else:
+                                    print(f"🔍 DEBUG: Skipped fact (exists or low confidence)")
+                        else:
+                            print(f"🔍 DEBUG: No 'facts' key in extracted data")
+                    except json.JSONDecodeError as e:
+                        print(f"🔍 DEBUG: JSON decode error: {e}")
+                else:
+                    print(f"🔍 DEBUG: No JSON pattern found in response")
                 
             except Exception as e:
-                print(f"LLM fact extraction failed: {e}")
+                print(f"🔍 DEBUG: LLM fact extraction failed: {e}")
+                import traceback
+                traceback.print_exc()
                 # Continue without extracting (better than wrong data)
+        else:
+            print(f"🔍 DEBUG: No base_client available for fact extraction")
         
+        print(f"🔍 DEBUG: Final new_facts count: {len(new_facts)}")
+        print(f"🔍 DEBUG: Final new_facts: {new_facts}")
         return new_facts
     
     async def _save_conversation_turn(self, session_id: str, turn: ConversationTurn):
@@ -553,7 +597,8 @@ JSON response:"""
         self,
         session_id: str,
         conversation_turn: ConversationTurn,
-        current_affinity: Dict[str, Any]
+        current_affinity: Dict[str, Any],
+        provider_config: Optional[ProviderConfig] = None
     ) -> Dict[str, Any]:
         """Update affinity based on the interaction"""
         
@@ -569,16 +614,17 @@ USER: {conversation_turn.user_message}
 
 Rate the interaction quality (1-5):"""
                 
+                # CRITICAL FIX: Use provider_config for affinity evaluation
                 response = await self.client.base_client.send_message(
                     session_id=session_id,
                     message=sentiment_prompt,
                     personality_name="affinity_evaluator",
-                    provider_config=None
+                    provider_config=provider_config  # Use the actual provider config
                 )
                 
                 # Parse rating
                 import re
-                rating_match = re.search(r'\b([1-5])\b', response.get("content", response.get("response", "")))
+                rating_match = re.search(r'\b([1-5])\b', response.content if hasattr(response, 'content') else str(response))
                 if rating_match:
                     rating = int(rating_match.group(1))
                     points_change = rating  # Scale points with quality
@@ -592,7 +638,7 @@ Rate the interaction quality (1-5):"""
         
         # Update affinity
         await self.client.update_affinity(
-            user_id=session_id,
+            user_id=session_id,  # Keep session_id for affinity tracking
             personality_name=conversation_turn.personality_name,
             points_delta=points_change,
             interaction_type="conversation_interaction"

@@ -1,7 +1,13 @@
 {
-  "total_facts": 2,
+  "total_facts": 21,
   "total_episodes": 0,
   "fact_categories": {
+    "hobbies": 7,
+    "goals": 1,
+    "preferences": 2,
+    "relationships": 3,
+    "work": 4,
+    "personal_info": 2,
     "user_metadata": 2
   },
   "episode_types": {},
