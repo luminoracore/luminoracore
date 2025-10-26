@@ -130,7 +130,8 @@ class ConversationMemoryManager:
                 session_id=session_id,
                 user_message=user_message,
                 assistant_response=response["content"],
-                existing_facts=user_facts
+                existing_facts=user_facts,
+                provider_config=provider_config  # Pass provider_config
             )
             
             # Step 7: Save new facts to memory
@@ -446,7 +447,8 @@ Responde como {context.personality_name}, usando el contexto proporcionado para 
         session_id: str,
         user_message: str,
         assistant_response: str,
-        existing_facts: List[Dict[str, Any]]
+        existing_facts: List[Dict[str, Any]],
+        provider_config: Optional[ProviderConfig] = None
     ) -> List[Dict[str, Any]]:
         """
         Extract new facts from the conversation using LLM
