@@ -1,0 +1,18 @@
+[
+  {
+    "category": "user_metadata",
+    "key": "default_personality",
+    "value": "alex_digital",
+    "confidence": 1.0,
+    "created_at": "2025-10-26T02:52:45.614412",
+    "updated_at": "2025-10-26T02:52:45.614412"
+  },
+  {
+    "category": "user_metadata",
+    "key": "created_at",
+    "value": "2025-10-26T02:52:45.599793",
+    "confidence": 1.0,
+    "created_at": "2025-10-26T02:52:45.601811",
+    "updated_at": "2025-10-26T02:52:45.601811"
+  }
+]

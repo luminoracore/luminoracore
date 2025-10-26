@@ -86,12 +86,48 @@ class PersonalityManager:
             # Parse configuration from file
             config = parse_config(file_path)
             
-            # Extract name from filename if not in config
-            name = config.get("name")
-            if not name:
-                name = Path(file_path).stem
+            # Handle nested format (persona.name) vs flat format (name)
+            if "persona" in config:
+                # New nested format
+                persona = config["persona"]
+                # Use filename as key (safe identifier), persona name as display name
+                name = Path(file_path).stem  # Safe identifier like "dr_luna"
+                display_name = persona.get("name", name)  # Display name like "Dr. Luna"
+                description = persona.get("description", "")
+                
+                # Build system prompt from personality data
+                system_prompt_parts = []
+                system_prompt_parts.append(f"You are {display_name}. {description}")
+                
+                if "core_traits" in config:
+                    traits = config["core_traits"]
+                    if traits.get("archetype"):
+                        system_prompt_parts.append(f"Archetype: {traits['archetype']}")
+                
+                if "behavioral_rules" in config:
+                    rules = config["behavioral_rules"]
+                    if rules:
+                        system_prompt_parts.append("\nBehavioral rules:")
+                        for rule in rules:
+                            system_prompt_parts.append(f"- {rule}")
+                
+                system_prompt = "\n".join(system_prompt_parts)
+                
+            else:
+                # Old flat format
+                name = config.get("name") or Path(file_path).stem
+                description = config.get("description", "")
+                system_prompt = config.get("system_prompt", "")
             
-            return await self.load_personality(name, config)
+            # Create proper config for load_personality
+            proper_config = {
+                "name": name,
+                "description": description,
+                "system_prompt": system_prompt,
+                "metadata": config.get("metadata", {})
+            }
+            
+            return await self.load_personality(name, proper_config)
             
         except Exception as e:
             logger.error(f"Failed to load personality from file {file_path}: {e}")

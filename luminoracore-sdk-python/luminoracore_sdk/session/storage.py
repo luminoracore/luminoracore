@@ -204,9 +204,9 @@ class JSONFileStorage(SessionStorage):
         async with self._lock:
             if session_id in self._data:
                 del self._data[session_id]
-                await self._save_data()
-                return True
-        return False
+        # Save outside the lock to avoid deadlock
+        await self._save_data()
+        return True
     
     async def list_sessions(self) -> List[str]:
         """List all session IDs in JSON file."""

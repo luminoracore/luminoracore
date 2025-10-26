@@ -32,6 +32,7 @@ class FlexibleSQLiteStorageV11(StorageV11Extension):
         episodes_table: str = None,
         moods_table: str = None,
         memories_table: str = None,
+        sessions_table: str = None,
         auto_create_tables: bool = True
     ):
         """
@@ -44,6 +45,7 @@ class FlexibleSQLiteStorageV11(StorageV11Extension):
             episodes_table: Name of episodes table (auto-detected if None)
             moods_table: Name of moods table (auto-detected if None)
             memories_table: Name of memories table (auto-detected if None)
+            sessions_table: Name of sessions table (auto-detected if None)
             auto_create_tables: Whether to create tables if they don't exist
         """
         self.database_path = database_path
@@ -55,6 +57,7 @@ class FlexibleSQLiteStorageV11(StorageV11Extension):
         self.episodes_table = episodes_table
         self.moods_table = moods_table
         self.memories_table = memories_table
+        self.sessions_table = sessions_table
         
         # Ensure database directory exists (only if path is not empty)
         if database_path and database_path != ":memory:":
@@ -101,6 +104,10 @@ class FlexibleSQLiteStorageV11(StorageV11Extension):
                     possible_names = ['memories', 'user_memories', 'luminora_memories', 'memories_table']
                     self.memories_table = next((name for name in possible_names if name in existing_tables), 'memories')
                 
+                if not self.sessions_table:
+                    possible_names = ['sessions', 'user_sessions', 'luminora_sessions', 'sessions_table']
+                    self.sessions_table = next((name for name in possible_names if name in existing_tables), 'sessions')
+                
                 logger.info(f"Detected tables: {existing_tables}")
                 
         except Exception as e:
@@ -111,6 +118,7 @@ class FlexibleSQLiteStorageV11(StorageV11Extension):
             self.episodes_table = self.episodes_table or 'episodes'
             self.moods_table = self.moods_table or 'moods'
             self.memories_table = self.memories_table or 'memories'
+            self.sessions_table = self.sessions_table or 'sessions'
     
     def _ensure_tables_exist(self):
         """Create tables if they don't exist"""
@@ -195,8 +203,22 @@ class FlexibleSQLiteStorageV11(StorageV11Extension):
                     )
                 """)
                 
+                # Create sessions table
+                cursor.execute(f"""
+                    CREATE TABLE IF NOT EXISTS {self.sessions_table} (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        session_id TEXT NOT NULL UNIQUE,
+                        user_id TEXT NOT NULL,
+                        personality_name TEXT NOT NULL,
+                        created_at TEXT NOT NULL,
+                        updated_at TEXT NOT NULL,
+                        last_activity TEXT NOT NULL,
+                        ttl INTEGER NOT NULL
+                    )
+                """)
+                
                 conn.commit()
-                logger.info(f"Tables created/verified: {self.facts_table}, {self.affinity_table}, {self.episodes_table}")
+                logger.info(f"Tables created/verified: {self.facts_table}, {self.affinity_table}, {self.episodes_table}, {self.sessions_table}")
                 
         except Exception as e:
             logger.error(f"Failed to create tables: {e}")

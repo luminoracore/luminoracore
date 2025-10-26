@@ -24,6 +24,11 @@ from .core import personality_v1_1
 from .core import compiler_v1_1
 from .storage import migrations
 
+# New core components
+from .core import PersonalityEngine, MemorySystem, EvolutionEngine
+from .interfaces import StorageInterface, MemoryInterface, PersonalityInterface, EvolutionInterface
+from .storage import BaseStorage, InMemoryStorage
+
 # Flexible storage modules
 from .storage import (
     FlexibleStorageManager,
@@ -51,6 +56,17 @@ __all__ = [
     "personality_v1_1",
     "compiler_v1_1",
     "migrations",
+    
+    # New core components
+    "PersonalityEngine",
+    "MemorySystem", 
+    "EvolutionEngine",
+    "StorageInterface",
+    "MemoryInterface",
+    "PersonalityInterface",
+    "EvolutionInterface",
+    "BaseStorage",
+    "InMemoryStorage",
     
     # Flexible storage modules
     "FlexibleStorageManager",

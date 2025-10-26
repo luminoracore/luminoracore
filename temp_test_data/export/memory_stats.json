@@ -1,0 +1,20 @@
+{
+  "total_facts": 5,
+  "total_episodes": 1,
+  "fact_categories": {
+    "preferences": 2,
+    "personal": 3
+  },
+  "episode_types": {
+    "conversation": 1
+  },
+  "most_important_episode": {
+    "episode_type": "conversation",
+    "title": "30-Message Chat Session",
+    "summary": "Comprehensive conversation with 30 messages covering various topics",
+    "importance": 0.9,
+    "sentiment": "neutral",
+    "created_at": "2025-10-26T02:21:02.284590",
+    "updated_at": "2025-10-26T02:21:02.284590"
+  }
+}

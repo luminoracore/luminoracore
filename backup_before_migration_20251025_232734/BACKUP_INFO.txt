@@ -1,0 +1,11 @@
+
+Backup created: 2025-10-25T23:27:36.530865
+Purpose: Before migration restructure
+Directories backed up: 5
+Files backed up: 1
+
+To restore from backup:
+1. Stop any running processes
+2. Remove current directories: rm -rf luminoracore luminoracore-sdk-python luminoracore-cli
+3. Copy from backup: cp -r backup_before_migration_20251025_232734/* .
+4. Test that everything works: python validate_migration.py
