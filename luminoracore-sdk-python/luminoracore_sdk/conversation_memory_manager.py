@@ -333,72 +333,85 @@ class ConversationMemoryManager:
             # Build the complete context string
             full_context = "\n\n".join(context_parts)
             
-            # Try to use the base_client with the context
-            if hasattr(self.client, 'base_client') and self.client.base_client:
+            # ✅ SOLUTION: Use Provider directly instead of base_client.send_message()
+            # This avoids the requirement for an existing session in DynamoDB
+            
+            # Convert dict to ProviderConfig if needed
+            if isinstance(provider_config, dict):
+                from .types.provider import ProviderConfig
+                provider_config_obj = ProviderConfig(
+                    name=provider_config.get("name", "deepseek"),
+                    api_key=provider_config.get("api_key", "mock-key"),
+                    model=provider_config.get("model", "deepseek-chat")
+                )
+            else:
+                provider_config_obj = provider_config
+            
+            if provider_config_obj:
                 try:
-                    # Create a context-aware message for the base client
-                    context_aware_message = f"""Contexto del usuario: {full_context}
-
-Usuario: {context.current_message}
-
-Responde como {context.personality_name}, usando el contexto proporcionado para dar una respuesta personalizada y relevante."""
+                    # Import ProviderFactory
+                    from .providers.factory import ProviderFactory
                     
-                    # Convert dict to ProviderConfig if needed
-                    if isinstance(provider_config, dict):
-                        from .types.provider import ProviderConfig
-                        provider_config_obj = ProviderConfig(
-                            name=provider_config.get("name", "deepseek"),
-                            api_key=provider_config.get("api_key", "mock-key"),
-                            model=provider_config.get("model", "deepseek-chat")
-                        )
-                    else:
-                        provider_config_obj = provider_config
+                    # Create provider instance
+                    provider = ProviderFactory.create_provider(provider_config_obj)
                     
-                    # Use the base client with the context-aware message
-                    response = await self.client.base_client.send_message(
-                        session_id=context.session_id,
-                        message=context_aware_message,
-                        personality_name=context.personality_name,
-                        provider_config=provider_config_obj
+                    # Create the complete prompt with context
+                    system_prompt = full_context
+                    user_prompt = context.current_message
+                    
+                    # Prepare messages for the provider
+                    messages = [
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt}
+                    ]
+                    
+                    # Call provider directly (doesn't require session to exist)
+                    print(f"🔍 DEBUG: Calling LLM provider directly with context length: {len(full_context)}")
+                    response = await provider.generate(
+                        messages=messages,
+                        temperature=0.7
                     )
                     
+                    # Extract content
+                    content = response.content if hasattr(response, 'content') else str(response)
+                    
+                    print(f"🔍 DEBUG: LLM response received: {content[:100]}...")
+                    
                     return {
-                        "content": response.content if hasattr(response, 'content') else str(response),
+                        "content": content,
                         "metadata": {
                             "context_used": True,
                             "personality_name": context.personality_name,
                             "affinity_level": context.affinity['current_level'],
                             "facts_count": len(context.user_facts),
-                            "history_length": len(context.conversation_history)
+                            "history_length": len(context.conversation_history),
+                            "provider_used": provider_config_obj.name if provider_config_obj else "unknown"
                         }
                     }
                     
                 except Exception as e:
-                    print(f"Base client send_message failed: {e}")
-                    # Use context-aware fallback
-                    fallback_response = self._create_context_aware_fallback_response(context)
-                    return {
-                        "content": fallback_response["content"],
-                        "metadata": {
-                            **fallback_response["metadata"],
-                            "error": True,
-                            "error_message": str(e)
-                        }
-                    }
-            else:
-                # Final fallback with context awareness
-                fallback_response = self._create_context_aware_fallback_response(context)
-                return {
-                    "content": fallback_response["content"],
-                    "metadata": {
-                        **fallback_response["metadata"],
-                        "fallback": True
-                    }
+                    print(f"🔍 DEBUG: Provider direct call failed: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    # Fall through to fallback
+                    pass
+            
+            # Fallback: context-aware response without LLM
+            print(f"🔍 DEBUG: Using context-aware fallback response")
+            fallback_response = self._create_context_aware_fallback_response(context)
+            return {
+                "content": fallback_response["content"],
+                "metadata": {
+                    **fallback_response["metadata"],
+                    "fallback": True
                 }
+            }
                 
         except Exception as e:
             # Error handling - use context-aware fallback instead of generic error
-            print(f"Error in _generate_response_with_context: {e}")
+            print(f"🔍 DEBUG: Error in _generate_response_with_context: {e}")
+            import traceback
+            traceback.print_exc()
             fallback_response = self._create_context_aware_fallback_response(context)
             return {
                 "content": fallback_response["content"],
@@ -504,19 +517,43 @@ Output: {{"facts": [{{"category": "personal_info", "key": "name", "value": "John
 
 JSON response:"""
                 
-                # Use base client to get LLM extraction
-                # CRITICAL FIX: Use the provider_config passed to the method
-                print(f"🔍 DEBUG: Calling LLM for fact extraction with provider: {provider_config.name if provider_config else 'None'}")
-                response = await self.client.base_client.send_message(
-                    session_id=session_id,
-                    message=extraction_prompt,
-                    personality_name="fact_extractor",
-                    provider_config=provider_config  # Use the actual provider config
-                )
-                print(f"🔍 DEBUG: LLM response received: {response.content[:100] if hasattr(response, 'content') else str(response)[:100]}...")
+                # ✅ SOLUTION: Use Provider directly for fact extraction
+                # This avoids the requirement for an existing session in DynamoDB
+                print(f"🔍 DEBUG: Calling LLM provider directly for fact extraction: {provider_config.name if provider_config else 'None'}")
                 
-                # Parse LLM response
-                content = response.content if hasattr(response, 'content') else str(response)
+                # Convert dict to ProviderConfig if needed
+                if isinstance(provider_config, dict):
+                    from .types.provider import ProviderConfig
+                    provider_config_obj = ProviderConfig(
+                        name=provider_config.get("name", "deepseek"),
+                        api_key=provider_config.get("api_key", "mock-key"),
+                        model=provider_config.get("model", "deepseek-chat")
+                    )
+                else:
+                    provider_config_obj = provider_config
+                
+                if provider_config_obj:
+                    from .providers.factory import ProviderFactory
+                    provider = ProviderFactory.create_provider(provider_config_obj)
+                    
+                    # Prepare messages
+                    messages = [
+                        {"role": "user", "content": extraction_prompt}
+                    ]
+                    
+                    # Call provider directly
+                    response = await provider.generate(
+                        messages=messages,
+                        temperature=0.3  # Lower temperature for more deterministic extraction
+                    )
+                    
+                    content = response.content if hasattr(response, 'content') else str(response)
+                    print(f"🔍 DEBUG: LLM response received for fact extraction: {content[:100]}...")
+                else:
+                    print(f"🔍 DEBUG: No provider config available for fact extraction")
+                    content = ""
+                
+                # Parse LLM response (content already extracted above)
                 
                 # Try to extract JSON from response
                 import re
@@ -608,7 +645,7 @@ JSON response:"""
         points_change = 1
         
         # Use LLM to detect sentiment/quality of interaction
-        if hasattr(self.client, 'base_client') and self.client.base_client:
+        if provider_config:
             try:
                 sentiment_prompt = f"""Analyze this conversation interaction quality on a scale of 1-5 (1=negative, 5=very positive):
 
@@ -616,20 +653,35 @@ USER: {conversation_turn.user_message}
 
 Rate the interaction quality (1-5):"""
                 
-                # CRITICAL FIX: Use provider_config for affinity evaluation
-                response = await self.client.base_client.send_message(
-                    session_id=session_id,
-                    message=sentiment_prompt,
-                    personality_name="affinity_evaluator",
-                    provider_config=provider_config  # Use the actual provider config
-                )
+                # ✅ SOLUTION: Use Provider directly for affinity evaluation
+                # Convert dict to ProviderConfig if needed
+                if isinstance(provider_config, dict):
+                    from .types.provider import ProviderConfig
+                    provider_config_obj = ProviderConfig(
+                        name=provider_config.get("name", "deepseek"),
+                        api_key=provider_config.get("api_key", "mock-key"),
+                        model=provider_config.get("model", "deepseek-chat")
+                    )
+                else:
+                    provider_config_obj = provider_config
                 
-                # Parse rating
-                import re
-                rating_match = re.search(r'\b([1-5])\b', response.content if hasattr(response, 'content') else str(response))
-                if rating_match:
-                    rating = int(rating_match.group(1))
-                    points_change = rating  # Scale points with quality
+                if provider_config_obj:
+                    from .providers.factory import ProviderFactory
+                    provider = ProviderFactory.create_provider(provider_config_obj)
+                    
+                    messages = [{"role": "user", "content": sentiment_prompt}]
+                    response = await provider.generate(
+                        messages=messages,
+                        temperature=0.3
+                    )
+                    
+                    # Parse rating
+                    import re
+                    content = response.content if hasattr(response, 'content') else str(response)
+                    rating_match = re.search(r'\b([1-5])\b', content)
+                    if rating_match:
+                        rating = int(rating_match.group(1))
+                        points_change = rating  # Scale points with quality
                 
             except Exception as e:
                 print(f"LLM affinity evaluation failed: {e}")
