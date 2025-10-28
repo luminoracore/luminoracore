@@ -51,30 +51,68 @@ class AdvancedSentimentAnalyzer:
         self.NEGATIVE_THRESHOLD = 0.4
         self.CONFIDENCE_THRESHOLD = 0.7
         
-        # Emotion keywords
+        # Emotion keywords (English + Spanish for multilingual support)
         self.EMOTION_KEYWORDS = {
-            "joy": ["happy", "joyful", "excited", "cheerful", "delighted", "thrilled"],
-            "sadness": ["sad", "depressed", "melancholy", "sorrowful", "gloomy", "dejected"],
-            "anger": ["angry", "furious", "irritated", "annoyed", "frustrated", "enraged"],
-            "fear": ["afraid", "scared", "worried", "anxious", "terrified", "nervous"],
-            "surprise": ["surprised", "amazed", "shocked", "astonished", "stunned"],
-            "disgust": ["disgusted", "revolted", "repulsed", "sickened", "appalled"],
-            "trust": ["trust", "confident", "reliable", "faithful", "loyal"],
-            "anticipation": ["excited", "eager", "hopeful", "optimistic", "enthusiastic"]
+            "joy": [
+                "happy", "joyful", "excited", "cheerful", "delighted", "thrilled",
+                "feliz", "alegre", "emocionado", "contento", "encantado", "eufórico", "radiante"
+            ],
+            "sadness": [
+                "sad", "depressed", "melancholy", "sorrowful", "gloomy", "dejected",
+                "triste", "deprimido", "melancólico", "apenado", "desanimado", "abatido"
+            ],
+            "anger": [
+                "angry", "furious", "irritated", "annoyed", "frustrated", "enraged",
+                "enojado", "furioso", "irritado", "molesto", "frustrado", "enfurecido", "rabioso"
+            ],
+            "fear": [
+                "afraid", "scared", "worried", "anxious", "terrified", "nervous",
+                "asustado", "atemorizado", "preocupado", "ansioso", "aterrorizado", "nervioso", "inquieto"
+            ],
+            "surprise": [
+                "surprised", "amazed", "shocked", "astonished", "stunned",
+                "sorprendido", "asombrado", "impactado", "pasmado", "atónito"
+            ],
+            "disgust": [
+                "disgusted", "revolted", "repulsed", "sickened", "appalled",
+                "disgustado", "revoltado", "asqueado", "repugnado", "horrorizado"
+            ],
+            "trust": [
+                "trust", "confident", "reliable", "faithful", "loyal",
+                "confianza", "seguro", "confiado", "fiable", "leal", "fiel"
+            ],
+            "anticipation": [
+                "excited", "eager", "hopeful", "optimistic", "enthusiastic",
+                "emocionado", "ansioso", "esperanzado", "optimista", "entusiasta", "ilusionado"
+            ]
         }
         
-        # Sentiment patterns
+        # Sentiment patterns (English + Spanish for multilingual support)
         self.SENTIMENT_PATTERNS = {
             "positive": [
+                # English patterns
                 r"\b(good|great|excellent|amazing|wonderful|fantastic|awesome|perfect|love|like|enjoy|happy|pleased|satisfied)\b",
-                r"\b(thank you|thanks|appreciate|grateful|pleased|delighted)\b"
+                r"\b(thank you|thanks|appreciate|grateful|pleased|delighted)\b",
+                # Spanish patterns
+                r"\b(bueno|genial|excelente|increíble|maravilloso|fantástico|perfecto|amo|me encanta|disfruto|feliz|contento|satisfecho)\b",
+                r"\b(gracias|agradecido|encantado|emocionado|optimista|esperanzado)\b",
+                r"\b(me siento bien|todo va bien|estoy feliz|me gusta|estoy contento)\b"
             ],
             "negative": [
+                # English patterns
                 r"\b(bad|terrible|awful|horrible|hate|dislike|angry|frustrated|annoyed|disappointed|upset)\b",
-                r"\b(error|problem|issue|wrong|broken|failed|unsatisfactory)\b"
+                r"\b(error|problem|issue|wrong|broken|failed|unsatisfactory)\b",
+                # Spanish patterns
+                r"\b(malo|terrible|horrible|odio|no me gusta|enojado|frustrado|molesto|decepcionado|triste)\b",
+                r"\b(error|problema|fallo|roto|fracaso|insatisfecho|preocupado|ansioso)\b",
+                r"\b(me siento mal|todo va mal|estoy triste|no funciona|me preocupa)\b"
             ],
             "neutral": [
-                r"\b(ok|okay|fine|alright|sure|maybe|perhaps|possibly)\b"
+                # English patterns
+                r"\b(ok|okay|fine|alright|sure|maybe|perhaps|possibly)\b",
+                # Spanish patterns
+                r"\b(ok|vale|bien|correcto|claro|tal vez|quizás|posiblemente)\b",
+                r"\b(no sé|no estoy seguro|neutral|normal|regular)\b"
             ]
         }
     
@@ -377,16 +415,24 @@ class AdvancedSentimentAnalyzer:
             }}
             """
             
-            # Get LLM response
-            response = await self.llm_provider.generate(
-                messages=[{"role": "user", "content": prompt}],
+            # ✅ FIX: Use .chat() with ChatMessage objects (not .generate())
+            from ..types.provider import ChatMessage
+            
+            messages = [
+                ChatMessage(role="user", content=prompt)
+            ]
+            
+            # Get LLM response using .chat() method
+            response = await self.llm_provider.chat(
+                messages=messages,
                 temperature=0.1,
                 max_tokens=300
             )
             
             # Parse response
             try:
-                analysis = json.loads(response.content)
+                content = response.content if hasattr(response, 'content') else str(response)
+                analysis = json.loads(content)
                 return {
                     "llm_sentiment": analysis.get("overall_sentiment", "neutral"),
                     "llm_score": analysis.get("sentiment_score", 0.5),
