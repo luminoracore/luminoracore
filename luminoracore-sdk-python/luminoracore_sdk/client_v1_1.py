@@ -719,56 +719,103 @@ class LuminoraCoreClientV11:
     async def analyze_sentiment(
         self,
         user_id: str,
-        message: str,
-        context: Optional[List[str]] = None
+        message: Optional[str] = None,
+        context: Optional[List[str]] = None,
+        session_id: Optional[str] = None
     ) -> Dict[str, Any]:
         """
-        Analyze sentiment of user message
+        Analyze sentiment of user message or entire session
         
         Args:
             user_id: User ID
-            message: Message to analyze
-            context: Previous messages for context
+            message: Optional message to analyze. If None and session_id provided, analyzes entire session
+            context: Previous messages for context (only used if message is provided)
+            session_id: Optional session ID. If provided and message is None, analyzes entire session conversations
             
         Returns:
-            Sentiment analysis results
+            Sentiment analysis results with:
+            - sentiment: "positive" | "neutral" | "negative"
+            - sentiment_score: float (0.0 - 1.0)
+            - confidence: float (0.0 - 1.0)
+            - emotions_detected: List[str]
+            - sentiment_trend: str
+            - analysis_timestamp: str
+            - message_count: int
+            - detailed_analysis: dict
         """
         if not self.sentiment_analyzer:
             logger.warning("Sentiment analyzer not configured")
-            return {"sentiment": "neutral", "confidence": 0.5}
+            return {"sentiment": "neutral", "confidence": 0.5, "error": "Sentiment analyzer not configured"}
         
         try:
-            # Create session_id for analysis
-            session_id = f"{user_id}_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            # MODE 1: Analyze entire session (if session_id provided and message is None/empty)
+            if session_id and not message:
+                logger.info(f"Analyzing entire session: {session_id}")
+                
+                # Use the original session_id to find conversations
+                # Conversations are stored with: get_facts(user_id=session_id, category="conversation_history")
+                result = await self.sentiment_analyzer.analyze_sentiment(session_id, user_id)
+                
+                return {
+                    "sentiment": result.overall_sentiment,
+                    "confidence": result.confidence,
+                    "sentiment_score": result.sentiment_score,
+                    "emotions_detected": result.emotions_detected,
+                    "sentiment_trend": result.sentiment_trend,
+                    "analysis_timestamp": result.analysis_timestamp,
+                    "message_count": result.message_count,
+                    "detailed_analysis": result.detailed_analysis
+                }
             
-            # Save message for analysis
-            await self.storage_v11.save_memory(
-                user_id=user_id,
-                memory_key="current_message",
-                memory_value={
+            # MODE 2: Analyze specific message
+            elif message:
+                logger.info(f"Analyzing specific message for user: {user_id}")
+                
+                # Create temporary session_id for single message analysis
+                temp_session_id = f"{user_id}_message_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+                
+                # Convert message and context to conversation format for analysis
+                conversation_data = [{
                     "content": message,
-                    "context": context or [],
+                    "type": "user",
                     "timestamp": datetime.now().isoformat()
-                },
-                session_id=session_id
-            )
+                }]
+                
+                if context:
+                    for ctx_msg in context[-3:]:  # Last 3 context messages
+                        conversation_data.insert(0, {
+                            "content": ctx_msg,
+                            "type": "context",
+                            "timestamp": datetime.now().isoformat()
+                        })
+                
+                # Perform analysis using the conversation data directly
+                # Use a helper method that can analyze conversation data directly
+                basic_analysis = self.sentiment_analyzer._perform_basic_analysis(conversation_data)
+                advanced_analysis = await self.sentiment_analyzer._perform_advanced_analysis(conversation_data)
+                emotion_analysis = self.sentiment_analyzer._perform_emotion_analysis(conversation_data)
+                
+                # Combine analyses
+                combined_result = self.sentiment_analyzer._combine_analyses(
+                    basic_analysis, advanced_analysis, emotion_analysis, {}
+                )
+                
+                return {
+                    "sentiment": combined_result["overall_sentiment"],
+                    "confidence": combined_result["confidence"],
+                    "sentiment_score": combined_result["sentiment_score"],
+                    "emotions_detected": combined_result["emotions_detected"],
+                    "sentiment_trend": "stable",  # No trend for single message
+                    "analysis_timestamp": datetime.now().isoformat(),
+                    "message_count": len(conversation_data),
+                    "detailed_analysis": combined_result["detailed_analysis"]
+                }
             
-            # Perform advanced sentiment analysis
-            result = await self.sentiment_analyzer.analyze_sentiment(session_id, user_id)
-            
-            return {
-                "sentiment": result.overall_sentiment,
-                "confidence": result.confidence,
-                "sentiment_score": result.sentiment_score,
-                "emotions_detected": result.emotions_detected,
-                "sentiment_trend": result.sentiment_trend,
-                "analysis_timestamp": result.analysis_timestamp,
-                "message_count": result.message_count,
-                "detailed_analysis": result.detailed_analysis
-            }
+            else:
+                return {"sentiment": "neutral", "confidence": 0.0, "error": "Either message or session_id must be provided"}
             
         except Exception as e:
-            logger.error(f"Sentiment analysis failed: {e}")
+            logger.error(f"Sentiment analysis failed: {e}", exc_info=True)
             return {"sentiment": "neutral", "confidence": 0.0, "error": str(e)}
     
     # EXPORT METHODS

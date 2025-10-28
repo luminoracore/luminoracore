@@ -1,0 +1,841 @@
+# Test de Análisis de Sentimientos
+
+## ✅ Script Creado: `test_sentiment.py`
+
+El script prueba el sistema de análisis de sentimientos con 4 fases:
+
+### Fase 1: Crear Conversaciones
+- 3 mensajes positivos
+- 3 mensajes neutrales  
+- 3 mensajes negativos
+
+### Fase 2: Analizar Sentimiento
+- Analiza el sentimiento de un mensaje específico
+- Endpoint: `POST /api/v1/sentiment/analyze/{session_id}`
+- Parámetros opcionales: `message`, `context`
+
+### Fase 3: Analizar Mensaje Específico
+- Analiza un mensaje individual con sentimiento positivo
+
+### Fase 4: Obtener Historial
+- Obtiene el historial de análisis de sentimientos
+- Endpoint: `GET /api/v1/sentiment/history/{session_id}?limit=50`
+
+## 📊 Resultados Actuales
+
+### ✅ Lo que Funciona:
+- Endpoints responden correctamente (200 OK)
+- El análisis se ejecuta sin errores
+- El formato de respuesta es correcto
+
+### ⚠️ Lo que Necesita Ajustes:
+- El análisis devuelve valores por defecto:
+  - Sentimiento: `neutral`
+  - Score: `0.5`
+  - Confidence: `0.0`
+  - Message count: `0`
+  - Error: "No conversation data available"
+
+## 🔍 Problema Identificado
+
+El método `analyze_sentiment` del cliente no está encontrando las conversaciones guardadas en la sesión. Esto puede deberse a:
+
+1. **Formato de almacenamiento**: Las conversaciones se guardan con un formato diferente al esperado
+2. **Session ID mapping**: El user_id extraído del session_id no coincide
+3. **Timing**: Las conversaciones necesitan tiempo para guardarse antes del análisis
+
+## 📝 Cómo Usar el Script
+
+```bash
+python test_sentiment.py
+```
+
+El script:
+1. Obtiene token JWT
+2. Crea 9 conversaciones con diferentes sentimientos
+3. Analiza el sentimiento de un mensaje
+4. Obtiene el historial de sentimientos
+
+## 🎯 Próximos Pasos para Mejorar
+
+1. Verificar cómo se guardan las conversaciones en DynamoDB
+2. Asegurar que `analyze_sentiment` busca en el storage correcto
+3. Verificar el mapeo de session_id → user_id
+4. Considerar agregar un delay después de crear conversaciones
+
+## 📋 Endpoints Disponibles
+
+### POST `/api/v1/sentiment/analyze/{session_id}`
+```json
+{
+  "message": "Mensaje opcional para analizar",
+  "context": ["contexto", "adicional", "opcional"]
+}
+```
+
+### GET `/api/v1/sentiment/history/{session_id}?limit=50`
+- Devuelve historial de análisis de sentimientos
+
+## 💻 Código de la Lambda Handler
+
+### Implementación Actual: `src/handlers/sentiment.py`
+
+```python
+"""
+Sentiment Analysis Handler for LuminoraCore v1.1
+Analyzes sentiment of conversations and provides insights
+"""
+import json
+import os
+from typing import Dict, Any
+from src.common.logger import get_logger
+from src.common.response_helper import create_response, create_error_response
+from src.common.async_wrapper import lambda_async_handler
+
+# LuminoraCore v1.1 imports
+from luminoracore_sdk import LuminoraCoreClient, LuminoraCoreClientV11, FlexibleDynamoDBStorageV11
+
+logger = get_logger(__name__)
+
+
+def get_client_v11():
+    """Get LuminoraCoreClientV11 instance with persistent storage"""
+    try:
+        # Initialize base client
+        base_client = LuminoraCoreClient()
+        
+        # Initialize storage v11 with DynamoDB (persistent)
+        storage_v11 = FlexibleDynamoDBStorageV11(
+            table_name=os.environ.get('DYNAMODB_TABLE', 'luminora-sessions-v1-1'),
+            region_name=os.environ.get('DYNAMODB_REGION', 'eu-west-1')
+        )
+        
+        # Initialize v1.1 client
+        client_v11 = LuminoraCoreClientV11(base_client, storage_v11=storage_v11)
+        return client_v11
+    except Exception as e:
+        logger.error(f"Failed to initialize LuminoraCoreClientV11: {e}")
+        return None
+
+
+# Initialize components
+client_v11 = get_client_v11()
+
+
+async def async_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
+    """
+    Lambda handler for sentiment analysis endpoints
+    
+    Endpoints:
+    - POST /api/v1/sentiment/analyze/{session_id}
+    - GET /api/v1/sentiment/history/{session_id}
+    """
+    try:
+        logger.info("Sentiment analysis handler started")
+        
+        # Extract path and method (HTTP API v2 format)
+        path = event.get('rawPath', event.get('path', ''))
+        method = event.get('requestContext', {}).get('http', {}).get('method', event.get('httpMethod', 'GET'))
+        
+        # Extract session_id from path
+        path_parts = path.split('/')
+        session_id = None
+        if 'analyze' in path_parts or 'history' in path_parts:
+            session_id = path_parts[-1]
+        
+        if not session_id:
+            return create_error_response(400, "Missing session_id in path")
+        
+        if method == 'POST':
+            return await handle_analyze_sentiment(event, session_id)
+        elif method == 'GET':
+            return await handle_get_sentiment_history(event, session_id)
+        else:
+            return create_error_response(405, f"Method {method} not allowed")
+        
+    except Exception as e:
+        logger.error(f"Unexpected error in sentiment analysis handler: {str(e)}", exc_info=True)
+        return create_error_response(500, "Internal server error")
+
+
+async def handle_analyze_sentiment(event: Dict[str, Any], session_id: str) -> Dict[str, Any]:
+    """Analyze sentiment of session conversations"""
+    try:
+        # Parse request body (optional parameters)
+        body = event.get('body')
+        analysis_params = {}
+        
+        if body:
+            if isinstance(body, str):
+                body = json.loads(body)
+            analysis_params = body
+        
+        # Check if client is available
+        if not client_v11:
+            return create_error_response(500, "Client v1.1 not available")
+        
+        # Use real API implementation
+        user_id = session_id.split('_')[0] if '_' in session_id else "default_user"
+        message = analysis_params.get('message', '')
+        context = analysis_params.get('context', [])
+        
+        sentiment_result = await client_v11.analyze_sentiment(
+            user_id=user_id,
+            message=message,
+            context=context
+        )
+        
+        # Add session_id to result
+        sentiment_result["session_id"] = session_id
+        
+        return create_response(200, {
+            "success": True,
+            "session_id": session_id,
+            "sentiment_analysis": sentiment_result,
+            "message": "Sentiment analyzed successfully"
+        })
+        
+    except json.JSONDecodeError as e:
+        logger.error(f"JSON decode error: {str(e)}")
+        return create_error_response(400, "Invalid JSON format")
+    except Exception as e:
+        logger.error(f"Error analyzing sentiment: {str(e)}", exc_info=True)
+        return create_error_response(500, "Failed to analyze sentiment")
+
+
+async def handle_get_sentiment_history(event: Dict[str, Any], session_id: str) -> Dict[str, Any]:
+    """Get sentiment analysis history for session"""
+    try:
+        # Get query parameters
+        query_params = event.get('queryStringParameters') or {}
+        
+        # Check if client is available
+        if not client_v11:
+            return create_error_response(500, "Client v1.1 not available")
+        
+        # Use real API implementation
+        user_id = session_id.split('_')[0] if '_' in session_id else "default_user"
+        limit = int(query_params.get('limit', 50))
+        
+        history = await client_v11.get_sentiment_history(
+            user_id=user_id,
+            limit=limit
+        )
+        
+        return create_response(200, {
+            "success": True,
+            "session_id": session_id,
+            "sentiment_history": history,
+            "count": len(history)
+        })
+        
+    except Exception as e:
+        logger.error(f"Error retrieving sentiment history: {str(e)}", exc_info=True)
+        return create_error_response(500, "Failed to retrieve sentiment history")
+
+
+# Apply the async wrapper decorator
+handler = lambda_async_handler(async_handler)
+```
+
+### Implementación en el SDK: `client_v1_1.py`
+
+```python
+async def analyze_sentiment(
+    self,
+    user_id: str,
+    message: str,
+    context: Optional[List[str]] = None
+) -> Dict[str, Any]:
+    """
+    Analyze sentiment of user message
+    
+    Args:
+        user_id: User ID
+        message: Message to analyze
+        context: Previous messages for context
+        
+    Returns:
+        Sentiment analysis results with:
+        - sentiment: "positive" | "neutral" | "negative"
+        - sentiment_score: float (0.0 - 1.0)
+        - confidence: float (0.0 - 1.0)
+        - emotions_detected: List[str]
+        - sentiment_trend: str
+        - analysis_timestamp: str
+        - message_count: int
+        - detailed_analysis: dict
+    """
+    if not self.sentiment_analyzer:
+        logger.warning("Sentiment analyzer not configured")
+        return {"sentiment": "neutral", "confidence": 0.5}
+    
+    try:
+        # Create session_id for analysis
+        session_id = f"{user_id}_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        
+        # Save message for analysis
+        await self.storage_v11.save_memory(
+            user_id=user_id,
+            memory_key="current_message",
+            memory_value={
+                "content": message,
+                "context": context or [],
+                "timestamp": datetime.now().isoformat()
+            },
+            session_id=session_id
+        )
+        
+        # Perform advanced sentiment analysis
+        result = await self.sentiment_analyzer.analyze_sentiment(session_id, user_id)
+        
+        return {
+            "sentiment": result.overall_sentiment,
+            "confidence": result.confidence,
+            "sentiment_score": result.sentiment_score,
+            "emotions_detected": result.emotions_detected,
+            "sentiment_trend": result.sentiment_trend,
+            "analysis_timestamp": result.analysis_timestamp,
+            "message_count": result.message_count,
+            "detailed_analysis": result.detailed_analysis
+        }
+        
+    except Exception as e:
+        logger.error(f"Sentiment analysis failed: {e}")
+        return {"sentiment": "neutral", "confidence": 0.0, "error": str(e)}
+```
+
+## 📝 Explicación de la Implementación
+
+### Cómo Funciona Actualmente
+
+1. **Endpoint POST `/api/v1/sentiment/analyze/{session_id}`**:
+   - Extrae `session_id` de la URL
+   - Parsea el body opcional (puede incluir `message` y `context`)
+   - Extrae `user_id` del `session_id` (primera parte antes de `_`)
+   - Llama a `client_v11.analyze_sentiment()` con:
+     - `user_id`: Extraído del session_id
+     - `message`: Del body (opcional)
+     - `context`: Del body (opcional)
+   - Retorna el resultado del análisis
+
+2. **Lógica del SDK (`analyze_sentiment`)**:
+   - Crea un nuevo `session_id` temporal para el análisis
+   - Guarda el mensaje en storage usando `save_memory()`
+   - Llama a `sentiment_analyzer.analyze_sentiment()` que:
+     - Busca conversaciones guardadas en DynamoDB
+     - Realiza análisis básico y avanzado usando LLM
+     - Detecta emociones
+     - Calcula tendencias
+     - Retorna un `SentimentResult` completo
+
+### ⚠️ Problema Actual Identificado
+
+**Línea 95 del handler:**
+```python
+user_id = session_id.split('_')[0] if '_' in session_id else "default_user"
+```
+
+**Problema:** 
+- Si el `session_id` es `"test_sentiment_session"`, extrae `user_id = "test"`
+- Pero las conversaciones se guardaron con `user_id = "test_sentiment"` (o el session_id completo)
+- Esto causa que no encuentre las conversaciones guardadas
+
+**Problema en el SDK (línea 742-757):**
+```python
+# Crea un session_id nuevo para análisis
+session_id = f"{user_id}_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+
+# Guarda el mensaje pero con session_id diferente
+await self.storage_v11.save_memory(..., session_id=session_id)
+
+# Busca conversaciones con este nuevo session_id (no encuentra nada)
+result = await self.sentiment_analyzer.analyze_sentiment(session_id, user_id)
+```
+
+El análisis busca conversaciones usando un `session_id` nuevo en lugar del original de las conversaciones.
+
+### ✅ Lo que el Framework Debería Hacer
+
+Según la documentación del framework, el análisis de sentimientos debería:
+
+1. **Analizar conversaciones existentes en una sesión:**
+   - Recibir `session_id` de la URL
+   - Buscar TODAS las conversaciones de esa sesión en DynamoDB
+   - Analizar el sentimiento de toda la conversación histórica
+   - Retornar análisis agregado
+
+2. **O analizar un mensaje específico:**
+   - Si se envía `message` en el body
+   - Analizar solo ese mensaje (con contexto opcional)
+   - Retornar análisis del mensaje individual
+
+### 🔧 Mejora Necesaria
+
+El método `analyze_sentiment` del SDK debería:
+
+1. **Si `message` está vacío:**
+   ```python
+   if not message:
+       # Analizar todas las conversaciones de la sesión original
+       conversation_history = await self._get_conversation_history(session_id)
+       # Analizar el historial completo
+   ```
+
+2. **Si `message` está presente:**
+   ```python
+   else:
+       # Analizar solo el mensaje específico
+       result = await sentiment_analyzer.analyze_message(message, context)
+   ```
+
+3. **Usar el `session_id` original:**
+   - No crear un nuevo `session_id` para análisis
+   - Usar el `session_id` recibido para buscar conversaciones
+   - O usar `user_id` directamente si no hay sesión específica
+
+### 🔍 Cómo Busca Conversaciones el Framework
+
+El método `_get_conversation_data()` del `AdvancedSentimentAnalyzer` (línea 185+):
+
+```python
+async def _get_conversation_data(
+    self,
+    session_id: str,
+    user_id: str
+) -> List[Dict[str, Any]]:
+    """Get conversation data for analysis"""
+    try:
+        # Intenta obtener conversaciones desde storage
+        # Busca en diferentes formatos según cómo se guardaron
+        conversation_history = await self.storage.get_conversation_history(
+            session_id=session_id,
+            user_id=user_id
+        )
+        
+        if conversation_history:
+            return conversation_history
+        
+        # Fallback: buscar por user_id
+        user_conversations = await self.storage.get_user_conversations(user_id)
+        return user_conversations
+        
+    except Exception as e:
+        logger.error(f"Error getting conversation data: {e}")
+        return []
+```
+
+**Código Real (líneas 185-217):**
+
+```python
+async def _get_conversation_data(
+    self,
+    session_id: str,
+    user_id: str
+) -> List[Dict[str, Any]]:
+    """Get conversation data for analysis"""
+    try:
+        # Intenta obtener conversaciones desde storage con clave específica
+        conversation_key = f"conversation_{session_id}"
+        conversation_data = await self.storage.get_memory(session_id, conversation_key)
+        
+        if conversation_data:
+            return json.loads(conversation_data) if isinstance(conversation_data, str) else conversation_data
+        
+        # Fallback: obtener de episodes y facts
+        episodes = await self.storage.get_episodes(user_id)
+        facts = await self.storage.get_facts(user_id)
+        
+        # Convertir a formato de conversación
+        conversation = []
+        for episode in episodes:
+            conversation.append({
+                "type": "episode",
+                "content": f"{episode['title']}: {episode['summary']}",
+                "sentiment": episode.get("sentiment", "neutral"),
+                "timestamp": episode.get("created_at", datetime.now().isoformat())
+            })
+        
+        return conversation
+        
+    except Exception as e:
+        logger.error(f"Failed to get conversation data: {e}")
+        return []
+```
+
+**El problema identificado:**
+1. Busca con clave `f"conversation_{session_id}"` pero las conversaciones se guardan con otra estructura
+2. Cuando creamos un nuevo `session_id` para análisis, ese ID no existe en storage
+3. El fallback a episodes/facts no encuentra las conversaciones reales del chat
+
+**Solución necesaria:**
+- Pasar el `session_id` original de las conversaciones (no crear uno nuevo)
+- O modificar cómo se buscan las conversaciones para usar el historial real guardado por `conversation_memory_manager`
+
+### 🔍 Cómo se Guardan las Conversaciones
+
+El `conversation_memory_manager` guarda las conversaciones así (línea 621-639):
+
+```python
+async def _save_conversation_turn(self, session_id: str, turn: ConversationTurn):
+    """Save a conversation turn to storage"""
+    turn_data = {
+        "user_message": turn.user_message,
+        "assistant_response": turn.assistant_response,
+        "personality_name": turn.personality_name,
+        "timestamp": turn.timestamp.isoformat(),
+        "facts_learned": turn.facts_learned
+    }
+    
+    turn_key = f"turn_{turn.timestamp.strftime('%Y%m%d_%H%M%S_%f')}"
+    
+    # IMPORTANTE: Guarda usando session_id como user_id
+    await self.client.storage_v11.save_fact(
+        user_id=session_id,  # ← AQUÍ: usa session_id como user_id
+        category="conversation_history",
+        key=turn_key,
+        value=json.dumps(turn_data)
+    )
+```
+
+Y las obtiene así (línea 190-229):
+
+```python
+async def _get_conversation_history(self, session_id: str) -> List[ConversationTurn]:
+    """Get conversation history for the session"""
+    try:
+        # IMPORTANTE: Busca usando session_id como user_id
+        history_data = await self.client.storage_v11.get_facts(
+            user_id=session_id,  # ← AQUÍ: usa session_id como user_id
+            category="conversation_history"
+        )
+        
+        if not history_data:
+            return []
+        
+        # Parsea el historial
+        conversation_history = []
+        for fact in history_data:
+            if fact.get("key", "").startswith("turn_"):
+                turn_data = fact["value"]
+                if isinstance(turn_data, str):
+                    turn_data = json.loads(turn_data)
+                
+                conversation_history.append(ConversationTurn(
+                    user_message=turn_data["user_message"],
+                    assistant_response=turn_data["assistant_response"],
+                    personality_name=turn_data["personality_name"],
+                    timestamp=datetime.fromisoformat(turn_data["timestamp"]),
+                    facts_learned=turn_data.get("facts_learned", [])
+                ))
+        
+        # Ordena por timestamp y retorna últimos N turnos
+        conversation_history.sort(key=lambda x: x.timestamp)
+        return conversation_history[-self.max_history_turns:]
+        
+    except Exception as e:
+        logger.error(f"Error getting conversation history: {e}")
+        return []
+```
+
+**🔑 Clave Importante:**
+- Las conversaciones se guardan con `category="conversation_history"` y `key="turn_..."`
+- Se guardan usando `session_id` como `user_id`
+- El análisis de sentimientos necesita buscar con el mismo `session_id` y `category="conversation_history"`
+
+**El problema:** El `sentiment_analyzer._get_conversation_data()` busca con clave `f"conversation_{session_id}"` pero debería buscar facts con `category="conversation_history"` y `user_id=session_id`.
+
+## 🎯 Lo que el Framework Puede Hacer
+
+### Capacidades del `AdvancedSentimentAnalyzer`:
+
+1. **Análisis Multi-Nivel:**
+   - ✅ Análisis básico (palabras clave, patrones)
+   - ✅ Análisis avanzado (usando LLM)
+   - ✅ Análisis de emociones (joy, sadness, anger, fear, etc.)
+   - ✅ Análisis de tendencias (cómo evoluciona el sentimiento)
+
+2. **Datos que Retorna:**
+   ```python
+   {
+       "overall_sentiment": "positive" | "neutral" | "negative",
+       "sentiment_score": 0.0 - 1.0,  # 0 = muy negativo, 1 = muy positivo
+       "confidence": 0.0 - 1.0,       # Confianza en el análisis
+       "emotions_detected": ["joy", "excitement", ...],
+       "sentiment_trend": "improving" | "stable" | "declining",
+       "message_count": int,
+       "detailed_analysis": {
+           "basic_analysis": {...},
+           "advanced_analysis": {...},
+           "emotion_breakdown": {...},
+           "trend_data": {...}
+       },
+       "analysis_timestamp": "ISO8601"
+   }
+   ```
+
+3. **Análisis de Tendencia:**
+   - Compara el sentimiento actual con análisis anteriores
+   - Detecta si está mejorando, empeorando o estable
+   - Calcula promedio móvil de sentimientos
+
+4. **Persistencia:**
+   - Guarda cada análisis en DynamoDB
+   - Permite recuperar historial completo
+   - Facilita análisis comparativos
+
+## 💡 Mejora Propuesta para el Handler
+
+Modificar `handle_analyze_sentiment` para:
+
+```python
+async def handle_analyze_sentiment(event: Dict[str, Any], session_id: str) -> Dict[str, Any]:
+    """Analyze sentiment of session conversations"""
+    try:
+        body = event.get('body', {})
+        if isinstance(body, str):
+            body = json.loads(body)
+        
+        if not client_v11:
+            return create_error_response(500, "Client v1.1 not available")
+        
+        # MEJORA: Pasar session_id completo, no solo user_id
+        message = body.get('message', '')
+        context = body.get('context', [])
+        
+        # Si hay mensaje específico, analizar solo ese
+        if message:
+            sentiment_result = await client_v11.analyze_sentiment(
+                user_id=session_id,  # Usar session_id como user_id temporalmente
+                message=message,
+                context=context
+            )
+        else:
+            # Analizar toda la sesión - necesitamos pasar session_id al analyzer
+            # MEJORA NECESARIA: El SDK debe aceptar session_id directamente
+            user_id = session_id  # O extraer de otra forma
+            sentiment_result = await client_v11.analyze_sentiment_for_session(
+                session_id=session_id,  # Nuevo método propuesto
+                user_id=user_id
+            )
+        
+        sentiment_result["session_id"] = session_id
+        
+        return create_response(200, {
+            "success": True,
+            "session_id": session_id,
+            "sentiment_analysis": sentiment_result,
+            "message": "Sentiment analyzed successfully"
+        })
+```
+
+## 🔧 Cambio Necesario en el SDK
+
+El método `analyze_sentiment` del SDK debería tener dos modos:
+
+```python
+async def analyze_sentiment(
+    self,
+    user_id: str,
+    message: Optional[str] = None,  # Si es None, analiza la sesión
+    context: Optional[List[str]] = None,
+    session_id: Optional[str] = None  # AÑADIR: session_id original
+) -> Dict[str, Any]:
+    """
+    Analyze sentiment:
+    - Si message está presente: analiza solo ese mensaje
+    - Si message es None y session_id está presente: analiza toda la sesión
+    - Si ambos son None: retorna error
+    """
+    if not self.sentiment_analyzer:
+        return {"sentiment": "neutral", "confidence": 0.5}
+    
+    try:
+        # MODO 1: Analizar mensaje específico
+        if message:
+            # Analizar solo el mensaje (con contexto opcional)
+            result = await self.sentiment_analyzer.analyze_message(message, context)
+        
+        # MODO 2: Analizar sesión completa
+        elif session_id:
+            # Usar el session_id original para buscar conversaciones
+            result = await self.sentiment_analyzer.analyze_sentiment(
+                session_id=session_id,
+                user_id=user_id  # Puede ser el session_id si no hay user_id separado
+            )
+        
+        else:
+            return {"error": "Either message or session_id must be provided"}
+        
+        return {
+            "sentiment": result.overall_sentiment,
+            "confidence": result.confidence,
+            "sentiment_score": result.sentiment_score,
+            "emotions_detected": result.emotions_detected,
+            "sentiment_trend": result.sentiment_trend,
+            "analysis_timestamp": result.analysis_timestamp,
+            "message_count": result.message_count,
+            "detailed_analysis": result.detailed_analysis
+        }
+        
+    except Exception as e:
+        logger.error(f"Sentiment analysis failed: {e}")
+        return {"sentiment": "neutral", "confidence": 0.0, "error": str(e)}
+```
+
+## 🔧 Comandos Útiles
+
+Para probar manualmente:
+
+```bash
+# Obtener token
+curl -X POST https://nxdsjksrga.execute-api.eu-west-1.amazonaws.com/auth/token \
+  -H "Content-Type: application/json" \
+  -d '{"user_id":"test","username":"test"}'
+
+# Analizar sentimiento
+curl -X POST \
+  https://nxdsjksrga.execute-api.eu-west-1.amazonaws.com/api/v1/sentiment/analyze/test_session \
+  -H "Authorization: Bearer TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Estoy muy feliz hoy"}'
+
+# Obtener historial
+curl -X GET \
+  "https://nxdsjksrga.execute-api.eu-west-1.amazonaws.com/api/v1/sentiment/history/test_session?limit=10" \
+  -H "Authorization: Bearer TOKEN"
+```
+
+## 📋 Resumen Final para el Framework
+
+### ✅ Lo que Hacemos Actualmente
+
+1. **Lambda Handler (`src/handlers/sentiment.py`)**:
+   - Extrae `session_id` de la URL: `/api/v1/sentiment/analyze/{session_id}`
+   - Permite parámetros opcionales en body: `message`, `context`
+   - Llama a `client_v11.analyze_sentiment(user_id, message, context)`
+
+2. **SDK Client (`client_v1_1.py`)**:
+   - Método `analyze_sentiment(user_id, message, context)`:
+     - Crea un NUEVO `session_id` para análisis
+     - Guarda el mensaje en storage
+     - Llama a `sentiment_analyzer.analyze_sentiment(session_id_nuevo, user_id)`
+
+3. **Sentiment Analyzer (`sentiment_analyzer.py`)**:
+   - Busca conversaciones con `session_id` nuevo (no existe)
+   - Retorna valores por defecto porque no encuentra datos
+
+### ❌ Problema Principal
+
+**Desconexión entre cómo se guardan y cómo se buscan las conversaciones:**
+
+- **Se guardan:** `user_id=session_id`, `category="conversation_history"`, `key="turn_..."`
+- **Se buscan:** `session_id=nuevo_session_id`, `conversation_key="conversation_{session_id}"`
+
+**El análisis nunca encuentra las conversaciones porque usa un `session_id` diferente al original.**
+
+### ✅ Lo que el Framework DEBERÍA Hacer
+
+1. **Modo 1: Analizar sesión completa**
+   ```python
+   POST /api/v1/sentiment/analyze/{session_id}
+   # Body vacío o sin "message"
+   ```
+   - Usar el `session_id` de la URL (ORIGINAL)
+   - Buscar conversaciones con: `get_facts(user_id=session_id, category="conversation_history")`
+   - Analizar todas las conversaciones encontradas
+
+2. **Modo 2: Analizar mensaje específico**
+   ```python
+   POST /api/v1/sentiment/analyze/{session_id}
+   # Body: {"message": "texto a analizar", "context": [...]}
+   ```
+   - Analizar solo el mensaje proporcionado
+   - Usar contexto opcional si se proporciona
+   - No necesita buscar conversaciones previas
+
+### 🔧 Cambio Necesario en el SDK
+
+Modificar `client_v1_1.analyze_sentiment()` para:
+
+```python
+async def analyze_sentiment(
+    self,
+    user_id: str,
+    message: Optional[str] = None,
+    context: Optional[List[str]] = None,
+    session_id: Optional[str] = None  # ← AÑADIR: session_id original
+) -> Dict[str, Any]:
+    """
+    Si message está vacío y session_id está presente:
+        - Buscar conversaciones con get_facts(user_id=session_id, category="conversation_history")
+        - Analizar todas las conversaciones de la sesión
+    
+    Si message está presente:
+        - Analizar solo ese mensaje (con contexto opcional)
+    """
+    
+    if not self.sentiment_analyzer:
+        return {"sentiment": "neutral", "confidence": 0.5}
+    
+    # MODO 1: Analizar sesión completa
+    if not message and session_id:
+        # Buscar conversaciones reales
+        facts = await self.storage_v11.get_facts(
+            user_id=session_id,
+            category="conversation_history"
+        )
+        
+        # Convertir facts a formato de conversación
+        conversation_data = []
+        for fact in facts:
+            if fact.get("key", "").startswith("turn_"):
+                turn_data = json.loads(fact["value"]) if isinstance(fact["value"], str) else fact["value"]
+                conversation_data.append({
+                    "content": f"Usuario: {turn_data['user_message']}\nAsistente: {turn_data['assistant_response']}",
+                    "timestamp": turn_data.get("timestamp")
+                })
+        
+        # Analizar conversación completa
+        result = await self.sentiment_analyzer.analyze_conversation_data(
+            session_id=session_id,
+            user_id=user_id,
+            conversation_data=conversation_data
+        )
+    
+    # MODO 2: Analizar mensaje específico
+    elif message:
+        result = await self.sentiment_analyzer.analyze_message(
+            message=message,
+            context=context or []
+        )
+    
+    else:
+        return {"error": "Either message or session_id must be provided"}
+    
+    return {
+        "sentiment": result.overall_sentiment,
+        "confidence": result.confidence,
+        "sentiment_score": result.sentiment_score,
+        "emotions_detected": result.emotions_detected,
+        "sentiment_trend": result.sentiment_trend,
+        "analysis_timestamp": result.analysis_timestamp,
+        "message_count": result.message_count,
+        "detailed_analysis": result.detailed_analysis
+    }
+```
+
+### 📊 Estado Actual del Sistema
+
+- ✅ **Endpoints funcionan**: Responden 200 OK
+- ✅ **Framework implementado**: `AdvancedSentimentAnalyzer` tiene todas las capacidades
+- ✅ **Conversaciones se guardan**: En DynamoDB con estructura correcta
+- ❌ **Análisis no encuentra datos**: Usa `session_id` incorrecto
+- ⚠️ **Necesita ajuste**: Cambiar cómo se busca/busca las conversaciones
+
+### 🎯 Próximos Pasos Recomendados
+
+1. Modificar `client_v1_1.analyze_sentiment()` para aceptar `session_id` opcional
+2. Si `message` está vacío y `session_id` está presente, buscar conversaciones reales
+3. Usar `get_facts(user_id=session_id, category="conversation_history")` para obtener datos
+4. Pasar datos reales al `sentiment_analyzer` en lugar de crear `session_id` nuevo

@@ -360,14 +360,15 @@ class ConversationMemoryManager:
                     user_prompt = context.current_message
                     
                     # Prepare messages for the provider
+                    from ..types.provider import ChatMessage
                     messages = [
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": user_prompt}
+                        ChatMessage(role="system", content=system_prompt),
+                        ChatMessage(role="user", content=user_prompt)
                     ]
                     
                     # Call provider directly (doesn't require session to exist)
                     print(f"🔍 DEBUG: Calling LLM provider directly with context length: {len(full_context)}")
-                    response = await provider.generate(
+                    response = await provider.chat(
                         messages=messages,
                         temperature=0.7
                     )
@@ -534,15 +535,16 @@ JSON response:"""
                 
                 if provider_config_obj:
                     from .providers.factory import ProviderFactory
+                    from .types.provider import ChatMessage
                     provider = ProviderFactory.create_provider(provider_config_obj)
                     
                     # Prepare messages
                     messages = [
-                        {"role": "user", "content": extraction_prompt}
+                        ChatMessage(role="user", content=extraction_prompt)
                     ]
                     
                     # Call provider directly
-                    response = await provider.generate(
+                    response = await provider.chat(
                         messages=messages,
                         temperature=0.3  # Lower temperature for more deterministic extraction
                     )
@@ -667,10 +669,11 @@ Rate the interaction quality (1-5):"""
                 
                 if provider_config_obj:
                     from .providers.factory import ProviderFactory
+                    from .types.provider import ChatMessage
                     provider = ProviderFactory.create_provider(provider_config_obj)
                     
-                    messages = [{"role": "user", "content": sentiment_prompt}]
-                    response = await provider.generate(
+                    messages = [ChatMessage(role="user", content=sentiment_prompt)]
+                    response = await provider.chat(
                         messages=messages,
                         temperature=0.3
                     )

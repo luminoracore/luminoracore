@@ -187,33 +187,101 @@ class AdvancedSentimentAnalyzer:
         session_id: str,
         user_id: str
     ) -> List[Dict[str, Any]]:
-        """Get conversation data for analysis"""
+        """
+        Get conversation data for analysis
+        
+        ✅ FIX: Now searches for conversations in the correct format:
+        - Uses get_facts(user_id=session_id, category="conversation_history")
+        - Parses turn_* keys with user_message and assistant_response
+        """
         try:
-            # Get conversation from storage
-            conversation_key = f"conversation_{session_id}"
-            conversation_data = await self.storage.get_memory(session_id, conversation_key)
+            # ✅ PRIMARY METHOD: Get conversations from conversation_history category
+            # This matches how ConversationMemoryManager saves conversations:
+            # save_fact(user_id=session_id, category="conversation_history", key="turn_...", value=...)
+            try:
+                history_facts = await self.storage.get_facts(
+                    user_id=session_id,  # Use session_id as user_id (matching how they're saved)
+                    category="conversation_history"
+                )
+                
+                if history_facts:
+                    logger.info(f"Found {len(history_facts)} conversation turns from conversation_history")
+                    conversation_data = []
+                    
+                    for fact in history_facts:
+                        if fact.get("key", "").startswith("turn_"):
+                            try:
+                                # Parse turn data
+                                turn_data = fact.get("value", {})
+                                if isinstance(turn_data, str):
+                                    turn_data = json.loads(turn_data)
+                                
+                                # Add user message
+                                conversation_data.append({
+                                    "content": turn_data.get("user_message", ""),
+                                    "type": "user",
+                                    "timestamp": turn_data.get("timestamp", datetime.now().isoformat()),
+                                    "sentiment": None  # Will be analyzed
+                                })
+                                
+                                # Add assistant response
+                                conversation_data.append({
+                                    "content": turn_data.get("assistant_response", ""),
+                                    "type": "assistant",
+                                    "timestamp": turn_data.get("timestamp", datetime.now().isoformat()),
+                                    "sentiment": None  # Will be analyzed
+                                })
+                                
+                            except (json.JSONDecodeError, KeyError, TypeError) as e:
+                                logger.warning(f"Error parsing conversation turn: {e}")
+                                continue
+                    
+                    # Sort by timestamp
+                    conversation_data.sort(key=lambda x: x.get("timestamp", ""))
+                    
+                    if conversation_data:
+                        logger.info(f"Successfully parsed {len(conversation_data)} conversation messages")
+                        return conversation_data
+                        
+            except Exception as e:
+                logger.warning(f"Failed to get conversation_history facts: {e}")
+                # Fall through to fallback methods
             
-            if conversation_data:
-                return json.loads(conversation_data) if isinstance(conversation_data, str) else conversation_data
+            # FALLBACK 1: Try old format (conversation_key)
+            try:
+                conversation_key = f"conversation_{session_id}"
+                conversation_data = await self.storage.get_memory(session_id, conversation_key)
+                
+                if conversation_data:
+                    logger.info("Found conversation data using old format")
+                    return json.loads(conversation_data) if isinstance(conversation_data, str) else conversation_data
+            except Exception as e:
+                logger.debug(f"Old format not found: {e}")
             
-            # Fallback: get from episodes and facts
-            episodes = await self.storage.get_episodes(user_id)
-            facts = await self.storage.get_facts(user_id)
+            # FALLBACK 2: Get from episodes and facts (for user-level analysis)
+            try:
+                episodes = await self.storage.get_episodes(user_id)
+                
+                conversation = []
+                for episode in episodes:
+                    conversation.append({
+                        "type": "episode",
+                        "content": f"{episode.get('title', '')}: {episode.get('summary', '')}",
+                        "sentiment": episode.get("sentiment", "neutral"),
+                        "timestamp": episode.get("created_at", datetime.now().isoformat())
+                    })
+                
+                if conversation:
+                    logger.info(f"Found {len(conversation)} episodes as fallback")
+                    return conversation
+            except Exception as e:
+                logger.debug(f"Episodes fallback failed: {e}")
             
-            # Convert to conversation format
-            conversation = []
-            for episode in episodes:
-                conversation.append({
-                    "type": "episode",
-                    "content": f"{episode['title']}: {episode['summary']}",
-                    "sentiment": episode.get("sentiment", "neutral"),
-                    "timestamp": episode.get("created_at", datetime.now().isoformat())
-                })
-            
-            return conversation
+            logger.warning(f"No conversation data found for session_id={session_id}, user_id={user_id}")
+            return []
             
         except Exception as e:
-            logger.error(f"Failed to get conversation data: {e}")
+            logger.error(f"Failed to get conversation data: {e}", exc_info=True)
             return []
     
     def _perform_basic_analysis(
