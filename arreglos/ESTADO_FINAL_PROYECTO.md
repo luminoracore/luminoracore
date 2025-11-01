@@ -35,7 +35,7 @@
 ### 2. SDK (`luminoracore-sdk-python`)
 **Ruta:** `luminoracore-sdk-python/`  
 **Propósito:** Integración con LLM providers y storages  
-**Estado:** ✅ Correcto (v1.1.1 o v1.1.2)
+**Estado:** ✅ Correcto (v1.1.2)
 
 **Cambios aplicados:**
 1. ✅ **FIX CRÍTICO:** Import corregido
@@ -48,21 +48,26 @@
    - Ahora: `Path(__file__).parent` ✅
    - Línea: 316 en `conversation_memory_manager.py`
 
-3. ✅ Método `_load_personality_data()` implementado
-4. ✅ Método `_build_personality_prompt()` implementado
-5. ✅ Integración con CORE (import opcional con fallback)
-6. ✅ Normalización de fact values
-7. ✅ Filtro de conversation_history
-8. ✅ Cálculo dinámico de context_used
-9. ✅ Tests: PASS
+3. ✅ **FIX CRÍTICO:** Package data corregido
+   - Agregado: `[tool.setuptools.package-data]` en `pyproject.toml`
+   - Ahora: Personalidades se incluyen en pip install ✅
+   - Líneas: 96-97 en `pyproject.toml`
+
+4. ✅ Método `_load_personality_data()` implementado
+5. ✅ Método `_build_personality_prompt()` implementado
+6. ✅ Integración con CORE (import opcional con fallback)
+7. ✅ Normalización de fact values
+8. ✅ Filtro de conversation_history
+9. ✅ Cálculo dinámico de context_used
+10. ✅ Tests: PASS
 
 **Archivos modificados:**
 - `luminoracore_sdk/conversation_memory_manager.py` (múltiples fixes)
 - `luminoracore_sdk/client_v1_1.py` (exports y sentiment)
 - `luminoracore_sdk/session/storage_dynamodb_flexible.py` (normalización)
 - `luminoracore_sdk/analysis/sentiment_analyzer.py` (corrección LLM calls)
-- `pyproject.toml` (versión)
-- `__version__.py` (versión)
+- `pyproject.toml` (versión v1.1.2 + package-data)
+- `__version__.py` (versión v1.1.2)
 
 **Sin dependencias incorrectas**
 
@@ -85,7 +90,19 @@
 
 ## 🐛 Fixes Aplicados (Completos)
 
-### Fix 1: Import Relativo Incorrecto (CRÍTICO)
+### Fix 1: Package Data de Personalidades (CRÍTICO)
+**Prioridad:** ⚠️ CRÍTICO  
+**Estado:** ✅ Aplicado y validado
+
+**Problema:** Los archivos JSON de personalidades NO se incluían cuando se instalaba el SDK con `pip install`.
+
+**Solución:** Agregada sección `[tool.setuptools.package-data]` en `pyproject.toml`
+
+**Impacto:** Sin este fix, Lambda Layer NO tiene las personalidades (solo 3 en fallback en lugar de 11).
+
+---
+
+### Fix 2: Import Relativo Incorrecto (CRÍTICO)
 **Prioridad:** ⚠️ CRÍTICO  
 **Estado:** ✅ Aplicado y validado
 
@@ -97,7 +114,7 @@
 
 ---
 
-### Fix 2: Path de Personalidades en SDK
+### Fix 3: Path de Personalidades en SDK
 **Prioridad:** ⚠️ CRÍTICO  
 **Estado:** ✅ Aplicado y validado
 
@@ -109,7 +126,7 @@
 
 ---
 
-### Fix 3: Carga de Personalidades desde JSON
+### Fix 4: Carga de Personalidades desde JSON
 **Prioridad:** 🔴 Alta  
 **Estado:** ✅ Aplicado y validado
 
@@ -124,7 +141,7 @@
 
 ---
 
-### Fix 4: Normalización de Fact Values
+### Fix 5: Normalización de Fact Values
 **Prioridad:** 🟡 Media  
 **Estado:** ✅ Aplicado y validado
 
@@ -136,7 +153,7 @@
 
 ---
 
-### Fix 5: Filtro de Conversation History
+### Fix 6: Filtro de Conversation History
 **Prioridad:** 🟡 Media  
 **Estado:** ✅ Aplicado y validado
 
@@ -148,7 +165,7 @@
 
 ---
 
-### Fix 6: Cálculo de context_used
+### Fix 7: Cálculo de context_used
 **Prioridad:** 🟡 Media  
 **Estado:** ✅ Aplicado y validado
 
@@ -160,7 +177,7 @@
 
 ---
 
-### Fix 7: Función en CORE para Buscar Personalidades
+### Fix 8: Función en CORE para Buscar Personalidades
 **Prioridad:** 🟢 Baja (arquitectura)  
 **Estado:** ✅ Aplicado y validado
 
@@ -234,7 +251,7 @@ luminoracore-cli/ (CLI)
 
 ## 🚀 Para Deployment
 
-### Lambda Layer v75
+### Lambda Layer v76 (Nueva versión con fix de package-data)
 
 **Estructura esperada en Lambda:**
 ```
@@ -310,6 +327,7 @@ luminoracore-cli/ (CLI)
 - ❌ Respuestas siempre genéricas
 - ❌ Import relativo roto
 - ❌ Path incorrecto en Lambda
+- ❌ Package data no incluía JSON (solo 3 personalidades en fallback)
 - ❌ Facts con formato incorrecto
 - ❌ context_used siempre True
 - ❌ conversation_history mezclado con user_facts
@@ -319,6 +337,7 @@ luminoracore-cli/ (CLI)
 - ✅ Respuestas personalizadas según JSON
 - ✅ Import correcto (`.types`)
 - ✅ Path correcto en Lambda (`.parent`)
+- ✅ Package data correcto (11 personalidades disponibles)
 - ✅ Facts siempre como strings
 - ✅ context_used calculado dinámicamente
 - ✅ conversation_history separado
@@ -327,8 +346,8 @@ luminoracore-cli/ (CLI)
 
 1. ✅ **Código listo** - Todos los fixes aplicados
 2. ✅ **Tests pasando** - 7/7 tests OK
-3. ✅ **Documentación completa** - 16+ documentos
-4. ⏳ **Build Lambda Layer v75** - Con nuevos fixes
+3. ✅ **Documentación completa** - 18+ documentos
+4. ⏳ **Build Lambda Layer v76** - Con TODOS los fixes (incluyendo package-data)
 5. ⏳ **Deploy a producción** - serverless deploy
 6. ⏳ **Verificación en prod** - Probar personalidades
 
