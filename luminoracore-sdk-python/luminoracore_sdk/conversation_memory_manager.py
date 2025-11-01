@@ -167,6 +167,13 @@ class ConversationMemoryManager:
                 provider_config=provider_config  # Pass provider_config
             )
             
+            # ✅ FIX: Calculate context_used correctly based on actual context
+            # context_used should be True if we had previous context to use
+            # - If there are previous conversation turns → context was used
+            # - If there are existing user facts → context was used
+            # - If both are empty (first message) → NO context used
+            context_used = len(conversation_history) > 0 or len(user_facts) > 0
+            
             return {
                 "success": True,
                 "response": response["content"],
@@ -177,7 +184,7 @@ class ConversationMemoryManager:
                 "affinity_level": affinity["current_level"],
                 "affinity_points": affinity["affinity_points"],
                 "conversation_length": len(conversation_history) + 1,
-                "context_used": True,
+                "context_used": context_used,  # ✅ CORRECT: Based on actual context
                 "new_facts": new_facts,
                 "affinity_change": affinity_change
             }
