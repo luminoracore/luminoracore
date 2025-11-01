@@ -539,7 +539,7 @@ class ConversationMemoryManager:
                     user_prompt = context.current_message
                     
                     # Prepare messages for the provider
-                    from ..types.provider import ChatMessage
+                    from .types.provider import ChatMessage
                     messages = [
                         ChatMessage(role="system", content=system_prompt),
                         ChatMessage(role="user", content=user_prompt)
