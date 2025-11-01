@@ -398,16 +398,31 @@ class FlexibleDynamoDBStorageV11(StorageV11Extension):
                     logger.info(f"DEBUG get_facts() - Item {i} has key and category")
                     try:
                         fact_value = item['value']
+                        
+                        # ✅ FIX: Normalizar value para asegurar que siempre sea string
+                        # El storage puede tener values como objetos (JSON parseado), pero el frontend espera strings
                         if isinstance(fact_value, str):
                             try:
-                                fact_value = json.loads(fact_value)
+                                # Si es JSON válido, intentar parsearlo y luego convertirlo a string
+                                parsed = json.loads(fact_value)
+                                if isinstance(parsed, (dict, list)):
+                                    fact_value = json.dumps(parsed, ensure_ascii=False)
+                                # Si no es objeto, mantener como string
                             except:
-                                pass  # Keep as string if not JSON
+                                pass  # Mantener como string si no es JSON válido
+                        elif isinstance(fact_value, (dict, list)):
+                            # Si ya es objeto, convertir a JSON string
+                            fact_value = json.dumps(fact_value, ensure_ascii=False)
+                        elif fact_value is None:
+                            fact_value = ''
+                        else:
+                            # Cualquier otro tipo, convertir a string
+                            fact_value = str(fact_value)
                         
                         fact = {
                             'category': item['category'],
                             'key': item['key'],
-                            'value': fact_value,
+                            'value': fact_value,  # ← Siempre string
                             'confidence': float(item.get('confidence', 1.0)),
                             'created_at': item.get('created_at'),
                             'updated_at': item.get('updated_at')

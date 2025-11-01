@@ -843,11 +843,14 @@ class LuminoraCoreClientV11:
             # Get conversation history
             conversation_history = await self._get_conversation_history(session_id)
             
-            # Get user facts if session exists
+            # Get user facts if session exists (excluir conversation_history)
+            # ✅ FIX: No incluir conversation_history en facts del usuario para export
             user_facts = []
             if session_data:
                 user_id = session_data.get("user_id", "unknown")
-                user_facts = await self.get_facts(user_id)
+                all_user_facts = await self.get_facts(user_id)
+                # Filtrar conversation_history de user_facts (los turns no son facts del usuario)
+                user_facts = [f for f in all_user_facts if f.get('category') != 'conversation_history']
             
             export_data = {
                 "session_id": session_id,
@@ -893,8 +896,10 @@ class LuminoraCoreClientV11:
             All user conversations
         """
         try:
-            # Get all user facts
-            user_facts = await self.get_facts(user_id)
+            # Get all user facts (excluir conversation_history)
+            # ✅ FIX: No incluir conversation_history en facts del usuario
+            all_user_facts = await self.get_facts(user_id)
+            user_facts = [f for f in all_user_facts if f.get('category') != 'conversation_history']
             
             # Get user affinity data
             affinity_data = {}
@@ -1612,9 +1617,11 @@ class LuminoraCoreClientV11:
             # Get conversation history
             conversation_history = await self.conversation_manager._get_conversation_history(session_id)
             
-            # Get user facts
+            # Get user facts (excluir conversation_history)
+            # ✅ FIX: No incluir conversation_history en facts del usuario
             user_id = session_data.get('user_id', session_id)
-            user_facts = await self.get_facts(user_id)
+            all_user_facts = await self.get_facts(user_id)
+            user_facts = [f for f in all_user_facts if f.get('category') != 'conversation_history']
             
             # Get affinity
             personality_name = session_data.get('personality_name', 'default')
@@ -1650,8 +1657,10 @@ class LuminoraCoreClientV11:
             if not self.storage_v11:
                 return json.dumps({"error": "Storage v1.1 not configured"})
             
-            # Get all user data
-            user_facts = await self.get_facts(user_id)
+            # Get all user data (excluir conversation_history)
+            # ✅ FIX: No incluir conversation_history en facts del usuario
+            all_user_facts = await self.get_facts(user_id)
+            user_facts = [f for f in all_user_facts if f.get('category') != 'conversation_history']
             affinity_data = await self.get_affinity(user_id, "default")
             sentiment_history = await self.get_sentiment_history(user_id)
             mood_history = await self.get_mood_history(user_id, "default")

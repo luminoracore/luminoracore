@@ -94,8 +94,11 @@ class ConversationMemoryManager:
             # Step 1: Get conversation history
             conversation_history = await self._get_conversation_history(session_id)
             
-            # Step 2: Get user facts from memory
-            user_facts = await self.client.get_facts(user_id)
+            # Step 2: Get user facts from memory (excluir conversation_history)
+            # ✅ FIX: No incluir conversation_history en facts del usuario para contexto
+            # Los turns de conversación se guardan como facts pero no deben usarse como facts
+            all_user_facts = await self.client.get_facts(user_id)
+            user_facts = [f for f in all_user_facts if f.get('category') != 'conversation_history']
             
             # Step 3: Get user affinity/relationship level
             affinity = await self.client.get_affinity(user_id, personality_name)
@@ -585,10 +588,21 @@ JSON response:"""
                                 print(f"🔍 DEBUG: Fact exists: {exists}, confidence: {fact_data.get('confidence', 0)}")
                                 
                                 if not exists and fact_data.get('confidence', 0) > 0.7:
+                                    # ✅ FIX: Asegurar que value sea siempre string (no objeto)
+                                    # El LLM puede devolver value como objeto en el JSON, pero el frontend espera strings
+                                    fact_value = fact_data.get('value', '')
+                                    if isinstance(fact_value, (dict, list)):
+                                        import json as json_module
+                                        fact_value = json_module.dumps(fact_value, ensure_ascii=False)
+                                    elif fact_value is None:
+                                        fact_value = ''
+                                    else:
+                                        fact_value = str(fact_value)
+                                    
                                     new_fact = {
                                         "category": fact_data.get('category', 'other'),
                                         "key": fact_data.get('key', 'fact'),
-                                        "value": fact_data.get('value', ''),
+                                        "value": fact_value,  # ← Siempre string
                                         "confidence": fact_data.get('confidence', 0.8)
                                     }
                                     new_facts.append(new_fact)
