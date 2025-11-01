@@ -10,7 +10,7 @@ __author__ = "LuminoraCore Team"
 __email__ = "team@luminoracore.dev"
 __license__ = "MIT"
 
-from .core.personality import Personality, PersonalityError
+from .core.personality import Personality, PersonalityError, find_personality_file
 from .core.schema import PersonalitySchema
 from .tools.validator import PersonalityValidator
 from .tools.compiler import PersonalityCompiler, LLMProvider
@@ -42,7 +42,8 @@ from .logging_config import setup_logging, auto_configure, get_logger
 __all__ = [
     # v1.0 modules
     "Personality",
-    "PersonalityError", 
+    "PersonalityError",
+    "find_personality_file",
     "PersonalitySchema",
     "PersonalityValidator",
     "PersonalityCompiler",

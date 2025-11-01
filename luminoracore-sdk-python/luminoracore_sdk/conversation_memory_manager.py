@@ -304,8 +304,8 @@ class ConversationMemoryManager:
     async def _load_personality_data(self, personality_name: str) -> Optional[Dict[str, Any]]:
         """Load personality data from JSON file"""
         try:
-            import pathlib
             from pathlib import Path
+            import json
             
             # Try to get personalities directory from client
             personalities_dir = None
@@ -313,8 +313,32 @@ class ConversationMemoryManager:
                 personalities_dir = self.client.base_client.personalities_dir
             else:
                 # Default to SDK personalities directory
-                sdk_dir = Path(__file__).parent.parent
-                personalities_dir = str(sdk_dir / "personalities")
+                # In Lambda Layer: __file__ is /opt/python/luminoracore_sdk/conversation_memory_manager.py
+                # So __file__.parent is /opt/python/luminoracore_sdk
+                # And personalities are at: /opt/python/luminoracore_sdk/personalities/
+                # In development: __file__ is .../luminoracore_sdk/conversation_memory_manager.py
+                # So __file__.parent is .../luminoracore_sdk
+                # And personalities are at: .../luminoracore_sdk/personalities/
+                # We use parent (not parent.parent) because personalities are in the same directory as this file
+                sdk_dir = Path(__file__).parent  # This is luminoracore_sdk directory
+                personalities_dir = sdk_dir / "personalities"
+            
+            # Try to use core's find_personality_file if available (for core personalities)
+            try:
+                from luminoracore import find_personality_file
+                core_file = find_personality_file(personality_name)
+                if core_file and core_file.exists():
+                    with open(core_file, 'r', encoding='utf-8') as f:
+                        return json.load(f)
+            except (ImportError, Exception):
+                # Core not available or error, continue with SDK search
+                pass
+            
+            # Search in SDK personalities directory
+            personalities_path = Path(personalities_dir)
+            if not personalities_path.exists():
+                logger.warning(f"Personalities directory not found: {personalities_dir}")
+                return None
             
             # Try different name formats (Grandma Hope -> grandma_hope.json)
             # Also handle "Dr. Luna" -> "dr_luna.json"
