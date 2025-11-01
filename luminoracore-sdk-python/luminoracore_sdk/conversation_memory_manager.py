@@ -7,9 +7,12 @@ This is the CRITICAL fix for proper conversation memory integration
 import asyncio
 import json
 import time
+import logging
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 from dataclasses import dataclass
+
+logger = logging.getLogger(__name__)
 
 # from .client_v1_1 import LuminoraCoreClientV11  # Avoid circular import
 from .types.provider import ProviderConfig
@@ -298,6 +301,139 @@ class ConversationMemoryManager:
             context_string=context_string
         )
     
+    async def _load_personality_data(self, personality_name: str) -> Optional[Dict[str, Any]]:
+        """Load personality data from JSON file"""
+        try:
+            import pathlib
+            from pathlib import Path
+            
+            # Try to get personalities directory from client
+            personalities_dir = None
+            if hasattr(self.client, 'base_client') and hasattr(self.client.base_client, 'personalities_dir'):
+                personalities_dir = self.client.base_client.personalities_dir
+            else:
+                # Default to SDK personalities directory
+                sdk_dir = Path(__file__).parent.parent
+                personalities_dir = str(sdk_dir / "personalities")
+            
+            # Try different name formats (Grandma Hope -> grandma_hope.json)
+            # Also handle "Dr. Luna" -> "dr_luna.json"
+            name_variations = [
+                personality_name.lower().replace(" ", "_").replace(".", "_"),  # "Dr. Luna" -> "dr_luna"
+                personality_name.lower().replace(" ", "_"),  # "grandma hope" -> "grandma_hope"
+                personality_name.lower().replace(" ", "").replace(".", ""),     # "Dr. Luna" -> "drluna"
+                personality_name.lower().replace(" ", ""),     # "grandma hope" -> "grandmahope"
+                personality_name.lower().replace(".", "").replace(" ", "_"),  # "Dr. Luna" -> "dr_luna" (sin punto)
+                personality_name.lower(),                      # "grandma hope" -> "grandma hope"
+            ]
+            
+            # Try to find the personality file
+            personalities_path = Path(personalities_dir)
+            personality_file = None
+            
+            for variation in name_variations:
+                potential_files = [
+                    personalities_path / f"{variation}.json",
+                    personalities_path / f"{variation.lower()}.json",
+                ]
+                for file_path in potential_files:
+                    if file_path.exists():
+                        personality_file = file_path
+                        break
+                if personality_file:
+                    break
+            
+            # Also try direct match with spaces/underscores
+            if not personality_file:
+                for json_file in personalities_path.glob("*.json"):
+                    # Check if the personality name matches (case-insensitive)
+                    file_stem = json_file.stem.lower()
+                    name_lower = personality_name.lower().replace(" ", "_")
+                    if file_stem == name_lower or personality_name.lower() in file_stem or file_stem in personality_name.lower():
+                        personality_file = json_file
+                        break
+            
+            if not personality_file:
+                logger.warning(f"Personality file not found for: {personality_name}")
+                return None
+            
+            # Load and parse JSON
+            with open(personality_file, 'r', encoding='utf-8') as f:
+                personality_data = json.load(f)
+            
+            return personality_data
+            
+        except Exception as e:
+            logger.warning(f"Failed to load personality {personality_name}: {e}")
+            return None
+    
+    def _build_personality_prompt(self, personality_data: Dict[str, Any], personality_name: str) -> str:
+        """Build complete personality prompt from JSON data"""
+        prompt_parts = []
+        
+        # Extract persona info
+        if "persona" in personality_data:
+            persona = personality_data["persona"]
+            name = persona.get("name", personality_name)
+            description = persona.get("description", "")
+            prompt_parts.append(f"You are {name}. {description}")
+        else:
+            prompt_parts.append(f"You are {personality_name}.")
+        
+        # Add core traits
+        if "core_traits" in personality_data:
+            traits = personality_data["core_traits"]
+            trait_lines = []
+            if traits.get("archetype"):
+                trait_lines.append(f"Archetype: {traits['archetype']}")
+            if traits.get("temperament"):
+                trait_lines.append(f"Temperament: {traits['temperament']}")
+            if traits.get("communication_style"):
+                trait_lines.append(f"Communication Style: {traits['communication_style']}")
+            if trait_lines:
+                prompt_parts.append("\nCore Traits:\n" + "\n".join(f"- {line}" for line in trait_lines))
+        
+        # Add linguistic profile
+        if "linguistic_profile" in personality_data:
+            ling = personality_data["linguistic_profile"]
+            ling_parts = []
+            if ling.get("tone"):
+                tones = ling["tone"] if isinstance(ling["tone"], list) else [ling["tone"]]
+                ling_parts.append(f"Tone: {', '.join(tones)}")
+            if ling.get("vocabulary"):
+                vocab = ling["vocabulary"] if isinstance(ling["vocabulary"], list) else [ling["vocabulary"]]
+                ling_parts.append(f"Vocabulary to use: {', '.join(vocab[:10])}")  # Limit to first 10
+            if ling.get("fillers"):
+                fillers = ling["fillers"] if isinstance(ling["fillers"], list) else [ling["fillers"]]
+                ling_parts.append(f"Common expressions/fillers: {', '.join(fillers[:5])}")  # Limit to first 5
+            if ling.get("syntax"):
+                ling_parts.append(f"Syntax style: {ling['syntax']}")
+            if ling_parts:
+                prompt_parts.append("\nLinguistic Profile:\n" + "\n".join(f"- {part}" for part in ling_parts))
+        
+        # Add behavioral rules
+        if "behavioral_rules" in personality_data:
+            rules = personality_data["behavioral_rules"]
+            if rules:
+                prompt_parts.append("\nBehavioral Rules:")
+                for rule in rules:
+                    prompt_parts.append(f"- {rule}")
+        
+        # Add advanced parameters (if relevant)
+        if "advanced_parameters" in personality_data:
+            params = personality_data["advanced_parameters"]
+            param_parts = []
+            if params.get("verbosity"):
+                param_parts.append(f"Verbosity: {params['verbosity']}")
+            if params.get("formality"):
+                param_parts.append(f"Formality: {params['formality']}")
+            if params.get("empathy"):
+                param_parts.append(f"Empathy: {params['empathy']}")
+            if param_parts:
+                prompt_parts.append("\nCommunication Parameters:\n" + "\n".join(f"- {part}" for part in param_parts))
+        
+        return "\n".join(prompt_parts)
+    
     async def _generate_response_with_context(
         self,
         context: ConversationContext,
@@ -309,9 +445,18 @@ class ConversationMemoryManager:
             # Build a comprehensive context string for the LLM
             context_parts = []
             
-            # 1. Personality and relationship context
-            context_parts.append(f"You are {context.personality_name}, an AI personality.")
-            context_parts.append(f"Current relationship level: {context.affinity['current_level']} ({context.affinity['affinity_points']}/100 points)")
+            # ✅ FIX: Load and apply personality data from JSON file
+            personality_data = await self._load_personality_data(context.personality_name)
+            if personality_data:
+                # Build complete personality prompt from JSON
+                personality_prompt = self._build_personality_prompt(personality_data, context.personality_name)
+                context_parts.append(personality_prompt)
+            else:
+                # Fallback to simple name if file not found
+                context_parts.append(f"You are {context.personality_name}, an AI personality.")
+            
+            # Relationship context
+            context_parts.append(f"\nCurrent relationship level: {context.affinity['current_level']} ({context.affinity['affinity_points']}/100 points)")
             
             # 2. User facts context
             if context.user_facts:
