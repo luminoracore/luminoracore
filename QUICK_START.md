@@ -5,10 +5,10 @@ Get up and running with LuminoraCore in 5 minutes.
 ## Installation
 
 ```bash
-# Install all components
-pip install -e luminoracore/
-pip install -e luminoracore-sdk-python/
-pip install -e luminoracore-cli/
+# Install per component (recommended)
+cd luminoracore && pip install . && cd ..
+cd luminoracore-sdk-python && pip install . && cd ..   # optional
+cd luminoracore-cli && pip install . && cd ..          # optional
 ```
 
 ## Your First Intelligent Bot
@@ -96,15 +96,8 @@ storage = FlexibleDynamoDBStorageV11(
 )
 ```
 
-## Complete Example
+## Next Steps
 
-Run the complete demo:
-
-```bash
-python examples/luminoracore_v1_1_complete_demo.py
-```
-
-This example demonstrates:
 - Memory management
 - Fact extraction
 - Affinity tracking

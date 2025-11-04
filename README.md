@@ -1,166 +1,95 @@
-# LuminoraCore - AI Personality Framework
+# LuminoraCore — Open framework for portable AI personalities and conversation data
 
-[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://python.org)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/status-v1.1_production_ready-brightgreen.svg)](#)
+LuminoraCore lets every user build their own portable “AI conversation data lake” and evolve AI personalities over time — independent from any single LLM vendor. Your conversations are your data: capture them, analyze what matters, and use those insights to make your AI personalities grow with you.
 
-**Professional AI personality framework with intelligent memory, relationship tracking, and contextual conversations.**
+## Why
 
-## 🚀 Quick Start
+- Data ownership: conversations should be portable, not locked inside a single LLM history.
+- Consistency: personalities should be defined structurally, not as vendor‑specific prompts.
+- Evolution: your daily interactions should make personalities know you better.
 
-### Installation
+## What we do (three pillars)
 
-```bash
-# Install core framework
-pip install luminoracore
+1) Data capture: store each conversation turn and its context, in your chosen storage backend.
+2) Analysis layer: extract relevant knowledge from conversations (facts, memorable episodes) and sentiment signals.
+3) Personality evolution: apply the extracted knowledge to refine and evolve the active personality you use with LLMs.
 
-# Install SDK for applications
-pip install luminoracore-sdk-python
+Result: a portable repository of conversations + insights that you can export, move, and reuse across tools.
 
-# Install CLI for development
-pip install luminoracore-cli
-```
+## How it works
 
-### Basic Usage
+- v1.0: Standard JSON personalities. We introduced a universal, simple JSON schema to define personalities once, independent of prompts and providers.
+- v1.1: Personality evolution begins. We capture data from conversations, extract facts/episodes/sentiment, persist them, and make them available to inform personality evolution and LLM usage.
+- Portability: choose your storage (SQLite, Redis, PostgreSQL, MongoDB, DynamoDB). Export your data as JSON today; more export formats coming.
 
-```python
-from luminoracore_sdk import LuminoraCoreClient, LuminoraCoreClientV11
+## Honest capability status (v1.1)
 
-# Initialize client
-client = LuminoraCoreClient()
-await client.initialize()
+- Analytics & Snapshots: REAL (~85%)
+  - Full snapshot export/import of state (facts, episodes, affinity, mood history, summaries)
+  - Session analytics and metrics calculated from real data
+- Mood System: SEMI‑READY (~40%)
+  - Data structures, persistence, feature flags exist; application logic to traits is partial and not yet enforced in compiler flows
+- Semantic Search: PLACEHOLDER (~15%)
+  - API and flags exist; no vector‑store or embeddings implementation yet
 
-# Create session and chat
-session_id = await client.create_session("dr_luna")
-response = await client.send_message(session_id, "Hello!")
+See `RELEASE_NOTES_v1.1.md` for details and migration notes from v1.0.
 
-# Use advanced memory features
-client_v11 = LuminoraCoreClientV11(client)
-await client_v11.save_fact("user123", "personal", "name", "Alice")
-facts = await client_v11.get_facts("user123")
-```
+## Architecture (high‑level)
 
-## 🧠 Key Features
+Capture → Analyze → Store → Evolve → Use
 
-### **Intelligent Memory System**
-- **Automatic Fact Extraction** - AI learns about users from conversations
-- **Relationship Tracking** - Affinity levels evolve based on interactions
-- **Contextual Conversations** - Full conversation history awareness
-- **Multi-Storage Support** - SQLite, PostgreSQL, DynamoDB, Redis, MongoDB
+- Capture: conversation messages and metadata
+- Analyze: sentiment, learned facts, memorable episodes, relationship/affinity
+- Store: pluggable backends (SQLite, Redis, PostgreSQL, MongoDB, DynamoDB)
+- Evolve: update personality state and configuration over time
+- Use: Core/CLI/SDK interfaces for apps and workflows
 
-### **Dynamic Personality Evolution**
-- **Relationship-Based Adaptation** - Personalities evolve as relationships deepen
-- **Context Awareness** - Every response considers full conversation history
-- **Real-time Evolution** - Changes happen instantly during conversations
+## Components
 
-### **Enterprise Ready**
-- **Universal Database Support** - Works with any existing database schema
-- **Flexible Configuration** - Adapts to any enterprise environment
-- **Cloud-Native** - Optimized for AWS, Azure, Google Cloud
-- **Professional Tooling** - CLI, migration system, monitoring
+- `luminoracore/` (Core): JSON personalities, validation, compilation, blending
+- `luminoracore-sdk-python/` (SDK): sessions, storage integrations, analytics, snapshots, v1.1 flows
+- `luminoracore-cli/` (CLI): validate/compile/blend, snapshot export/import, developer tools
 
-## 📚 Documentation
+## Installation (per component)
 
-- **[Installation Guide](INSTALLATION_GUIDE.md)** - Complete setup instructions
-- **[Memory System Guide](MEMORY_SYSTEM_DEEP_DIVE.md)** - Deep dive into memory capabilities
-- **[Quick Start Guide](QUICK_START.md)** - Get started in minutes
-- **[API Reference](luminoracore-sdk-python/docs/api_reference.md)** - Complete API documentation
-
-## 🛠 Components
-
-### **Core Framework** (`luminoracore/`)
-- Independent core engine
-- Memory and personality systems
-- Storage interfaces
-- No external dependencies
-
-### **SDK** (`luminoracore-sdk-python/`)
-- Python SDK for applications
-- Client implementations
-- Storage backends
-- Provider integrations
-
-### **CLI** (`luminoracore-cli/`)
-- Command-line tools
-- Memory management
-- Database migrations
-- Development utilities
-
-## 🔧 CLI Commands
+See `INSTALLATION_GUIDE.md` for full details. Summary:
 
 ```bash
-# Validate personalities
-luminoracore validate my_personality.json
+# Core (required)
+cd luminoracore && pip install . && cd ..
 
-# Test with real LLM
-luminoracore test scientist --provider openai
+# SDK (optional)
+cd luminoracore-sdk-python && pip install . && cd ..
 
-# Manage memory
-luminoracore memory facts --session-id user123
-
-# Database migrations
-luminoracore migrate --status
+# CLI (optional)
+cd luminoracore-cli && pip install . && cd ..
 ```
 
-## 🏗 Architecture
+Windows note: install Core without editable mode (no `-e`) to avoid namespace issues.
 
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   LuminoraCore  │    │   SDK Python    │    │      CLI        │
-│                 │    │                 │    │                 │
-│ • Standalone    │◄───┤ • Uses Core     │◄───┤ • Uses Core     │
-│ • Core Engine   │    │ • Client Layer  │    │ • Tools Layer   │
-│ • Memory System │    │ • API Wrapper   │    │ • Management    │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-```
+## Quick start
 
-## 📊 Storage Providers
+See `QUICK_START.md` for a minimal SDK example and first CLI commands.
 
-- **InMemoryStorageV11** - Development and testing
-- **FlexibleSQLiteStorageV11** - Local development
-- **FlexibleDynamoDBStorageV11** - AWS production
-- **FlexiblePostgreSQLStorageV11** - Enterprise databases
-- **FlexibleRedisStorageV11** - Caching and sessions
-- **FlexibleMongoDBStorageV11** - Document storage
+## Data ownership and portability
 
-## 🔄 Version Compatibility
+- Your data is yours: choose the backend, and export snapshots to JSON.
+- Future formats: CSV/TXT and LLM‑optimized exports are planned.
 
-**100% Backward Compatible** - Existing code continues to work unchanged.
+## Roadmap (selected)
 
-```python
-# Your existing code works without changes
-from luminoracore_sdk import LuminoraCoreClient, LuminoraCoreClientV11
+- Apply Mood System modifiers in compiler/runtime
+- Semantic Search (embeddings + vector store integrations)
+- Additional snapshot export formats (CSV/TXT)
+- Longer‑term memory tiers (short/medium/long‑range)
 
-client = LuminoraCoreClient()
-client_v11 = LuminoraCoreClientV11(client)
-# All functions work exactly the same
-```
+## Documentation
 
-## 📈 Performance
+- Installation Guide (EN): `INSTALLATION_GUIDE.md`
+- Quick Start (EN): `QUICK_START.md`
+- Memory System Deep Dive (EN): `MEMORY_SYSTEM_DEEP_DIVE.md`
+- Release Notes v1.1 (EN): `RELEASE_NOTES_v1.1.md`
 
-- **Optimized Architecture** - Core independence improves performance
-- **Intelligent Caching** - Memory system reduces LLM calls
-- **Flexible Storage** - Choose optimal backend for your use case
-- **Async Support** - Non-blocking operations throughout
+## License
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-- **Documentation**: Check the guides above
-- **Issues**: Report bugs and feature requests
-- **Discussions**: Ask questions and share ideas
-
----
-
-**LuminoraCore** - Building intelligent AI personalities with memory and relationships.
+MIT — see headers and component licenses as applicable.

@@ -4,31 +4,32 @@ Complete installation guide for all LuminoraCore components.
 
 ## Prerequisites
 
-- Python 3.9 or higher
+- Python 3.9 or higher (3.11 recommended)
 - pip package manager
-- Git (for development)
+- Git (optional, for cloning the repo)
 
 ## Quick Installation
 
-### 1. Clone Repository
+### 1. Clone Repository (optional)
 
 ```bash
 git clone https://github.com/luminoracore/luminoracore.git
 cd luminoracore
 ```
 
-### 2. Install All Components
+### 2. Install Components (per folder)
 
 ```bash
-# Install Core framework
-pip install -e luminoracore/
+# Core (required)
+cd luminoracore && pip install . && cd ..
 
-# Install SDK
-pip install -e luminoracore-sdk-python/
+# SDK (optional)
+cd luminoracore-sdk-python && pip install . && cd ..
 
-# Install CLI
-pip install -e luminoracore-cli/
+# CLI (optional)
+cd luminoracore-cli && pip install . && cd ..
 ```
+Note (Windows): install Core without editable mode (-e) to avoid namespace issues.
 
 ### 3. Verify Installation
 
@@ -49,7 +50,7 @@ luminoracore --version
 
 ```bash
 cd luminoracore/
-pip install -e .
+pip install .
 ```
 
 **Features:**
@@ -62,7 +63,7 @@ pip install -e .
 
 ```bash
 cd luminoracore-sdk-python/
-pip install -e .
+pip install .
 ```
 
 **Features:**
@@ -75,7 +76,7 @@ pip install -e .
 
 ```bash
 cd luminoracore-cli/
-pip install -e .
+pip install .
 ```
 
 **Features:**
@@ -272,10 +273,10 @@ pytest tests/ -v
 
 **Import Errors:**
 ```bash
-# Ensure packages are installed in development mode
-pip install -e luminoracore/
-pip install -e luminoracore-sdk-python/
-pip install -e luminoracore-cli/
+# Ensure packages are installed
+cd luminoracore && pip install . && cd ..
+cd luminoracore-sdk-python && pip install . && cd ..
+cd luminoracore-cli && pip install . && cd ..
 ```
 
 **Storage Connection Issues:**
@@ -291,7 +292,7 @@ print('Storage OK')
 **CLI Not Found:**
 ```bash
 # Ensure CLI is installed
-pip install -e luminoracore-cli/
+cd luminoracore-cli && pip install . && cd ..
 which luminoracore
 ```
 

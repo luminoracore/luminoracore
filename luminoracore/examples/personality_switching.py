@@ -9,7 +9,7 @@ from pathlib import Path
 # Add the parent directory to the path to import luminoracore
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from luminoracore import Personality, PersonalityCompiler, LLMProvider
+from luminoracore import Personality, PersonalityCompiler, LLMProvider, find_personality_file
 
 
 def demonstrate_personality_switching():
@@ -19,21 +19,18 @@ def demonstrate_personality_switching():
     
     # Load multiple personalities
     personalities = {}
-    personality_files = [
-        "luminoracore/luminoracore/personalities/dr_luna.json",
-        "luminoracore/luminoracore/personalities/captain_hook.json", 
-        "luminoracore/luminoracore/personalities/grandma_hope.json",
-        "luminoracore/luminoracore/personalities/marcus_sarcastic.json"
-    ]
+    personality_names = ["Dr. Luna", "Captain Hook Digital", "Grandma Hope", "Marcus Sarcasmus"]
     
     print("\n1. Loading personalities...")
-    for file_path in personality_files:
+    for name in personality_names:
+        # Use find_personality_file for robust path resolution
+        file_path = find_personality_file(name) or Path(__file__).parent.parent / "luminoracore" / "personalities" / f"{name.lower().replace(' ', '_').replace('.', '_')}.json"
         try:
             personality = Personality(file_path)
             personalities[personality.persona.name] = personality
             print(f"[OK] Loaded: {personality.persona.name} ({personality.core_traits.archetype})")
         except Exception as e:
-            print(f"[ERROR] Failed to load {file_path}: {e}")
+            print(f"[ERROR] Failed to load {name} ({file_path}): {e}")
     
     if not personalities:
         print("[ERROR] No personalities loaded successfully")

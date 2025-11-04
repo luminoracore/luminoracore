@@ -9,7 +9,7 @@ from pathlib import Path
 # Add the parent directory to the path to import luminoracore
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from luminoracore import Personality, PersonalityValidator, PersonalityCompiler, LLMProvider
+from luminoracore import Personality, PersonalityValidator, PersonalityCompiler, LLMProvider, find_personality_file
 
 
 def main():
@@ -20,7 +20,9 @@ def main():
     # Load a personality
     print("\n1. Loading a personality...")
     try:
-        personality = Personality("luminoracore/luminoracore/personalities/dr_luna.json")
+        # Use find_personality_file for robust path resolution
+        personality_path = find_personality_file("Dr. Luna") or Path(__file__).parent.parent / "luminoracore" / "personalities" / "dr_luna.json"
+        personality = Personality(personality_path)
         print(f"[OK] Loaded personality: {personality.persona.name}")
         print(f"  Description: {personality.persona.description}")
         print(f"  Archetype: {personality.core_traits.archetype}")

@@ -9,7 +9,7 @@ from pathlib import Path
 # Add the parent directory to the path to import luminoracore
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from luminoracore import Personality, PersonaBlend
+from luminoracore import Personality, PersonaBlend, find_personality_file
 
 
 def demonstrate_personality_blending():
@@ -20,13 +20,11 @@ def demonstrate_personality_blending():
     # Load personalities for blending
     print("\n1. Loading personalities for blending...")
     personalities = {}
-    personality_files = [
-        "luminoracore/luminoracore/personalities/dr_luna.json",
-        "luminoracore/luminoracore/personalities/captain_hook.json",
-        "luminoracore/luminoracore/personalities/grandma_hope.json"
-    ]
+    personality_names = ["Dr. Luna", "Captain Hook Digital", "Grandma Hope"]
     
-    for file_path in personality_files:
+    for name in personality_names:
+        # Use find_personality_file for robust path resolution
+        file_path = find_personality_file(name) or Path(__file__).parent.parent / "luminoracore" / "personalities" / f"{name.lower().replace(' ', '_').replace('.', '_')}.json"
         try:
             personality = Personality(file_path)
             personalities[personality.persona.name] = personality
@@ -34,7 +32,7 @@ def demonstrate_personality_blending():
             print(f"  Archetype: {personality.core_traits.archetype}")
             print(f"  Temperament: {personality.core_traits.temperament}")
         except Exception as e:
-            print(f"[ERROR] Failed to load {file_path}: {e}")
+            print(f"[ERROR] Failed to load {name} ({file_path}): {e}")
     
     if len(personalities) < 2:
         print("[ERROR] Need at least 2 personalities for blending")

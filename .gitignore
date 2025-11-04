@@ -1,3 +1,96 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.orig
+*.bak
+*.tmp
+~$*
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.venv/
+.venv*/
+.venv*/**
+.env
+.env.*
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+.eggs/
+*.egg-info/
+.eggs/**
+.buildozer/
+
+# Packaging / build
+build/
+dist/
+wheelhouse/
+*.whl
+pip-wheel-metadata/
+
+# Node
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+.vscode/**
+*.code-workspace
+
+# Logs
+*.log
+
+# Data/artifacts
+*.sqlite
+*.db
+*.db-journal
+*.pkl
+*.pt
+*.bin
+*.zip
+*.7z
+*.tar
+*.tar.gz
+*.parquet
+*.feather
+
+# Project-specific noisy paths
+luminoracore/**/build/
+luminoracore/**/lib/
+luminoracore/**/bdist.*
+luminoracore.egg-info/
+**/*.egg-info/
+
+luminoracore-cli/**/build/
+luminoracore-cli.egg-info/
+
+luminoracore-sdk-python/**/build/
+luminoracore-sdk-python.egg-info/
+
+backup_before_migration_*/
+
+# Temp test data
+temp_test_data_real/
+
+# Pyproject / setuptools outputs
+*.spec
+.installed.cfg
+MANIFEST
+
+# Coverage/Reports
+.coverage
+htmlcov/
+coverage.xml
+
+# OS metadata
+Desktop.ini
+$RECYCLE.BIN/
 # Python
 __pycache__/
 *.py[cod]
