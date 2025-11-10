@@ -1,0 +1,18 @@
+# Core dependencies only - no SDK dependencies
+jsonschema>=4.17.2
+pydantic>=2.0.0
+pyyaml>=6.0
+
+# Database drivers (optional - only if using specific storage)
+# sqlite3 is built-in
+# psycopg2-binary>=2.9.0  # PostgreSQL
+# boto3>=1.26.0          # DynamoDB
+# redis>=4.5.0           # Redis
+# pymongo>=4.3.0        # MongoDB
+
+# Development dependencies (optional)
+pytest>=7.4.0
+pytest-cov>=4.1.0
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.5.0

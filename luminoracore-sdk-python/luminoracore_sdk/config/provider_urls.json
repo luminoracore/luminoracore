@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LuminoraCore Provider URLs Configuration",
+  "description": "Configurable base URLs for all LLM providers. Edit this file to add new providers or change endpoints.",
+  "version": "1.0.0",
+  
+  "providers": {
+    "openai": {
+      "name": "OpenAI",
+      "base_url": "https://api.openai.com/v1",
+      "default_model": "gpt-3.5-turbo",
+      "chat_endpoint": "/chat/completions",
+      "description": "OpenAI GPT models (GPT-3.5, GPT-4, etc.)"
+    },
+    "anthropic": {
+      "name": "Anthropic",
+      "base_url": "https://api.anthropic.com/v1",
+      "default_model": "claude-3-sonnet-20240229",
+      "chat_endpoint": "/messages",
+      "description": "Anthropic Claude models"
+    },
+    "deepseek": {
+      "name": "DeepSeek",
+      "base_url": "https://api.deepseek.com/v1",
+      "default_model": "deepseek-chat",
+      "chat_endpoint": "/chat/completions",
+      "description": "DeepSeek models - Cost-effective alternative"
+    },
+    "mistral": {
+      "name": "Mistral AI",
+      "base_url": "https://api.mistral.ai/v1",
+      "default_model": "mistral-tiny",
+      "chat_endpoint": "/chat/completions",
+      "description": "Mistral AI models"
+    },
+    "cohere": {
+      "name": "Cohere",
+      "base_url": "https://api.cohere.ai/v1",
+      "default_model": "command",
+      "chat_endpoint": "/chat",
+      "description": "Cohere command models"
+    },
+    "google": {
+      "name": "Google AI",
+      "base_url": "https://generativelanguage.googleapis.com/v1",
+      "default_model": "gemini-pro",
+      "chat_endpoint": "/models",
+      "description": "Google Gemini models"
+    },
+    "llama": {
+      "name": "Llama (via Replicate)",
+      "base_url": "https://api.replicate.com/v1",
+      "default_model": "llama-2-7b-chat",
+      "chat_endpoint": "/predictions",
+      "description": "Meta Llama models via Replicate"
+    }
+  },
+  
+  "custom_providers": {
+    "_comment": "Add your custom LLM providers here",
+    "_example": {
+      "name": "My Custom LLM",
+      "base_url": "https://api.mycustom.com/v1",
+      "default_model": "custom-model",
+      "chat_endpoint": "/chat/completions",
+      "description": "My custom LLM provider"
+    }
+  },
+  
+  "notes": {
+    "how_to_override": "You can override these URLs when creating a provider by passing base_url parameter",
+    "how_to_add_new": "Add new providers in the 'custom_providers' section and register them via ProviderFactory.register_provider()",
+    "compatibility": "Most providers support OpenAI-compatible endpoints (/chat/completions)"
+  }
+}
+
