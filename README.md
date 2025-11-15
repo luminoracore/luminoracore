@@ -2,6 +2,8 @@
 
 > Your AI personality that travels with you. One memory, all models.
 
+LuminoraCore lets every user build their own portable "AI conversation data lake" and evolve AI personalities over time — independent from any single LLM vendor. Your conversations are your data: capture them, analyze what matters, and use those insights to make your AI personalities grow with you.
+
 [![GitHub stars](https://img.shields.io/github/stars/yourusername/luminoracore?style=social)](https://github.com/yourusername/luminoracore)
 [![Tests](https://img.shields.io/github/workflow/status/yourusername/luminoracore/tests?label=tests)](https://github.com/yourusername/luminoracore/actions)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -21,6 +23,12 @@ LuminoraCore lets every user build their own portable "AI conversation data lake
 **The result?** Continuity across AI platforms. Real evolution through data, persistence, and relationships that survive time, tools, and providers.
 
 [![GIF: ChatGPT → LuminoraCore → Claude → data persists](https://via.placeholder.com/800x400?text=GIF+Placeholder:+ChatGPT+%E2%86%92+LuminoraCore+%E2%86%92+Claude+%E2%86%92+data+persists)](https://example.com/solution-demo.gif)
+
+## 🔄 Evolution
+
+- **v1.0:** Standard JSON personalities. We introduced a universal, simple JSON schema to define personalities once, independent of prompts and providers.
+- **v1.1:** Personality evolution begins. We capture data from conversations, extract facts/episodes/sentiment, persist them, and make them available to inform personality evolution and LLM usage.
+- **Portability:** Choose your storage backend (SQLite, Redis, PostgreSQL, MongoDB, DynamoDB, in-memory) and keep the same personality/identity across any LLM provider.
 
 ## 🎯 Quick Start (3 lines of code)
 
