@@ -1,112 +1,157 @@
-# LuminoraCore — Open framework for portable AI personalities and conversation data
+# 🧠 LuminoraCore
 
-LuminoraCore lets every user build their own portable “AI conversation data lake” and evolve AI personalities over time — independent from any single LLM vendor. Your conversations are your data: capture them, analyze what matters, and use those insights to make your AI personalities grow with you.
+> Your AI personality that travels with you. One memory, all models.
 
-## The Shift We're Making
+[![GitHub stars](https://img.shields.io/github/stars/yourusername/luminoracore?style=social)](https://github.com/yourusername/luminoracore)
+[![Tests](https://img.shields.io/github/workflow/status/yourusername/luminoracore/tests?label=tests)](https://github.com/yourusername/luminoracore/actions)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Most AI systems today are learning to remember — but each platform remembers in isolation. Your ChatGPT might recall a conversation. Claude or Gemini might, too. None of them know it’s still you.
+## ⚡ The Problem
 
-LuminoraCore is not trying to bolt memory into a single model. We’re building continuity across them. Real evolution doesn’t happen inside a single session; it happens through data, persistence, and relationships that survive time, tools, and providers.
+Most AI systems today are learning to remember — but each platform remembers in isolation. Your ChatGPT might recall a conversation. Claude or Gemini might, too. None of them know it's still you.
 
-## Why
+**The result?** You lose your conversation history, context, and the personality you've built when switching between AI platforms or starting fresh.
 
-- Data ownership: conversations should be portable, not locked inside a single LLM history.
-- Consistency: personalities should be defined structurally, not as vendor‑specific prompts.
-- Evolution: your daily interactions should make personalities know you better.
+[![GIF: ChatGPT → lose data → start over](https://via.placeholder.com/800x400?text=GIF+Placeholder:+ChatGPT+%E2%86%92+lose+data+%E2%86%92+start+over)](https://example.com/problem-demo.gif)
 
-## What we do (three pillars)
+## ✨ The Solution
 
-1) Data capture: store each conversation turn and its context, in your chosen storage backend.
-2) Analysis layer: extract relevant knowledge from conversations (facts, memorable episodes) and sentiment signals.
-3) Personality evolution: apply the extracted knowledge to refine and evolve the active personality you use with LLMs.
+LuminoraCore lets every user build their own portable "AI conversation data lake" and evolve AI personalities over time — independent from any single LLM vendor. Your conversations are your data: capture them, analyze what matters, and use those insights to make your AI personalities grow with you.
 
-Result: a portable repository of conversations + insights that you can export, move, and reuse across tools.
+**The result?** Continuity across AI platforms. Real evolution through data, persistence, and relationships that survive time, tools, and providers.
 
-## How it works
+[![GIF: ChatGPT → LuminoraCore → Claude → data persists](https://via.placeholder.com/800x400?text=GIF+Placeholder:+ChatGPT+%E2%86%92+LuminoraCore+%E2%86%92+Claude+%E2%86%92+data+persists)](https://example.com/solution-demo.gif)
 
-- v1.0: Standard JSON personalities. We introduced a universal, simple JSON schema to define personalities once, independent of prompts and providers.
-- v1.1: Personality evolution begins. We capture data from conversations, extract facts/episodes/sentiment, persist them, and make them available to inform personality evolution and LLM usage.
-- Portability: choose your storage backend (SQLite, Redis, PostgreSQL, MongoDB, DynamoDB, in-memory) and keep the same personality/identity across any LLM provider.
+## 🎯 Quick Start (3 lines of code)
 
-## Honest capability status (v1.1)
+```bash
+pip install luminoracore
+# 2 more lines → working
+```
 
-- Personality schema & compilation: PRODUCTION-READY (100%)
-  - Stable JSON schema, compiler, validator, and personality blending
-- Memory system & storage adapters: PRODUCTION-READY (90%)
-  - Fact, episodic, and affinity subsystems run against SQLite/Redis/PostgreSQL/MongoDB/DynamoDB once configured
-- Analytics & snapshots: BETA (~60%)
-  - SDK-level exports/imports are available; CLI snapshot commands currently return demo payloads until the SDK wiring ships
-  - Session analytics and metrics operate on real data when storage is enabled
-- Mood System: SEMI‑READY (~40%)
-  - Data structures, persistence, feature flags exist; application logic to traits is partial and not yet enforced in compiler flows
-- Semantic Search: PLACEHOLDER (~15%)
-  - API and flags exist; no vector‑store or embeddings implementation yet
+**Full example:**
 
-See `RELEASE_NOTES_v1.1.md` for details and migration notes from v1.0.
+```python
+from luminoracore import Personality, Session
 
-## Architecture (high‑level)
+personality = Personality.load("my-personality.json")
+session = Session(personality)
+response = session.chat("Hello!")
+```
 
-Capture → Analyze → Store → Evolve → Use
+See `QUICK_START.md` for detailed examples and CLI commands.
 
-- Capture: conversation messages and metadata
-- Analyze: sentiment, learned facts, memorable episodes, relationship/affinity
-- Store: pluggable backends (SQLite, Redis, PostgreSQL, MongoDB, DynamoDB, in-memory)
-- Evolve: update personality state and configuration over time
-- Use: Core/CLI/SDK interfaces for apps and workflows
+## 🎬 See It In Action
 
-## Storage flexibility
+[![Watch the demo](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=VIDEO_ID)
 
-- Plug-and-play adapters for `SQLite`, `Redis`, `PostgreSQL`, `MongoDB`, `DynamoDB`, and `InMemoryStorage`.
-- Swap storage without touching personality logic. The `FlexibleStorageManager` auto-detects configuration via JSON or environment variables.
-- Export snapshots (facts, episodes, affinity, moods) through the SDK regardless of the backend you choose. Future CLI releases will connect the same pipeline for turnkey portability.
+*Replace VIDEO_ID with your actual YouTube video ID*
 
-## Components
+## 💡 Use Cases
 
-- `luminoracore/` (Core): JSON personalities, validation, compilation, blending
-- `luminoracore-sdk-python/` (SDK): sessions, storage integrations, analytics, snapshots, v1.1 flows
-- `luminoracore-cli/` (CLI): validate/compile/blend, snapshot export/import, developer tools
+- **Personal AI companion** — Build a consistent AI assistant that remembers you across all platforms
+- **Customer service bots** — Maintain conversation context and personality across sessions
+- **Research assistants** — Capture and evolve knowledge from research conversations
+- **Educational tutors** — Create personalized learning experiences that adapt over time
+- **Creative collaborators** — Develop AI personalities that learn your style and preferences
 
-## Installation (per component)
+## 🚀 Live Demo
 
-See `INSTALLATION_GUIDE.md` for full details. Summary:
+Try LuminoraCore in action: [demo.luminoracore.com](https://demo.luminoracore.com)
+
+*Replace with your actual demo URL*
+
+## 📦 Installation
+
+### Quick Install
 
 ```bash
 # Core (required)
 cd luminoracore && pip install . && cd ..
 
-# SDK (optional)
+# SDK (optional, for sessions and storage)
 cd luminoracore-sdk-python && pip install . && cd ..
 
-# CLI (optional)
+# CLI (optional, for developer tools)
 cd luminoracore-cli && pip install . && cd ..
 ```
 
-Windows note: install Core without editable mode (no `-e`) to avoid namespace issues.
+**Windows note:** Install Core without editable mode (no `-e`) to avoid namespace issues.
 
-## Quick start
+For detailed installation instructions, see `INSTALLATION_GUIDE.md`.
 
-See `QUICK_START.md` for a minimal SDK example and first CLI commands.
+## 🏗️ Architecture
 
-## Data ownership and portability
+```
+Capture → Analyze → Store → Evolve → Use
+```
 
-- Your data is yours: choose the backend, and export snapshots to JSON.
-- Feature flags let you opt into memory/affinity modules per deployment.
-- Future formats: CSV/TXT and LLM‑optimized exports are planned.
+**The Flow:**
 
-## Roadmap (selected)
+- **Capture:** Conversation messages and metadata from any LLM interaction
+- **Analyze:** Extract sentiment, learned facts, memorable episodes, and relationship/affinity signals
+- **Store:** Pluggable backends (SQLite, Redis, PostgreSQL, MongoDB, DynamoDB, in-memory)
+- **Evolve:** Update personality state and configuration over time based on insights
+- **Use:** Core/CLI/SDK interfaces for apps and workflows
 
-- Apply Mood System modifiers in compiler/runtime
-- Semantic Search (embeddings + vector store integrations)
-- Additional snapshot export formats (CSV/TXT)
-- Longer‑term memory tiers (short/medium/long‑range)
+**Components:**
 
-## Documentation
+- `luminoracore/` (Core): JSON personalities, validation, compilation, blending
+- `luminoracore-sdk-python/` (SDK): sessions, storage integrations, analytics, snapshots
+- `luminoracore-cli/` (CLI): validate/compile/blend, snapshot export/import, developer tools
 
-- Installation Guide (EN): `INSTALLATION_GUIDE.md`
-- Quick Start (EN): `QUICK_START.md`
-- Memory System Deep Dive (EN): `MEMORY_SYSTEM_DEEP_DIVE.md`
-- Release Notes v1.1 (EN): `RELEASE_NOTES_v1.1.md`
+**Storage Flexibility:**
 
-## License
+Choose your storage backend and swap without touching personality logic. The `FlexibleStorageManager` auto-detects configuration via JSON or environment variables. Export snapshots (facts, episodes, affinity, moods) through the SDK regardless of the backend you choose.
+
+## 🤝 Contributing
+
+We welcome contributions! Here's how you can help:
+
+1. **Report bugs** — Open an issue with detailed information
+2. **Suggest features** — Share your ideas for improving LuminoraCore
+3. **Submit pull requests** — Follow our coding standards and include tests
+4. **Improve documentation** — Help make LuminoraCore more accessible
+
+**Development Setup:**
+
+```bash
+git clone https://github.com/yourusername/luminoracore.git
+cd luminoracore
+# Follow installation steps above
+```
+
+**Guidelines:**
+
+- Follow existing code style and conventions
+- Add tests for new features
+- Update documentation as needed
+- Keep commits focused and well-described
+
+## 📄 License
 
 MIT — see headers and component licenses as applicable.
+
+---
+
+## 📚 Additional Documentation
+
+- **Installation Guide (EN):** `INSTALLATION_GUIDE.md`
+- **Quick Start (EN):** `QUICK_START.md`
+- **Memory System Deep Dive (EN):** `MEMORY_SYSTEM_DEEP_DIVE.md`
+- **Release Notes v1.1 (EN):** `RELEASE_NOTES_v1.1.md`
+
+## 🔍 Current Status (v1.1)
+
+**Production-Ready:**
+- ✅ Personality schema & compilation (100%)
+- ✅ Memory system & storage adapters (90%)
+
+**Beta:**
+- 🔄 Analytics & snapshots (~60%)
+
+**In Progress:**
+- 🚧 Mood System (~40%)
+- 🚧 Semantic Search (~15%)
+
+See `RELEASE_NOTES_v1.1.md` for details and migration notes from v1.0.
