@@ -4,11 +4,11 @@ import pytest
 import asyncio
 from unittest.mock import Mock, AsyncMock, patch
 
-from luminoracore.client import LuminoraCoreClient
-from luminoracore.types.session import StorageConfig, MemoryConfig
-from luminoracore.types.provider import ProviderConfig
-from luminoracore.types.personality import PersonalityData
-from luminoracore.utils.exceptions import LuminoraCoreSDKError
+from luminoracore_sdk import LuminoraCoreClient
+from luminoracore_sdk.types.session import StorageConfig, MemoryConfig
+from luminoracore_sdk.types.provider import ProviderConfig
+from luminoracore_sdk.types.personality import PersonalityData
+from luminoracore_sdk.utils.exceptions import LuminoraCoreSDKError
 
 
 class TestLuminoraCoreClient:
@@ -28,6 +28,7 @@ class TestLuminoraCoreClient:
             description="Test personality",
             author="Test Author",
             tags=["test"],
+            system_prompt="You are a helpful test personality. Always respond with test prefix.",
             persona={
                 "name": "test_personality",
                 "description": "Test personality",
@@ -274,6 +275,7 @@ class TestLuminoraCoreClient:
             description="Blended personality",
             author="Test Author",
             tags=["test", "blended"],
+            system_prompt="You are a blended personality. Be helpful and friendly.",
             persona={
                 "name": "blended_personality",
                 "description": "Blended personality",

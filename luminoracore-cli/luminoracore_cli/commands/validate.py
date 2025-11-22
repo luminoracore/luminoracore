@@ -23,7 +23,7 @@ def get_client() -> LuminoraCoreClient:
     return LuminoraCoreClient()
 
 
-async def validate_command(
+def validate_command(
     files: List[Path] = typer.Argument(
         ...,
         help="Personality files to validate",
@@ -74,6 +74,64 @@ async def validate_command(
         min=1,
         max=16,
     ),
+) -> None:
+    """Synchronous wrapper for async validate_command_impl."""
+    try:
+        # Try to get the current event loop
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            # If we're in a running loop, use create_task
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                future = executor.submit(asyncio.run, _validate_command_impl(
+                    files=files,
+                    schema_url=schema_url,
+                    strict=strict,
+                    format=format,
+                    output_file=output_file,
+                    quiet=quiet,
+                    parallel=parallel,
+                    max_workers=max_workers
+                ))
+                future.result()
+        else:
+            # If no loop is running, use asyncio.run
+            asyncio.run(_validate_command_impl(
+                files=files,
+                schema_url=schema_url,
+                strict=strict,
+                format=format,
+                output_file=output_file,
+                quiet=quiet,
+                parallel=parallel,
+                max_workers=max_workers
+            ))
+    except RuntimeError:
+        # Fallback: run in a new thread
+        import concurrent.futures
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(asyncio.run, _validate_command_impl(
+                files=files,
+                schema_url=schema_url,
+                strict=strict,
+                format=format,
+                output_file=output_file,
+                quiet=quiet,
+                parallel=parallel,
+                max_workers=max_workers
+            ))
+            future.result()
+
+
+async def _validate_command_impl(
+    files: List[Path],
+    schema_url: Optional[str],
+    strict: bool,
+    format: str,
+    output_file: Optional[Path],
+    quiet: bool,
+    parallel: bool,
+    max_workers: int,
 ) -> None:
     """
     Validate personality files against the LuminoraCore schema.
@@ -165,15 +223,15 @@ async def _validate_files_parallel(
     async def validate_single_file(file_path: Path) -> Tuple[Path, str, bool, Optional[str]]:
         try:
             personality_data = read_file(file_path)
-            result = await validator.validate_async(personality_data)
+            result = validator.validate(personality_data, strict=False)
             
-            if result.is_valid:
+            if result.get("valid", False):
                 name = personality_data.get("persona", {}).get("name", "Unknown")
                 return file_path, name, True, None
             else:
                 error_msg = "\n".join([
-                    f"• {error.message}" + (f" (at {error.field})" if error.field else "")
-                    for error in result.errors
+                    f"• {error}"
+                    for error in result.get("errors", [])
                 ])
                 return file_path, "Invalid", False, error_msg
                 
@@ -227,15 +285,15 @@ async def _validate_files_sequential(
     for file_path in files:
         try:
             personality_data = read_file(file_path)
-            result = await validator.validate_async(personality_data)
+            result = validator.validate(personality_data, strict=False)
             
-            if result.is_valid:
+            if result.get("valid", False):
                 name = personality_data.get("persona", {}).get("name", "Unknown")
                 results.append((file_path, name, True, None))
             else:
                 error_msg = "\n".join([
-                    f"• {error.message}" + (f" (at {error.field})" if error.field else "")
-                    for error in result.errors
+                    f"• {error}"
+                    for error in result.get("errors", [])
                 ])
                 results.append((file_path, "Invalid", False, error_msg))
                 
@@ -361,7 +419,7 @@ def _output_text(results: List[Tuple[Path, str, bool, Optional[str]]], quiet: bo
     """Output results as plain text."""
     
     for file_path, name, success, error_msg in results:
-        status = "✓ VALID" if success else "✗ INVALID"
+        status = "[OK] VALID" if success else "[ERROR] INVALID"
         console.print(f"{status}: {file_path}")
         
         if not success and error_msg:

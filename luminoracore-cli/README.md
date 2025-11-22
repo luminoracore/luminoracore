@@ -1,21 +1,35 @@
-# LuminoraCore CLI
+# 🛠️ LuminoraCore CLI
 
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/luminoracore/cli)
+[![Status](https://img.shields.io/badge/status-v1.1_ready-brightgreen.svg)](#)
+[![Tests](https://img.shields.io/badge/tests-28%2F28_passing-brightgreen.svg)](#)
 
-Professional command-line tool for AI personality management with LuminoraCore.
+**✅ PROFESSIONAL CLI TOOL - v1.1 PRODUCTION READY**
 
-## Features
+Professional command-line tool for AI personality management with LuminoraCore. Includes real API testing, interactive wizard, development server, memory management, and database migrations.
 
-- 🔍 **Validate** personality files against official schema
-- ⚙️ **Compile** personalities to provider-specific prompts
-- ✨ **Create** new personalities with interactive wizard
-- 🧪 **Test** personalities with real LLM providers
-- 🎭 **Blend** multiple personalities with custom weights
-- 🚀 **Serve** local development server with web interface
-- 📋 **List** and browse available personalities
-- ⬇️ **Update** personality cache from repository
+## Key Features
+
+### Core Features (v1.1)
+- **✅ Validate** - Validate personality files against official schema
+- **✅ Compile** - Compile personalities to provider-specific prompts
+- **✅ Create** - Create new personalities with interactive wizard
+- **✅ Test** - Test personalities with real LLM providers (OpenAI, Claude, etc.)
+- **✅ Blend** - Blend multiple personalities with custom weights
+- **✅ Serve** - Local development server with web interface
+- **✅ List** - List and browse available personalities
+- **✅ Update** - Update personality cache from repository
+- **✅ Real Testing** - Real connections to LLM APIs
+- **✅ Web Interface** - Integrated UI for testing and management
+- **✅ Error Handling** - Robust with automatic retries
+
+### New in v1.1 - Memory & Database Tools
+- **✅ Migrate** - Database migration management (up, down, status, list)
+- **✅ Memory** - Query and manage facts, episodes, and affinity
+- **✅ Snapshot** - Export/import session states and memories
+- **✅ Feature Flags** - Configure v1.1 features dynamically
 
 ## Installation
 
@@ -25,6 +39,7 @@ pip install luminoracore-cli
 
 ## Quick Start
 
+### v1.1 Commands
 ```bash
 # Validate a personality file
 luminoracore validate my_personality.json
@@ -42,7 +57,95 @@ luminoracore create --interactive
 luminoracore serve
 ```
 
+### v1.1 Commands
+```bash
+# Check migration status
+luminora-cli migrate --status
+
+# Query facts
+luminora-cli memory facts --session-id user_123
+
+# Create snapshot
+luminora-cli snapshot create --session-id user_123 --output backup.json
+
+# Restore snapshot
+luminora-cli snapshot restore --input backup.json --session-id new_user
+```
+
 ## Commands
+
+### v1.1 Commands
+
+#### Migrate
+Manage database migrations for v1.1 features:
+
+```bash
+# Check migration status
+luminoracore migrate --status
+
+# List all migrations
+luminoracore migrate --list
+
+# Apply migrations (up)
+luminoracore migrate up
+
+# Apply specific migration
+luminoracore migrate up --target 003
+
+# Rollback migrations (down)
+luminoracore migrate down
+
+# Dry-run (preview changes)
+luminoracore migrate up --dry-run
+
+# Force migration (skip checks)
+luminoracore migrate up --force
+```
+
+#### Memory
+Query and manage memory systems:
+
+```bash
+# Query facts for a session
+luminoracore memory facts --session-id user_123
+
+# Query facts by category
+luminoracore memory facts --category preferences --limit 10
+
+# Query episodes
+luminoracore memory episodes --session-id user_123
+
+# Query episodes by type
+luminoracore memory episodes --type achievement --min-importance 0.8
+
+# Check affinity level
+luminoracore memory affinity --session-id user_123
+
+# Export all memory data
+luminoracore memory export --output memory_data.json
+```
+
+#### Snapshot
+Export and import session states:
+
+```bash
+# Create snapshot of a session
+luminoracore snapshot create --session-id user_123 --output snapshot.json
+
+# Create snapshot with specific components
+luminoracore snapshot create --session-id user_123 --include facts,episodes,affinity
+
+# Restore snapshot
+luminoracore snapshot restore --input snapshot.json --session-id user_456
+
+# List snapshots
+luminoracore snapshot list
+
+# Compare snapshots
+luminoracore snapshot diff snapshot1.json snapshot2.json
+```
+
+### v1.1 Commands
 
 ### Validate
 Validate personality files against the LuminoraCore schema:

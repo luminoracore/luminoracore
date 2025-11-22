@@ -3,11 +3,13 @@ Personality compiler for LuminoraCore.
 """
 
 import json
+import hashlib
 from typing import Dict, Any, List, Optional, Union
 from pathlib import Path
 import logging
 from dataclasses import dataclass
 from enum import Enum
+from functools import lru_cache
 
 from ..core.personality import Personality, PersonalityError
 
@@ -20,6 +22,7 @@ class LLMProvider(Enum):
     """Supported LLM providers."""
     OPENAI = "openai"
     ANTHROPIC = "anthropic"
+    DEEPSEEK = "deepseek"
     LLAMA = "llama"
     MISTRAL = "mistral"
     COHERE = "cohere"
@@ -39,17 +42,145 @@ class CompilationResult:
 class PersonalityCompiler:
     """Compiles personalities into provider-specific prompts."""
     
-    def __init__(self):
-        """Initialize the compiler."""
+    def __init__(self, cache_size: int = 128):
+        """
+        Initialize the compiler.
+        
+        Args:
+            cache_size: Maximum number of compiled results to cache
+        """
         self.providers = {
             LLMProvider.OPENAI: self._compile_openai,
             LLMProvider.ANTHROPIC: self._compile_anthropic,
+            LLMProvider.DEEPSEEK: self._compile_deepseek,
             LLMProvider.LLAMA: self._compile_llama,
             LLMProvider.MISTRAL: self._compile_mistral,
             LLMProvider.COHERE: self._compile_cohere,
             LLMProvider.GOOGLE: self._compile_google,
             LLMProvider.UNIVERSAL: self._compile_universal,
         }
+        self._cache = {}
+        self._cache_size = cache_size
+        self._cache_hits = 0
+        self._cache_misses = 0
+    
+    def compile_system_prompt(self, personality: Personality, include_examples: bool = True) -> str:
+        """
+        Convert personality into a system prompt for LLMs.
+        
+        This is the CRITICAL method that makes personalities actually work.
+        It transforms the JSON personality definition into a coherent system prompt
+        that guides the LLM's behavior.
+        
+        Args:
+            personality: Personality object to compile
+            include_examples: Whether to include example interactions
+            
+        Returns:
+            Complete system prompt as string
+        """
+        prompt_parts = []
+        
+        # 1. Identity and role
+        prompt_parts.append(f"You are {personality.persona.name}.")
+        prompt_parts.append(f"{personality.persona.description}")
+        
+        # 2. Core traits
+        if personality.core_traits and len(personality.core_traits) > 0:
+            prompt_parts.append("\n## Your Core Personality Traits:")
+            for trait in personality.core_traits:
+                prompt_parts.append(f"- {trait}")
+        
+        # 3. Linguistic profile
+        if personality.linguistic_profile:
+            prompt_parts.append("\n## Your Communication Style:")
+            
+            # Tone
+            if personality.linguistic_profile.tone:
+                tones = ", ".join(personality.linguistic_profile.tone)
+                prompt_parts.append(f"- Tone: {tones}")
+            
+            # Formality level
+            if personality.linguistic_profile.formality_level:
+                prompt_parts.append(f"- Formality: {personality.linguistic_profile.formality_level}")
+            
+            # Response length preference
+            if personality.linguistic_profile.response_length:
+                prompt_parts.append(f"- Response length: {personality.linguistic_profile.response_length}")
+            
+            # Vocabulary preferences
+            if personality.linguistic_profile.vocabulary and len(personality.linguistic_profile.vocabulary) > 0:
+                vocab_sample = ", ".join(personality.linguistic_profile.vocabulary[:10])
+                prompt_parts.append(f"- Preferred vocabulary: {vocab_sample}")
+            
+            # Speech patterns
+            if personality.linguistic_profile.speech_patterns and len(personality.linguistic_profile.speech_patterns) > 0:
+                prompt_parts.append(f"- Speech patterns:")
+                for pattern in personality.linguistic_profile.speech_patterns[:5]:
+                    prompt_parts.append(f"  • \"{pattern}\"")
+        
+        # 4. Behavioral rules
+        if personality.behavioral_rules and len(personality.behavioral_rules) > 0:
+            prompt_parts.append("\n## Behavioral Guidelines:")
+            for i, rule in enumerate(personality.behavioral_rules, 1):
+                prompt_parts.append(f"{i}. {rule}")
+        
+        # 5. Trigger responses (if available)
+        if hasattr(personality, 'trigger_responses') and personality.trigger_responses:
+            triggers = personality.trigger_responses
+            
+            if hasattr(triggers, 'on_greeting') and triggers.on_greeting:
+                prompt_parts.append("\n## How to respond to greetings:")
+                for greeting in triggers.on_greeting[:3]:
+                    prompt_parts.append(f"- \"{greeting}\"")
+            
+            if hasattr(triggers, 'on_confusion') and triggers.on_confusion:
+                prompt_parts.append("\n## How to handle confusion:")
+                for response in triggers.on_confusion[:2]:
+                    prompt_parts.append(f"- \"{response}\"")
+        
+        # 6. Safety guards (if available)
+        if hasattr(personality, 'safety_guards') and personality.safety_guards:
+            guards = personality.safety_guards
+            
+            if hasattr(guards, 'forbidden_topics') and guards.forbidden_topics:
+                prompt_parts.append("\n## Topics to avoid:")
+                for topic in guards.forbidden_topics:
+                    prompt_parts.append(f"- {topic}")
+        
+        # 7. Examples (if requested and available)
+        if include_examples and hasattr(personality, 'examples') and personality.examples:
+            examples = personality.examples
+            if hasattr(examples, 'sample_responses') and examples.sample_responses:
+                prompt_parts.append("\n## Example Interactions:")
+                for i, example in enumerate(examples.sample_responses[:3], 1):
+                    if hasattr(example, 'input') and hasattr(example, 'output'):
+                        prompt_parts.append(f"\nExample {i}:")
+                        prompt_parts.append(f"User: {example.input}")
+                        prompt_parts.append(f"You: {example.output}")
+        
+        # 8. Advanced parameters guidance
+        if personality.advanced_parameters:
+            params = personality.advanced_parameters
+            prompt_parts.append("\n## Response Style Guidance:")
+            
+            if hasattr(params, 'temperature'):
+                if params.temperature < 0.3:
+                    prompt_parts.append("- Be precise, consistent, and focused")
+                elif params.temperature > 0.7:
+                    prompt_parts.append("- Be creative, varied, and exploratory")
+            
+            if hasattr(params, 'response_length'):
+                if params.response_length == "concise":
+                    prompt_parts.append("- Keep responses brief and to the point")
+                elif params.response_length == "detailed":
+                    prompt_parts.append("- Provide thorough, comprehensive responses")
+        
+        # 9. Final instruction
+        prompt_parts.append("\n## Important:")
+        prompt_parts.append("Stay in character at all times. Your responses should consistently reflect your personality traits, communication style, and behavioral guidelines.")
+        
+        return "\n".join(prompt_parts)
     
     def compile(self, personality: Union[Personality, Dict[str, Any]], 
                 provider: LLMProvider, 
@@ -71,6 +202,17 @@ class PersonalityCompiler:
             else:
                 personality_obj = personality
             
+            # Generate cache key
+            cache_key = self._generate_cache_key(personality_obj, provider, max_tokens)
+            
+            # Check cache first
+            if cache_key in self._cache:
+                self._cache_hits += 1
+                logger.debug(f"Cache hit for {personality_obj.persona.name} -> {provider.value}")
+                return self._cache[cache_key]
+            
+            self._cache_misses += 1
+            
             # Check compatibility
             if not personality_obj.is_compatible_with(provider.value):
                 logger.warning(f"Personality {personality_obj.persona.name} may not be optimized for {provider.value}")
@@ -88,12 +230,17 @@ class PersonalityCompiler:
             if max_tokens and token_estimate > max_tokens:
                 logger.warning(f"Prompt may exceed token limit: {token_estimate} > {max_tokens}")
             
-            return CompilationResult(
+            result = CompilationResult(
                 provider=provider,
                 prompt=prompt,
                 token_estimate=token_estimate,
                 metadata=metadata
             )
+            
+            # Cache the result
+            self._cache_result(cache_key, result)
+            
+            return result
             
         except Exception as e:
             logger.error(f"Compilation failed: {e}")
@@ -143,6 +290,31 @@ class PersonalityCompiler:
             "format": "xml",
             "model": "claude-3-sonnet",
             "max_tokens": max_tokens
+        }
+        
+        return prompt, metadata
+    
+    def _compile_deepseek(self, personality: Personality, max_tokens: Optional[int] = None) -> tuple:
+        """Compile for DeepSeek models."""
+        system_prompt = self._build_system_prompt(personality)
+        
+        # DeepSeek uses OpenAI-compatible messages format
+        prompt = {
+            "messages": [
+                {
+                    "role": "system",
+                    "content": system_prompt
+                }
+            ],
+            "model": "deepseek-chat",  # Default model
+            "temperature": self._get_temperature(personality),
+            "max_tokens": max_tokens
+        }
+        
+        metadata = {
+            "format": "messages",
+            "model": "deepseek-chat",
+            "temperature": prompt["temperature"]
         }
         
         return prompt, metadata
@@ -264,6 +436,7 @@ Assistant:"""
         
         return prompt, metadata
     
+    @lru_cache(maxsize=64)
     def _build_system_prompt(self, personality: Personality) -> str:
         """Build the core system prompt from personality data."""
         prompt_parts = []
@@ -414,3 +587,45 @@ Assistant:"""
                 f.write(result.prompt)
         
         logger.info(f"Saved compiled prompt to {output_path}")
+    
+    def _generate_cache_key(self, personality: Personality, provider: LLMProvider, max_tokens: Optional[int]) -> str:
+        """Generate a cache key for the compilation."""
+        # Create a hash of the personality data and compilation parameters
+        data = {
+            'personality_hash': hashlib.md5(json.dumps(personality.to_dict(), sort_keys=True).encode()).hexdigest(),
+            'provider': provider.value,
+            'max_tokens': max_tokens
+        }
+        return hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest()[:16]
+    
+    def _cache_result(self, cache_key: str, result: CompilationResult) -> None:
+        """Cache a compilation result."""
+        # Remove oldest entries if cache is full
+        if len(self._cache) >= self._cache_size:
+            # Remove the first (oldest) entry
+            oldest_key = next(iter(self._cache))
+            del self._cache[oldest_key]
+        
+        self._cache[cache_key] = result
+        logger.debug(f"Cached compilation result for key: {cache_key}")
+    
+    def clear_cache(self) -> None:
+        """Clear the compilation cache."""
+        self._cache.clear()
+        self._cache_hits = 0
+        self._cache_misses = 0
+        logger.info("Compilation cache cleared")
+    
+    def get_cache_stats(self) -> Dict[str, Any]:
+        """Get cache statistics."""
+        total_requests = self._cache_hits + self._cache_misses
+        hit_rate = (self._cache_hits / total_requests * 100) if total_requests > 0 else 0
+        
+        return {
+            'cache_size': len(self._cache),
+            'max_cache_size': self._cache_size,
+            'cache_hits': self._cache_hits,
+            'cache_misses': self._cache_misses,
+            'hit_rate': round(hit_rate, 2),
+            'total_requests': total_requests
+        }

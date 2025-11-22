@@ -6,9 +6,29 @@ services:
     ports:
       - "8000:8000"
     environment:
+      # Database connections
       - REDIS_URL=redis://redis:6379
       - POSTGRES_URL=postgresql://luminoracore:password@postgres:5432/luminoracore
       - MONGODB_URL=mongodb://mongodb:27017/luminoracore
+      
+      # v1.1 Configuration
+      - LUMINORA_VERSION=1.1.0
+      - LUMINORA_FEATURES_CONFIG=/app/config/features_production_safe.json
+      - LUMINORA_AUTO_MIGRATE=true
+      - LUMINORA_STORAGE_TYPE=postgres
+      
+      # v1.1 Feature Flags
+      - LUMINORA_FEATURE_AFFINITY=true
+      - LUMINORA_FEATURE_FACTS=true
+      - LUMINORA_FEATURE_EPISODES=true
+      - LUMINORA_FEATURE_HIERARCHICAL=true
+      - LUMINORA_FEATURE_ANALYTICS=true
+      - LUMINORA_FEATURE_SNAPSHOTS=true
+      
+      # Performance
+      - LUMINORA_CACHE_SIZE=1000
+      - LUMINORA_MAX_FACTS_PER_USER=500
+      - LUMINORA_MAX_EPISODES_PER_USER=100
     depends_on:
       - redis
       - postgres
@@ -16,7 +36,16 @@ services:
     volumes:
       - ./personalities:/app/personalities
       - ./logs:/app/logs
+      - ./config:/app/config
+      - ./data:/app/data
+      - ./snapshots:/app/snapshots
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import luminoracore_sdk; print('OK')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   redis:
     image: redis:7-alpine

@@ -9,34 +9,31 @@ from pathlib import Path
 # Add the parent directory to the path to import luminoracore
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from luminoracore import Personality, PersonalityCompiler, LLMProvider
+from luminoracore import Personality, PersonalityCompiler, LLMProvider, find_personality_file
 
 
 def demonstrate_personality_switching():
     """Demonstrate switching between different personalities."""
-    print("🔄 LuminoraCore Personality Switching Example")
+    print("LuminoraCore Personality Switching Example")
     print("=" * 60)
     
     # Load multiple personalities
     personalities = {}
-    personality_files = [
-        "personalities/dr_luna.json",
-        "personalities/captain_hook.json", 
-        "personalities/grandma_hope.json",
-        "personalities/marcus_sarcastic.json"
-    ]
+    personality_names = ["Dr. Luna", "Captain Hook Digital", "Grandma Hope", "Marcus Sarcasmus"]
     
     print("\n1. Loading personalities...")
-    for file_path in personality_files:
+    for name in personality_names:
+        # Use find_personality_file for robust path resolution
+        file_path = find_personality_file(name) or Path(__file__).parent.parent / "luminoracore" / "personalities" / f"{name.lower().replace(' ', '_').replace('.', '_')}.json"
         try:
             personality = Personality(file_path)
             personalities[personality.persona.name] = personality
-            print(f"✓ Loaded: {personality.persona.name} ({personality.core_traits.archetype})")
+            print(f"[OK] Loaded: {personality.persona.name} ({personality.core_traits.archetype})")
         except Exception as e:
-            print(f"✗ Failed to load {file_path}: {e}")
+            print(f"[ERROR] Failed to load {name} ({file_path}): {e}")
     
     if not personalities:
-        print("✗ No personalities loaded successfully")
+        print("[ERROR] No personalities loaded successfully")
         return
     
     # Compile each personality for OpenAI
@@ -48,9 +45,9 @@ def demonstrate_personality_switching():
         try:
             result = compiler.compile(personality, LLMProvider.OPENAI)
             compiled_personalities[name] = result
-            print(f"✓ Compiled: {name} ({result.token_estimate} tokens)")
+            print(f"[OK] Compiled: {name} ({result.token_estimate} tokens)")
         except Exception as e:
-            print(f"✗ Failed to compile {name}: {e}")
+            print(f"[ERROR] Failed to compile {name}: {e}")
     
     # Demonstrate different responses to the same question
     test_question = "Can you help me understand how photosynthesis works?"
@@ -59,7 +56,7 @@ def demonstrate_personality_switching():
     print("=" * 60)
     
     for name, personality in personalities.items():
-        print(f"\n🎭 {name} ({personality.core_traits.archetype}):")
+        print(f"\n{name} ({personality.core_traits.archetype}):")
         print(f"   Temperament: {personality.core_traits.temperament}")
         print(f"   Communication: {personality.core_traits.communication_style}")
         
@@ -79,7 +76,7 @@ def demonstrate_personality_switching():
     print("=" * 60)
     
     for name, result in compiled_personalities.items():
-        print(f"\n📝 {name}:")
+        print(f"\n{name}:")
         print(f"   Token estimate: {result.token_estimate}")
         print(f"   Temperature: {result.metadata.get('temperature', 'N/A')}")
         
@@ -89,7 +86,7 @@ def demonstrate_personality_switching():
             snippet = content[:200] + "..." if len(content) > 200 else content
             print(f"   Prompt snippet: {snippet}")
     
-    print(f"\n🎉 Personality switching example completed!")
+    print(f"\nPersonality switching example completed!")
     print(f"   Loaded {len(personalities)} personalities")
     print(f"   Compiled {len(compiled_personalities)} prompts")
 

@@ -16,7 +16,7 @@ def read_readme():
 
 # Read version from __init__.py
 def get_version():
-    init_path = os.path.join(os.path.dirname(__file__), 'luminoracore', '__init__.py')
+    init_path = os.path.join(os.path.dirname(__file__), 'luminoracore_sdk', '__init__.py')
     if os.path.exists(init_path):
         with open(init_path, 'r', encoding='utf-8') as f:
             for line in f:
@@ -35,6 +35,9 @@ setup(
     url="https://github.com/luminoracore/sdk-python",
     packages=find_packages(),
     include_package_data=True,
+    package_data={
+        'luminoracore_sdk': ['personalities/*.json'],
+    },
     python_requires='>=3.8',
     install_requires=[
         'luminoracore>=1.0.0,<2.0.0',
@@ -50,6 +53,9 @@ setup(
     extras_require={
         'openai': ['openai>=1.0.0,<2.0.0'],
         'anthropic': ['anthropic>=0.7.0,<1.0.0'],
+        'deepseek': ['httpx>=0.24.0'],  # DeepSeek uses httpx (already in base requirements)
+        'mistral': ['httpx>=0.24.0'],   # Mistral uses httpx
+        'llama': ['httpx>=0.24.0'],     # Llama via Replicate uses httpx
         'cohere': ['cohere>=4.21.0,<5.0.0'],
         'google': ['google-generativeai>=0.3.0,<1.0.0'],
         'redis': ['redis>=4.5.0,<5.0.0'],

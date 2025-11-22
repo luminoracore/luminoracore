@@ -9,6 +9,8 @@ from typing import Dict, Any, Optional, List
 import json
 import asyncio
 
+from pathlib import Path
+
 from luminoracore_cli.utils.errors import CLIError
 from luminoracore_cli.core.client import get_client
 

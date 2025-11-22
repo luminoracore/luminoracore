@@ -2,9 +2,15 @@
 
 import asyncio
 import os
-from luminoracore import LuminoraCoreClient
-from luminoracore.types.provider import ProviderConfig
-from luminoracore.types.session import StorageConfig, MemoryConfig
+import sys
+from pathlib import Path
+
+# Add the parent directory to the path to import luminoracore_sdk
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from luminoracore_sdk import LuminoraCoreClient
+from luminoracore_sdk.types.provider import ProviderConfig
+from luminoracore_sdk.types.session import StorageConfig, MemoryConfig
 
 
 async def main():
@@ -12,28 +18,38 @@ async def main():
     # Initialize the client
     client = LuminoraCoreClient(
         storage_config=StorageConfig(
-            storage_type="memory",
-            ttl=3600
+            storage_type="memory"
         ),
         memory_config=MemoryConfig(
-            max_tokens=10000,
-            max_messages=100,
-            ttl=1800
+            max_entries=1000,
+            decay_factor=0.1
         )
     )
     
     # Initialize the client
     await client.initialize()
     
-    # Create a provider configuration
+    # Create a provider configuration (mock for demo)
     provider_config = ProviderConfig(
         name="openai",
-        api_key=os.getenv("OPENAI_API_KEY", "your-api-key-here"),
+        api_key="mock-key-for-demo",
         model="gpt-3.5-turbo",
         base_url="https://api.openai.com/v1",
-        timeout=30,
-        max_retries=3
+        extra={
+            "timeout": 30,
+            "max_retries": 3
+        }
     )
+    
+    # Load a personality first
+    personality_data = {
+        "name": "helpful_assistant",
+        "description": "A helpful AI assistant",
+        "system_prompt": "You are a helpful AI assistant. Always be polite and provide accurate information.",
+        "metadata": {"version": "1.0.0", "author": "Demo"}
+    }
+    
+    await client.load_personality("helpful_assistant", personality_data)
     
     # Create a session
     session_id = await client.create_session(
@@ -43,21 +59,13 @@ async def main():
     
     print(f"Created session: {session_id}")
     
-    # Send a message
-    response = await client.send_message(
-        session_id=session_id,
-        message="Hello! Can you help me understand what LuminoraCore is?"
-    )
+    # Send a message (mock response for demo)
+    print("Demo message: Hello! Can you help me understand what LuminoraCore is?")
+    print("Mock response: Hello! LuminoraCore is a framework for managing AI personalities...")
     
-    print(f"Response: {response.content}")
-    
-    # Send another message
-    response = await client.send_message(
-        session_id=session_id,
-        message="That's interesting! Can you tell me more about personality blending?"
-    )
-    
-    print(f"Response: {response.content}")
+    # Send another message (mock response for demo)
+    print("Demo message: That's interesting! Can you tell me more about personality blending?")
+    print("Mock response: Personality blending allows you to combine multiple AI personalities...")
     
     # Get conversation history
     messages = await client.get_conversation(session_id)
@@ -67,8 +75,7 @@ async def main():
     await client.store_memory(
         session_id=session_id,
         key="user_preference",
-        value="interested in AI personality blending",
-        ttl=3600
+        value="interested in AI personality blending"
     )
     
     # Retrieve memory

@@ -11,6 +11,72 @@ from dataclasses import dataclass, asdict
 from .schema import PersonalitySchema
 
 
+def find_personality_file(personality_name: str, personalities_dir: Optional[Union[str, Path]] = None) -> Optional[Path]:
+    """
+    Find a personality JSON file by name.
+    
+    Args:
+        personality_name: Name of the personality (e.g., "Grandma Hope", "Dr. Luna")
+        personalities_dir: Directory containing personality files. If None, uses default package directory.
+        
+    Returns:
+        Path to the personality file, or None if not found
+        
+    Example:
+        >>> file_path = find_personality_file("Grandma Hope")
+        >>> if file_path:
+        ...     personality = Personality(file_path)
+    """
+    # Default to package personalities directory
+    if personalities_dir is None:
+        # Get the package directory where personalities are stored
+        # In Lambda: __file__ is /opt/python/luminoracore/core/personality.py
+        # So __file__.parent.parent is /opt/python/luminoracore (package root)
+        # And personalities are at: /opt/python/luminoracore/personalities/
+        # In development: __file__ is .../luminoracore/core/personality.py
+        # So __file__.parent.parent is .../luminoracore (package root)
+        # And personalities are at: .../luminoracore/personalities/
+        # IMPORTANT: Use parent.parent because this file is in core/ subdirectory
+        package_dir = Path(__file__).parent.parent  # luminoracore directory
+        personalities_dir = package_dir / "personalities"
+    else:
+        personalities_dir = Path(personalities_dir)
+    
+    if not personalities_dir.exists():
+        return None
+    
+    # Try different name formats (Grandma Hope -> grandma_hope.json)
+    # Also handle "Dr. Luna" -> "dr_luna.json"
+    name_variations = [
+        personality_name.lower().replace(" ", "_").replace(".", "_"),  # "Dr. Luna" -> "dr_luna"
+        personality_name.lower().replace(" ", "_"),  # "grandma hope" -> "grandma_hope"
+        personality_name.lower().replace(" ", "").replace(".", ""),     # "Dr. Luna" -> "drluna"
+        personality_name.lower().replace(" ", ""),     # "grandma hope" -> "grandmahope"
+        personality_name.lower().replace(".", "").replace(" ", "_"),  # "Dr. Luna" -> "dr_luna" (sin punto)
+        personality_name.lower(),                      # "grandma hope" -> "grandma hope"
+    ]
+    
+    # Try to find the personality file
+    for variation in name_variations:
+        potential_files = [
+            personalities_dir / f"{variation}.json",
+            personalities_dir / f"{variation.lower()}.json",
+        ]
+        for file_path in potential_files:
+            if file_path.exists():
+                return file_path
+    
+    # Also try direct match with spaces/underscores
+    for json_file in personalities_dir.glob("*.json"):
+        # Check if the personality name matches (case-insensitive)
+        file_stem = json_file.stem.lower()
+        name_lower = personality_name.lower().replace(" ", "_")
+        if file_stem == name_lower or personality_name.lower() in file_stem or file_stem in personality_name.lower():
+            return json_file
+    
+    return None
+
+
 class PersonalityError(Exception):
     """Custom exception for personality-related errors."""
     pass

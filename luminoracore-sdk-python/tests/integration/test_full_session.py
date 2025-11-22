@@ -4,10 +4,10 @@ import pytest
 import asyncio
 from unittest.mock import Mock, AsyncMock, patch
 
-from luminoracore.client import LuminoraCoreClient
-from luminoracore.types.session import StorageConfig, MemoryConfig
-from luminoracore.types.provider import ProviderConfig
-from luminoracore.types.personality import PersonalityData
+from luminoracore_sdk import LuminoraCoreClient
+from luminoracore_sdk.types.session import StorageConfig, MemoryConfig
+from luminoracore_sdk.types.provider import ProviderConfig
+from luminoracore_sdk.types.personality import PersonalityData
 
 
 class TestFullSessionWorkflow:
@@ -27,6 +27,7 @@ class TestFullSessionWorkflow:
             description="A helpful test personality",
             author="Test Author",
             tags=["test", "integration"],
+            system_prompt="You are a helpful test personality. Always respond with 'Test response: ' followed by the user's message.",
             persona={
                 "name": "test_personality",
                 "description": "A helpful test personality",
@@ -178,6 +179,7 @@ class TestFullSessionWorkflow:
             description="First personality",
             author="Test Author",
             tags=["test", "first"],
+            system_prompt="You are the first personality. Be helpful and friendly.",
             persona={
                 "name": "personality1",
                 "description": "First personality",
@@ -207,6 +209,7 @@ class TestFullSessionWorkflow:
             description="Second personality",
             author="Test Author",
             tags=["test", "second"],
+            system_prompt="You are the second personality. Be helpful and friendly.",
             persona={
                 "name": "personality2",
                 "description": "Second personality",
@@ -241,6 +244,7 @@ class TestFullSessionWorkflow:
             description="Blended personality",
             author="Test Author",
             tags=["test", "blended"],
+            system_prompt="You are a blended personality. Be helpful and friendly.",
             persona={
                 "name": "blended_personality",
                 "description": "Blended personality",

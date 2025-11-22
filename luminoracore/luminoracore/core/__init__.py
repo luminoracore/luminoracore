@@ -1,8 +1,14 @@
 """
-Core components for LuminoraCore personality management.
+LuminoraCore Core Components
+Core personality, memory, and evolution systems
 """
 
-from .personality import Personality, PersonalityError
-from .schema import PersonalitySchema
+from .personality_engine import PersonalityEngine
+from .memory_system import MemorySystem
+from .evolution_engine import EvolutionEngine
 
-__all__ = ["Personality", "PersonalityError", "PersonalitySchema"]
+__all__ = [
+    'PersonalityEngine',
+    'MemorySystem',
+    'EvolutionEngine'
+]

@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "luminoracore-cli"
-version = "1.0.0"
-description = "Professional CLI tool for LuminoraCore personality management"
+version = "1.2.0"  # Bump version for Core integration
+description = "Professional CLI tool for LuminoraCore personality management with database migrations and memory tools"
 readme = "README.md"
 license = {file = "LICENSE"}
 authors = [
@@ -33,8 +33,8 @@ classifiers = [
 ]
 requires-python = ">=3.8"
 dependencies = [
-    # Use local core package during workspace development
-    # "luminoracore>=1.0.0,<2.0.0",
+    # ✅ DESCOMENTADO: Core dependency activada para v1.2.0
+    "luminoracore>=1.2.0,<2.0.0",
     "click>=8.1.0,<9.0.0",
     "rich>=13.0.0,<14.0.0",
     "typer>=0.9.0,<1.0.0",
@@ -51,6 +51,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+sdk = [
+    "luminoracore-sdk>=1.2.0,<2.0.0",  # SDK opcional
+]
 dev = [
     "pytest>=7.3.0",
     "pytest-cov>=4.0.0",

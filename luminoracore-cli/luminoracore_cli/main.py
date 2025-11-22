@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import os
 import sys
 from pathlib import Path
@@ -24,7 +25,16 @@ from .commands import (
     update_command,
     init_command,
     info_command,
+    # v1.1 commands
+    migrate,
+    memory,
+    snapshot,
+    conversation_memory,
 )
+try:
+    from .commands.storage import app as storage_app
+except ImportError:
+    storage_app = None
 from .utils.console import console, error_console
 from .utils.errors import CLIError, handle_cli_error
 
@@ -34,7 +44,7 @@ install_rich_traceback(show_locals=True)
 # Create main app
 app = typer.Typer(
     name="luminoracore",
-    help="🌟 LuminoraCore CLI - Professional tool for AI personality management",
+    help="LuminoraCore CLI - Professional tool for AI personality management",
     epilog="Visit https://luminoracore.com for more information",
     no_args_is_help=True,
     rich_markup_mode="rich",
@@ -43,15 +53,13 @@ app = typer.Typer(
 )
 
 # Global options
-@app.callback()
+@app.callback(invoke_without_command=True)
 def main(
     ctx: typer.Context,
-    version: Optional[bool] = typer.Option(
-        None,
+    version: bool = typer.Option(
+        False,
         "--version",
-        "-v",
         help="Show version and exit",
-        is_flag=True,
     ),
     config_file: Optional[Path] = typer.Option(
         None,
@@ -106,7 +114,12 @@ def main(
     """
     if version:
         console.print(f"LuminoraCore CLI v{__version__}")
-        raise typer.Exit()
+        raise typer.Exit(0)
+    
+    # If no command provided, show help
+    if ctx.invoked_subcommand is None and not version:
+        console.print(ctx.get_help())
+        raise typer.Exit(0)
     
     # Configure console based on options
     if no_color:
@@ -129,19 +142,30 @@ def main(
         raise typer.Exit(1)
 
 # Register commands
-app.command("validate", help="🔍 Validate personality files")(validate_command)
-app.command("compile", help="⚙️ Compile personalities to prompts")(compile_command)
-app.command("create", help="✨ Create new personalities")(create_command)
-app.command("list", help="📋 List available personalities")(list_command)
-app.command("test", help="🧪 Test personalities interactively")(test_command)
-app.command("serve", help="🚀 Start development server")(serve_command)
-app.command("blend", help="🎭 Blend multiple personalities")(blend_command)
-app.command("update", help="⬇️ Update personality cache")(update_command)
-app.command("init", help="🏗️ Initialize new project")(init_command)
-app.command("info", help="ℹ️ Show personality information")(info_command)
+# Note: Typer handles async commands internally
+app.command("validate", help="Validate personality files")(validate_command)
+app.command("compile", help="Compile personalities to prompts")(compile_command)
+app.command("create", help="Create new personalities")(create_command)
+app.command("list", help="List available personalities")(list_command)
+app.command("test", help="Test personalities interactively")(test_command)
+app.command("serve", help="Start development server")(serve_command)
+app.command("blend", help="Blend multiple personalities")(blend_command)
+app.command("update", help="Update personality cache")(update_command)
+app.command("init", help="Initialize new project")(init_command)
+app.command("info", help="Show personality information")(info_command)
+
+# Register v1.1 commands
+app.command("migrate", help="Database migration management")(migrate)
+app.add_typer(memory, name="memory", help="Memory management (facts, episodes, affinity)")
+app.add_typer(snapshot, name="snapshot", help="Session snapshot export/import")
+app.command("conversation-memory", help="Test conversation memory integration - CRITICAL FIX")(conversation_memory)
+
+# Register flexible storage commands
+if storage_app:
+    app.add_typer(storage_app, name="storage", help="Flexible storage management for all databases")
 
 # Exception handling
-@app.callback(invoke_without_command=True)
+# @app.callback(invoke_without_command=True)  # DISABLED: conflicts with main callback
 def handle_exceptions(ctx: typer.Context) -> None:
     """Global exception handler."""
     try:

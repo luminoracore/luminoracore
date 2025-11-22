@@ -25,6 +25,68 @@ def compile_command(
     strict: bool = typer.Option(False, "--strict", help="Use strict validation"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output")
 ) -> int:
+    """Synchronous wrapper for async compile_command_impl."""
+    try:
+        # Try to get the current event loop
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            # If we're in a running loop, use create_task
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                future = executor.submit(asyncio.run, _compile_command_impl(
+                    personality=personality,
+                    provider=provider,
+                    model=model,
+                    output=output,
+                    format=format,
+                    include_metadata=include_metadata,
+                    validate=validate,
+                    strict=strict,
+                    verbose=verbose
+                ))
+                return future.result()
+        else:
+            # If no loop is running, use asyncio.run
+            return asyncio.run(_compile_command_impl(
+                personality=personality,
+                provider=provider,
+                model=model,
+                output=output,
+                format=format,
+                include_metadata=include_metadata,
+                validate=validate,
+                strict=strict,
+                verbose=verbose
+            ))
+    except RuntimeError:
+        # Fallback: run in a new thread
+        import concurrent.futures
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(asyncio.run, _compile_command_impl(
+                personality=personality,
+                provider=provider,
+                model=model,
+                output=output,
+                format=format,
+                include_metadata=include_metadata,
+                validate=validate,
+                strict=strict,
+                verbose=verbose
+            ))
+            return future.result()
+
+
+async def _compile_command_impl(
+    personality: str,
+    provider: str,
+    model: Optional[str],
+    output: Optional[str],
+    format: str,
+    include_metadata: bool,
+    validate: bool,
+    strict: bool,
+    verbose: bool
+) -> int:
     """
     Compile a personality to provider-specific prompts.
     
@@ -32,11 +94,15 @@ def compile_command(
     format suitable for the specified LLM provider and model.
     """
     try:
-        # Find personality file
-        personality_path = find_personality_files(personality)
-        if not personality_path:
-            error_console.print(f"[red]Error: Personality '{personality}' not found[/red]")
-            return 1
+        # Find personality file - check if it's a direct path first
+        personality_path = Path(personality)
+        if not personality_path.exists():
+            # Try to find by name
+            found_paths = find_personality_files(personality)
+            if not found_paths:
+                error_console.print(f"[red]Error: Personality '{personality}' not found[/red]")
+                raise typer.Exit(1)
+            personality_path = found_paths[0] if isinstance(found_paths, list) else found_paths
         
         if verbose:
             console.print(f"[blue]Found personality file: {personality_path}[/blue]")
@@ -46,7 +112,7 @@ def compile_command(
             personality_data = read_json_file(personality_path)
         except Exception as e:
             error_console.print(f"[red]Error loading personality file: {e}[/red]")
-            return 1
+            raise typer.Exit(1)
         
         # Validate personality if requested
         if validate:
@@ -60,7 +126,7 @@ def compile_command(
                 error_console.print("[red]Validation failed:[/red]")
                 for error in validation_result["errors"]:
                     error_console.print(f"  [red]• {error}[/red]")
-                return 1
+                raise typer.Exit(1)
             
             if verbose:
                 console.print("[green]✓ Personality validation passed[/green]")
@@ -72,7 +138,7 @@ def compile_command(
         client = get_client()
         
         # Compile personality
-        compilation_result = client.compile_personality(
+        compilation_result = await client.compile_personality(
             personality_data=personality_data,
             provider=provider,
             model=model,
@@ -93,7 +159,7 @@ def compile_command(
             output_text = yaml.dump(compilation_result, default_flow_style=False)
         else:
             error_console.print(f"[red]Error: Unsupported format '{format}'[/red]")
-            return 1
+            raise typer.Exit(1)
         
         # Output result
         if output:
@@ -111,16 +177,16 @@ def compile_command(
         
     except ValidationError as e:
         error_console.print(f"[red]Validation error: {e}[/red]")
-        return 1
+        raise typer.Exit(1)
     except CLIError as e:
         error_console.print(f"[red]CLI error: {e}[/red]")
-        return 1
+        raise typer.Exit(1)
     except Exception as e:
         error_console.print(f"[red]Unexpected error: {e}[/red]")
         if verbose:
             import traceback
             error_console.print(traceback.format_exc())
-        return 1
+        raise typer.Exit(1)
 
 
 if __name__ == "__main__":

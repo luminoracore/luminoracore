@@ -9,24 +9,26 @@ from pathlib import Path
 # Add the parent directory to the path to import luminoracore
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from luminoracore import Personality, PersonalityValidator, PersonalityCompiler, LLMProvider
+from luminoracore import Personality, PersonalityValidator, PersonalityCompiler, LLMProvider, find_personality_file
 
 
 def main():
     """Demonstrate basic LuminoraCore usage."""
-    print("🌟 LuminoraCore Basic Usage Example")
+    print("LuminoraCore Basic Usage Example")
     print("=" * 50)
     
     # Load a personality
     print("\n1. Loading a personality...")
     try:
-        personality = Personality("personalities/dr_luna.json")
-        print(f"✓ Loaded personality: {personality.persona.name}")
+        # Use find_personality_file for robust path resolution
+        personality_path = find_personality_file("Dr. Luna") or Path(__file__).parent.parent / "luminoracore" / "personalities" / "dr_luna.json"
+        personality = Personality(personality_path)
+        print(f"[OK] Loaded personality: {personality.persona.name}")
         print(f"  Description: {personality.persona.description}")
         print(f"  Archetype: {personality.core_traits.archetype}")
         print(f"  Temperament: {personality.core_traits.temperament}")
     except Exception as e:
-        print(f"✗ Failed to load personality: {e}")
+        print(f"[ERROR] Failed to load personality: {e}")
         return
     
     # Validate the personality
@@ -36,18 +38,18 @@ def main():
         result = validator.validate(personality)
         
         if result.is_valid:
-            print("✓ Personality validation passed")
+            print("[OK] Personality validation passed")
             if result.warnings:
                 print(f"  Warnings: {len(result.warnings)}")
             if result.suggestions:
                 print(f"  Suggestions: {len(result.suggestions)}")
         else:
-            print("✗ Personality validation failed")
+            print("[ERROR] Personality validation failed")
             for error in result.errors:
                 print(f"  Error: {error}")
             return
     except Exception as e:
-        print(f"✗ Validation failed: {e}")
+        print(f"[ERROR] Validation failed: {e}")
         return
     
     # Compile for different providers
@@ -57,24 +59,24 @@ def main():
         
         # Test compilation for OpenAI
         openai_result = compiler.compile(personality, LLMProvider.OPENAI)
-        print(f"✓ OpenAI compilation successful")
+        print(f"[OK] OpenAI compilation successful")
         print(f"  Token estimate: {openai_result.token_estimate}")
         print(f"  Format: {openai_result.metadata['format']}")
         
         # Test compilation for Anthropic
         anthropic_result = compiler.compile(personality, LLMProvider.ANTHROPIC)
-        print(f"✓ Anthropic compilation successful")
+        print(f"[OK] Anthropic compilation successful")
         print(f"  Token estimate: {anthropic_result.token_estimate}")
         print(f"  Format: {anthropic_result.metadata['format']}")
         
         # Test compilation for Llama
         llama_result = compiler.compile(personality, LLMProvider.LLAMA)
-        print(f"✓ Llama compilation successful")
+        print(f"[OK] Llama compilation successful")
         print(f"  Token estimate: {llama_result.token_estimate}")
         print(f"  Format: {llama_result.metadata['format']}")
         
     except Exception as e:
-        print(f"✗ Compilation failed: {e}")
+        print(f"[ERROR] Compilation failed: {e}")
         return
     
     # Display personality information
@@ -107,7 +109,7 @@ def main():
             print(f"    Input: {example.input}")
             print(f"    Output: {example.output}")
     
-    print("\n🎉 Basic usage example completed successfully!")
+    print("\nBasic usage example completed successfully!")
 
 
 if __name__ == "__main__":

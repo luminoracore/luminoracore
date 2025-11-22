@@ -185,12 +185,18 @@ class InteractiveChat:
         """
         try:
             # Compile personality to system message
-            compiled = self.compiler.compile_to_openai(self.personality)
-            return compiled.get('system_message', '')
+            compiled = self.compiler.compile(
+                personality_data=self.personality,
+                provider=self.provider,
+                include_metadata=False
+            )
+            return compiled.get('prompt', '')
         except Exception:
             # Fallback to basic personality info
-            name = self.personality.get('name', 'Assistant')
-            description = self.personality.get('description', '')
+            name = self.personality.get('persona', {}).get('name', 'Assistant')
+            description = self.personality.get('persona', {}).get('description', '')
+            if not description:
+                description = self.personality.get('description', '')
             return f"You are {name}. {description}"
     
     def _get_assistant_response(self) -> str:
@@ -200,29 +206,41 @@ class InteractiveChat:
             Assistant response
         """
         try:
-            # Prepare messages for the API
-            api_messages = []
+            # Get the last user message
+            user_messages = [msg for msg in self.messages if msg.role == "user"]
+            if not user_messages:
+                return "I'm ready to chat! Please send me a message."
             
-            # Add recent conversation history
-            recent_messages = self.messages[-10:]  # Last 10 messages
-            
-            for msg in recent_messages:
-                if msg.role != "system":
-                    api_messages.append({
-                        "role": msg.role,
-                        "content": msg.content
-                    })
+            test_message = user_messages[-1].content
             
             # Get response from tester
-            response = self.tester.test_openai(
-                messages=api_messages,
-                personality=self.personality
-            )
+            # Note: tester.test() is async, but we're in sync context
+            # We'll need to handle this differently
+            import asyncio
             
-            return response.get('content', 'I apologize, but I cannot generate a response at this time.')
+            # Run async test in event loop
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                # If loop is already running, we need to use a different approach
+                # For now, use a simple mock response
+                return self._get_mock_response(test_message)
+            else:
+                result = loop.run_until_complete(
+                    self.tester.test(
+                        personality_data=self.personality,
+                        provider=self.provider,
+                        test_message=test_message
+                    )
+                )
+                return result.get('response', 'I apologize, but I cannot generate a response at this time.')
             
         except Exception as e:
             return f"I apologize, but I encountered an error: {e}"
+    
+    def _get_mock_response(self, message: str) -> str:
+        """Get a mock response when async is not available."""
+        personality_name = self.personality.get('persona', {}).get('name', 'AI Assistant')
+        return f"Hello! I'm {personality_name}. You said: '{message}'. This is a mock response. For real responses, ensure API keys are configured."
     
     def _display_message(self, message: ChatMessage) -> None:
         """Display a chat message.

@@ -9,7 +9,7 @@ from luminoracore_cli.commands.validate import validate_command
 from luminoracore_cli.utils.errors import ValidationError
 
 
-def call_validate_command(files, **kwargs):
+async def call_validate_command(files, **kwargs):
     """Helper function to call validate_command with proper parameter handling."""
     # Set default values for all parameters
     params = {
@@ -29,7 +29,8 @@ def call_validate_command(files, **kwargs):
             files = [files]
         files = [Path(f) if isinstance(f, str) else f for f in files]
     
-    return validate_command(
+    # Call the synchronous validate_command
+    validate_command(
         files=files,
         schema_url=params['schema_url'],
         strict=params['strict'],

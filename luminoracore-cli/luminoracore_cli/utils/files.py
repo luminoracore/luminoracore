@@ -9,7 +9,7 @@ from typing import Dict, Any, List, Optional, Union
 from .errors import FileError
 
 
-def find_personality_files(directory: Path) -> List[Path]:
+def find_personality_files(directory: Union[str, Path]) -> List[Path]:
     """
     Find all personality files in a directory.
     
@@ -19,6 +19,7 @@ def find_personality_files(directory: Path) -> List[Path]:
     Returns:
         List of personality file paths
     """
+    directory = Path(directory)
     if not directory.exists() or not directory.is_dir():
         raise FileError(f"Directory does not exist: {directory}")
     
